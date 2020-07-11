@@ -8,7 +8,7 @@ export interface IRefreshToken extends Document {
 }
 
 /**
- *  User model interface
+ *  User model interface with mongoose functions
  */
 export interface IUser extends Document {
     name: string;
@@ -23,10 +23,34 @@ export interface IUser extends Document {
     consultations: [];
     reviews: [];
     notificationEmail: string;
-    sendNotificationToEmail: string;
-    sendMailingsToEmail: string;
+    sendNotificationToEmail: boolean;
+    sendMailingsToEmail: boolean;
     createdAt: Date;
     lastActiveAt: Date;
+}
+
+/**
+ *  User onject without mongoose functios
+ *  Used by self-made user objects
+ */
+export interface UserObject {
+    id: IUser["_id"];
+    name: IUser["name"];
+    surname: IUser["surname"];
+    photoUrl: IUser["photoUrl"];
+    phone: IUser["phone"];
+    email: IUser["email"];
+    password: IUser["password"];
+    sex: IUser["sex"];
+    city?: IUser["city"];
+    country?: IUser["country"];
+    consultations: IUser["consultations"];
+    reviews: IUser["reviews"];
+    notificationEmail: IUser["notificationEmail"];
+    sendNotificationToEmail: IUser["sendNotificationToEmail"];
+    sendMailingsToEmail: IUser["sendMailingsToEmail"];
+    createdAt: IUser["createdAt"];
+    lastActiveAt: IUser["lastActiveAt"];
 }
 
 /**

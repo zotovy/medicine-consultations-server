@@ -1,5 +1,5 @@
 // @types
-import { IUser } from "./models";
+import { UserObject } from "./models";
 
 /**
  *  This type describe return object of UserServices.getUsers() function
@@ -15,7 +15,7 @@ export type TGetUsers = {
     message?: string;
 
     // Return operation results if success
-    users?: IUser[];
+    users?: UserObject[];
 };
 
 /**
@@ -124,7 +124,7 @@ export type TGetUserById = {
     message?: string;
 
     // Return user if success
-    user?: IUser;
+    user?: UserObject;
 };
 
 /**
@@ -139,13 +139,17 @@ export type TCreateUser = {
         | "no_user_found_error"
         | "invalid_error"
         | "no_user_found"
-        | "created_user_is_null";
+        | "created_user_is_null"
+        | "not_validated_error";
+
+    // Validation errors
+    errors?: TValidationErrors;
 
     // Show error message if failed
     message?: string;
 
     // Return user if success
-    user?: IUser;
+    user?: UserObject;
 };
 
 /**
@@ -162,7 +166,7 @@ export type TUpdateUser = {
     message?: string;
 
     // Return user if success
-    user?: IUser;
+    user?: UserObject;
 
     // Return validation errors if failed validation
     validationErrors?: TValidationErrors;
@@ -182,7 +186,7 @@ export type TRemoveUser = {
     message?: string;
 
     // Return user if success
-    user?: IUser;
+    user?: UserObject;
 };
 
 // All types in one object

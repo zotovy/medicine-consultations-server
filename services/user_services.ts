@@ -3,6 +3,7 @@ import User from "../models/user";
 
 // Services
 import emailServices from "./mail_services";
+import { IUserToUserObj } from "./types_services";
 
 // @types
 import {
@@ -11,14 +12,14 @@ import {
     TCreateUser,
     TGetUserById,
     TRemoveUser,
-    TSendResetPasswordMail,
     TSetUserAvatar,
     TUpdateUser,
     TValidateUser,
     TValidationErrors,
     TValidationErrorType,
 } from "../types/services";
-import { IUser } from "../types/models";
+import { IUser, UserObject } from "../types/models";
+import { error } from "console";
 
 class UserServices {
     /**
@@ -40,19 +41,23 @@ class UserServices {
      * Async get all users
      */
     async getUsers(
-        amount: number, // length of returned array
+        amount: number = 50, // length of returned array, default = 50
         from: number = 0 // start index, default = 0
     ): Promise<TGetUsers> {
         try {
-            const users: IUser[] = await User.find({}).skip(from).limit(amount);
+            const raw: IUser[] = await User.find({})
+                .skip(from)
+                .limit(amount)
+                .lean();
 
             // no user were found
-            if (!users)
+            if (!raw)
                 return {
                     success: true,
                     users: [],
                 };
 
+            let users: UserObject[] = raw.map((e) => IUserToUserObj(e));
             console.log(`successfully get all users (${users.length})`);
 
             return {
@@ -92,7 +97,7 @@ class UserServices {
         if (user.password === password) {
             return {
                 success: true,
-                id: user.id,
+                id: user._id,
             };
         }
 
@@ -128,7 +133,7 @@ class UserServices {
      * This function validate user and return
      */
     async validateUser(
-        user: IUser,
+        user: any,
         needUnique: boolean = true
     ): Promise<TValidateUser> {
         let errors: TValidationErrors = {};
@@ -182,9 +187,23 @@ class UserServices {
                     const users = await User.find({
                         email: user.email,
                     });
+
                     if (users.length != 0 && needUnique) {
-                        errors.email = ErrorType.UniqueError;
+                        if (needUnique) {
+                            errors.email = ErrorType.UniqueError;
+                        } else {
+                            if (users[0].id !== user.id) {
+                                errors.email = ErrorType.UniqueError;
+                            }
+                        }
                     }
+
+                    // if (
+                    //     (users.length != 0 && needUnique) ||
+                    //     (users.length != 0 && users[0].id != user.id)
+                    // ) {
+                    //     errors.email = ErrorType.UniqueError;
+                    // }
                 }
             }
         } else errors.email = ErrorType.RequiredError;
@@ -215,7 +234,7 @@ class UserServices {
         // Reviews
         if (!user.reviews) errors.reviews = ErrorType.RequiredError;
         else if (!Array.isArray(user.reviews)) {
-            errors.consultations = ErrorType.TypeError;
+            errors.reviews = ErrorType.TypeError;
         }
 
         // Notification Email
@@ -233,8 +252,15 @@ class UserServices {
                     const users = await User.find({
                         notificationEmail: user.notificationEmail,
                     });
-                    if (users.length != 0 && needUnique) {
-                        errors.notificationEmail = ErrorType.UniqueError;
+                    if (users.length != 0) {
+                        if (needUnique) {
+                            errors.notificationEmail = ErrorType.UniqueError;
+                        } else {
+                            if (users[0].id !== user.id) {
+                                errors.notificationEmail =
+                                    ErrorType.UniqueError;
+                            }
+                        }
                     }
                 }
             }
@@ -265,15 +291,15 @@ class UserServices {
         // created at
         if (user.createdAt == undefined || user.createdAt == null)
             errors.createdAt = ErrorType.RequiredError;
-        else if (user.createdAt instanceof Date) {
+        else if (!(user.createdAt instanceof Date)) {
             errors.createdAt = ErrorType.TypeError;
         }
 
         // last active at
         if (user.lastActiveAt == undefined || user.lastActiveAt == null)
             errors.lastActiveAt = ErrorType.RequiredError;
-        else if (user.createdAt instanceof Date) {
-            errors.createdAt = ErrorType.TypeError;
+        else if (!(user.createdAt! instanceof Date)) {
+            errors.lastActiveAt = ErrorType.TypeError;
         }
 
         if (Object.keys(errors).length == 0) {
@@ -397,7 +423,7 @@ class UserServices {
                 return {
                     success: false,
                     error: "no_user_found_error",
-                    message: error,
+                    message: `No user found with id = ${id}`,
                 };
             }
 
@@ -405,10 +431,10 @@ class UserServices {
 
             return {
                 success: true,
-                user: user[0],
+                user: IUserToUserObj(user[0]),
             };
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return {
                 success: false,
                 error: "invalid_error",
@@ -421,8 +447,21 @@ class UserServices {
     /**
      * Create user and return new user
      */
-    async createUser(data: IUser): Promise<TCreateUser> {
+    async createUser(data: UserObject): Promise<TCreateUser> {
         try {
+            const validation = await this.validateUser(data);
+
+            // not validated
+            if (!validation.success) {
+                console.log(`user is not validated`);
+                return {
+                    success: false,
+                    error: "not_validated_error",
+                    errors: validation.errors,
+                    message: "User is not validated",
+                };
+            }
+
             const user: IUser = new User(data);
 
             if (!user) {
@@ -441,7 +480,7 @@ class UserServices {
 
             return {
                 success: true,
-                user,
+                user: IUserToUserObj(user),
             };
         } catch (e) {
             console.log(e);
@@ -457,9 +496,9 @@ class UserServices {
     /**
      * Update received  user with the same id
      */
-    async updateUser(newUser: IUser): Promise<TUpdateUser> {
+    async updateUser(newUser: UserObject): Promise<TUpdateUser> {
         // Check received user
-        const responce = await this.validateUser(newUser, false);
+        const responce = await this.validateUser(newUser, true);
 
         // not validated
         if (!responce.success) {
@@ -474,9 +513,10 @@ class UserServices {
         try {
             const user: IUser | null = await User.findOneAndUpdate(
                 {
-                    id: newUser._id,
+                    _id: newUser.id,
                 },
-                newUser
+                newUser,
+                { new: true }
             );
 
             if (!user) {
@@ -490,10 +530,9 @@ class UserServices {
 
             return {
                 success: true,
-                user,
+                user: IUserToUserObj(user),
             };
         } catch (e) {
-            console.log(e);
             return {
                 success: false,
                 error: "invalid_error",
@@ -525,14 +564,7 @@ class UserServices {
         let removed: IUser | undefined | null;
 
         // remove user
-        await user.remove((removeError, removedUser) => {
-            if (removeError) {
-                error = removeError;
-                return null;
-            }
-
-            if (removedUser) removed = removedUser;
-        });
+        removed = await user.deleteOne();
 
         // error
         if (error) {
@@ -548,7 +580,7 @@ class UserServices {
             console.log(`successfully delete user with id = ${id}`);
             return {
                 success: true,
-                user: removed,
+                user: IUserToUserObj(removed),
             };
         } else {
             return {
