@@ -19,7 +19,7 @@ import {
     TValidationErrorType,
 } from "../types/services";
 import { IUser, UserObject } from "../types/models";
-import { error } from "console";
+import { error, info } from "console";
 
 class UserServices {
     /**
@@ -187,8 +187,7 @@ class UserServices {
                     const users = await User.find({
                         email: user.email,
                     });
-
-                    if (users.length != 0 && needUnique) {
+                    if (users.length != 0) {
                         if (needUnique) {
                             errors.email = ErrorType.UniqueError;
                         } else {
@@ -293,6 +292,11 @@ class UserServices {
             errors.createdAt = ErrorType.RequiredError;
         else if (!(user.createdAt instanceof Date)) {
             errors.createdAt = ErrorType.TypeError;
+        } else {
+            const parsed = Date.parse(user.createdAt.toString());
+            if (isNaN(parsed) || parsed === 0) {
+                errors.createdAt = ErrorType.TypeError;
+            }
         }
 
         // last active at
@@ -300,6 +304,11 @@ class UserServices {
             errors.lastActiveAt = ErrorType.RequiredError;
         else if (!(user.createdAt! instanceof Date)) {
             errors.lastActiveAt = ErrorType.TypeError;
+        } else {
+            const parsed = Date.parse(user.lastActiveAt.toString());
+            if (isNaN(parsed) || parsed === 0) {
+                errors.lastActiveAt = ErrorType.TypeError;
+            }
         }
 
         if (Object.keys(errors).length == 0) {
@@ -498,7 +507,7 @@ class UserServices {
      */
     async updateUser(newUser: UserObject): Promise<TUpdateUser> {
         // Check received user
-        const responce = await this.validateUser(newUser, true);
+        const responce = await this.validateUser(newUser, false);
 
         // not validated
         if (!responce.success) {

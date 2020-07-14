@@ -4,10 +4,34 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
+// @types
+import { Server } from "http";
+
 import ApiRouter from "./routes/index";
 
-dotenv.config();
+// Config MODE to dev
+// process.env.MODE = "testing";
 
+// Config env
+if (process.env.MODE === "testing") {
+    // load testing config
+    const result = dotenv.config({ path: "./.env.testing" });
+    if (result.error) {
+        console.error(result.error);
+    }
+} else if (process.env.MODE === "production") {
+    // load production config
+    const result = dotenv.config({ path: "./.env" });
+    if (result.error) {
+        console.error(result.error);
+    }
+} else {
+    // load dev config
+    const result = dotenv.config({ path: "./.env.dev" });
+    if (result.error) {
+        console.error(result.error);
+    }
+}
 // Create app
 const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
@@ -28,6 +52,8 @@ if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"));
 }
 
+let server: Server | undefined;
+
 const main = async () => {
     try {
         // connect to db
@@ -43,8 +69,9 @@ const main = async () => {
         db.on("error", (error: Error) => console.log(error));
 
         // setup server listen
-        app.listen(PORT, "localhost", () => {
+        server = app.listen(PORT, "localhost", () => {
             console.log(`server listening on localhost:${PORT}`);
+            console.log(process.env.jwt_access);
         });
     } catch (e) {
         console.log(e);
@@ -53,3 +80,6 @@ const main = async () => {
 
 // run server
 main();
+
+export default app;
+export { server };

@@ -9,7 +9,8 @@ import userServices from "../services/user_services";
 import { RefreshToken } from "../models/tokens";
 
 // @types
-import { IUser } from "../types/models";
+import { UserObject } from "../types/models";
+import { info } from "console";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -57,12 +58,12 @@ const upload = multer({
 /**
  * Generate and returh token for received user id
  */
-const generateToken = (id: string): string => {
+export const generateToken = (id: string, key: string): string => {
     return jwt.sign(
         {
             id,
         },
-        process.env.jwt_access ?? "",
+        process.env[key] ?? "",
         {
             expiresIn: "30m",
         }
@@ -136,7 +137,10 @@ Router.post("/generate-token", async (req, res) => {
     }
 
     const accessToken: string = jwt.sign({ id }, process.env.jwt_access ?? "");
-    const refreshToken: string = jwt.sign({ id }, process.env.jwt_access ?? "");
+    const refreshToken: string = jwt.sign(
+        { id },
+        process.env.jwt_refresh ?? ""
+    );
 
     return res.status(200).json({
         success: true,
@@ -214,7 +218,7 @@ Router.post("/token", async (req, res) => {
         value: token,
     });
 
-    if (!founded) {
+    if (founded.length == 0) {
         return res.status(400).json({
             success: false,
             error: "invalid_token",
@@ -225,18 +229,21 @@ Router.post("/token", async (req, res) => {
     // Verify token
     jwt.verify(
         token,
-        process.env.jwt_access ?? "",
+        process.env.jwt_refresh ?? "",
         async (err: any, userId: any) => {
             if (err) {
                 return res.status(400).json({
                     success: false,
-                    error: "invalid_token",
+                    error: err,
                     message: "Token didn't verified",
                 });
             }
 
-            const newAccessToken: string = generateToken(userId);
-            const newRefreshToken: string = generateToken(userId);
+            const newAccessToken: string = generateToken(userId, "jwt_access");
+            const newRefreshToken: string = generateToken(
+                userId,
+                "jwt_refresh"
+            );
 
             await RefreshToken.findOneAndUpdate(
                 { value: token },
@@ -391,10 +398,15 @@ Router.post("/user/setAvatar", upload.single("photoUrl"), async (req, res) => {
  */
 Router.post("/user", async (req, res) => {
     // Get user from request body
-    const user: IUser = req.body;
+    const user: UserObject = req.body;
+
+    // Convert String Date ---> Date
+    user.createdAt = new Date(user.createdAt);
+    user.lastActiveAt = new Date(user.lastActiveAt);
 
     // no body
-    if (!user) {
+    // 2 - createdAt & lastActiveAt aslo in user obj
+    if (!user || Object.keys(user).length === 2) {
         console.log("body is null");
         return res.status(412).json({
             success: false,
@@ -408,8 +420,9 @@ Router.post("/user", async (req, res) => {
 
     if (!isValidated.success) {
         console.log("user is not validated");
-        return res.json({
+        return res.status(400).json({
             success: false,
+            error: "not_validated_error",
             errors: isValidated.errors,
             message: "User is not validated",
         });
@@ -429,10 +442,10 @@ Router.post("/user", async (req, res) => {
         }
 
         // generate access token
-        const accessToken = generateToken(dbcode.user?.id);
+        const accessToken = generateToken(dbcode.user?.id, "jwt_access");
 
         // generate refresh token
-        const refreshToken = generateToken(dbcode.user?.id);
+        const refreshToken = generateToken(dbcode.user?.id, "jwt_refresh");
 
         // push refresh token to db
         await RefreshToken.create({
@@ -475,7 +488,7 @@ Router.put("/user/:id", async (req, res, next) => {
     }
 
     // Get new user from request body
-    const newUser: IUser = req.body;
+    const newUser: UserObject = req.body;
 
     // Check new user
     if (!newUser) {
@@ -486,13 +499,17 @@ Router.put("/user/:id", async (req, res, next) => {
         });
     }
 
+    // Convert String Date ---> Date
+    newUser.createdAt = new Date(newUser.createdAt);
+    newUser.lastActiveAt = new Date(newUser.lastActiveAt);
+
     const isValidated = await userServices.validateUser(newUser, false);
 
     if (!isValidated.success) {
         return res.status(412).json({
             success: false,
             errors: isValidated.errors,
-            error: "not_validated",
+            error: "not_validated_error",
             message: "User is not validated",
         });
     }

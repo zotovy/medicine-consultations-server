@@ -8,6 +8,7 @@ import userServices from "../user_services";
 
 // @types
 import { UserObject } from "../../types/models";
+import { IUserToUserObj } from "../types_services";
 
 /**
  *  ? This test module testing user services
@@ -71,7 +72,7 @@ describe("Test UserServices", () => {
 
     // Remove all date from mongodb after each test case
     afterEach(async () => {
-        await User.deleteMany({});
+        await User.remove({});
     });
 
     // SECTION: getUsers()
@@ -80,7 +81,7 @@ describe("Test UserServices", () => {
         /** Test getting 3 simple users   */
         test("should get 3 users", async () => {
             //* Given
-            const user1: UserObject = sampleUser;
+            const user1: UserObject = { ...sampleUser };
             const user2: UserObject = {
                 ...sampleUser,
                 name: "Максим",
@@ -96,20 +97,21 @@ describe("Test UserServices", () => {
 
             //* Results
             // Test 1 user
-            const create1 = await User.create(user1);
-            user1.id = create1._id;
+            expect(await User.find({})).toEqual([]);
+            const create1 = await User.create(sampleUser);
+            user1.id = String(create1._id);
             const responce1 = await userServices.getUsers();
             const result1: UserObject[] | undefined = responce1.users;
 
             // Test 2 users
             const create2 = await User.create(user2);
-            user2.id = create2._id;
+            user2.id = String(create2._id);
             const responce2 = await userServices.getUsers();
             const result2: UserObject[] | undefined = responce2.users;
 
             // Test 3 users
             const create3 = await User.create(user3);
-            user3.id = create3._id;
+            user3.id = String(create3._id);
             const responce3 = await userServices.getUsers();
             const result3: UserObject[] | undefined = responce3.users;
 
@@ -166,7 +168,7 @@ describe("Test UserServices", () => {
             const { _id } = await User.create(sampleUser);
             await User.updateOne({ _id: _id }, updatedUser);
 
-            updatedUser.id = _id;
+            updatedUser.id = String(_id);
             const answer: UserObject[] = [updatedUser];
 
             const responce = await userServices.getUsers();
@@ -441,7 +443,7 @@ describe("Test UserServices", () => {
         test("should get sample user", async () => {
             //* Given
             const { _id } = await User.create(sampleUser);
-            const answer = { ...sampleUser, id: _id };
+            const answer = { ...sampleUser, id: String(_id) };
 
             //* Result
             const responce = await userServices.getUserById(_id);
@@ -548,7 +550,7 @@ describe("Test UserServices", () => {
                 lastActiveAt: new Date(),
             };
             const { _id } = await User.create(sampleUser);
-            updated.id = _id;
+            updated.id = String(_id);
 
             //* Result
             const responce = await userServices.updateUser(updated);
@@ -577,6 +579,7 @@ describe("Test UserServices", () => {
 
             // User-2 updated
             const updated: UserObject = {
+                ...sampleUser,
                 id: undefined,
                 name: "Вера",
                 surname: "Баскова",
@@ -629,7 +632,7 @@ describe("Test UserServices", () => {
         test("should remove sample user", async () => {
             //* Given
             const { _id } = await User.create(sampleUser);
-            const user = { ...sampleUser, id: _id };
+            const user = { ...sampleUser, id: String(_id) };
 
             //* Result
             const responce = await userServices.removeUser(_id);
@@ -643,9 +646,9 @@ describe("Test UserServices", () => {
             expect(users.length).toEqual(0);
         });
 
-        // ANCHOR: shouldn't return error on not exisiting user
+        // ANCHOR: should return error on not exisiting user
         /** Trying to remove not existing user. Function should return error no_user_found*/
-        test("shouldn't return error on not exisiting user", async () => {
+        test("should return error on not exisiting user", async () => {
             //* Given
             const id: string = "123456789101";
 

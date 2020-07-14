@@ -5,7 +5,7 @@ import { IUser, UserObject } from "../types/models";
  */
 export function IUserToUserObj(e: IUser): UserObject {
     return {
-        id: e._id,
+        id: String(e._id),
         name: e.name,
         surname: e.surname,
         photoUrl: e.photoUrl,
