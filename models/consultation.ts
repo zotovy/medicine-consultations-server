@@ -2,27 +2,17 @@ import { Schema, model } from "mongoose";
 
 const requiredField = [true, "required_error"];
 
-const consultation = new Schema({
+const Consultation = new Schema({
     patientId: {
         type: String,
         required: requiredField,
     },
-    patientName: {
-        type: String,
-        required: requiredField,
-    },
+
     doctorId: {
         type: String,
         required: requiredField,
     },
-    doctorName: {
-        type: String,
-        required: requiredField,
-    },
-    doctorPhotoUrl: {
-        type: String,
-        required: requiredField,
-    },
+
     doctorSpecialty: {
         type: String,
         required: requiredField,
@@ -36,4 +26,4 @@ const consultation = new Schema({
     },
 });
 
-module.exports = model("Consultation", consultation);
+export default model("Consultation", Consultation);

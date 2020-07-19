@@ -188,6 +188,21 @@ describe("Test user routes", () => {
             expect(status).toEqual(200);
             expect(data.success).toEqual(true);
             expect(data.id).toEqual(answer);
+            expect(data.tokens.access).toBeDefined();
+            expect(data.tokens.refresh).toBeDefined();
+
+            // Verify tokens
+            const id_access: any = jwt.verify(
+                data.tokens.access,
+                process.env.jwt_access ?? ""
+            );
+            const id_refresh: any = jwt.verify(
+                data.tokens.refresh,
+                process.env.jwt_refresh ?? ""
+            );
+
+            expect(id_access.id).toEqual(String(_id));
+            expect(id_refresh.id).toEqual(String(_id));
 
             done();
         });

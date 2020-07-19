@@ -1,4 +1,6 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
+import Consultation from "./consultation";
+import Review from "./speciality";
 
 // @types
 import { IUser } from "../types/models";
@@ -16,6 +18,10 @@ const user = new Schema({
         type: String,
         required: reqiredField,
         validate: [(value) => value.length > 0, "length_error"],
+    },
+    // Отчество
+    patronymic: {
+        type: String,
     },
     photoUrl: {
         type: String,
@@ -66,8 +72,16 @@ const user = new Schema({
     country: {
         type: String,
     },
-    consultations: [], // todo
-    reviews: [], // todo
+    consultations: {
+        type: [Consultation],
+        required: true,
+        default: [],
+    },
+    reviews: {
+        type: [Review],
+        required: true,
+        default: [],
+    },
     notificationEmail: {
         type: String,
         unique: true,
@@ -84,11 +98,15 @@ const user = new Schema({
     createdAt: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: new Date(),
     },
     lastActiveAt: {
         type: Date,
         required: true,
+    },
+    favourites: {
+        type: [mongoose.Types.ObjectId],
+        default: [],
     },
 });
 

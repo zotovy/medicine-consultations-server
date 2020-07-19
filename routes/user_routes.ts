@@ -1,6 +1,7 @@
 // Todo: resize uploaded image
 
 import express from "express";
+import rateLimitter from "express-rate-limit";
 import crypto from "crypto";
 import path from "path";
 import jwt from "jsonwebtoken";
@@ -11,6 +12,7 @@ import { RefreshToken } from "../models/tokens";
 // @types
 import { UserObject } from "../types/models";
 import { info } from "console";
+import { report } from "process";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -122,10 +124,15 @@ const authenticateToken = (req: any, res: any, next: Function): void => {
 };
 
 // ANCHOR: generate-token
+// Limit request
+const generateTokenLimitter = rateLimitter({
+    windowMs: 10 * 60 * 1000,
+    max: 3, // 3 per 10 min
+});
 /**
  *  This function generate new access & refresh token
  */
-Router.post("/generate-token", async (req, res) => {
+Router.post("/generate-token", generateTokenLimitter, async (req, res) => {
     const id: string | undefined = req.body?.id;
 
     if (!id) {
@@ -152,10 +159,15 @@ Router.post("/generate-token", async (req, res) => {
 });
 
 // ANCHOR: login-user
+// Limit request
+const loginTokenLimitter = rateLimitter({
+    windowMs: 10 * 60 * 1000,
+    max: 10, // 10 per 10 min
+});
 /**
  *  This function check user received email & password
  */
-Router.post("/login-user", async (req, res) => {
+Router.post("/login-user", loginTokenLimitter, async (req, res) => {
     const email: string | undefined = req.body.email;
     const password: string | undefined = req.body.password;
 
@@ -180,29 +192,50 @@ Router.post("/login-user", async (req, res) => {
         });
     }
 
+    const accessToken: string = generateToken(dbcode.id ?? "", "jwt_access");
+    const refreshToken: string = generateToken(dbcode.id ?? "", "jwt_refresh");
+
     return res.status(200).json({
         success: true,
         id: dbcode.id,
+        tokens: {
+            access: accessToken,
+            refresh: refreshToken,
+        },
     });
 });
 
 // ANCHOR: send-reset-password-email
+// Limit request
+const resetPasswordEmailLimitter = rateLimitter({
+    windowMs: 10 * 60 * 1000,
+    max: 10, // 10 per 10 min
+});
 /**
  * This function send reset email with reset password link
  */
-Router.post("/send-reset-password-email", async (req, res) => {
-    const email = req.body.email;
+Router.post(
+    "/send-reset-password-email",
+    resetPasswordEmailLimitter,
+    async (req, res) => {
+        const email = req.body.email;
 
-    await userServices.sendResetPasswordMail(email);
+        await userServices.sendResetPasswordMail(email);
 
-    res.status(200).json({ success: true });
-});
+        res.status(200).json({ success: true });
+    }
+);
 
 // ANCHOR: Refresh token
+// Limit request
+const tokenLimitter = rateLimitter({
+    windowMs: 10 * 60 * 1000,
+    max: 5, // 5 per 10 min
+});
 /**
  * This function generate new access & refresh token by receiver refresh token
  */
-Router.post("/token", async (req, res) => {
+Router.post("/token", tokenLimitter, async (req, res) => {
     const token = req.body?.token;
 
     if (!token) {
@@ -271,11 +304,16 @@ Router.post("/token", async (req, res) => {
 });
 
 // ANCHOR: Get all users
+// Limit request
+const getUsersLimitter = rateLimitter({
+    windowMs: 1 * 60 * 1000,
+    max: 100, // 100 per 1 minute
+});
 /**
  * This function get all existings users
  * defaultAmount = 50
  */
-Router.get("/users", async (req, res) => {
+Router.get("/users", getUsersLimitter, async (req, res) => {
     const amount: number = req.body.amount ?? 50;
     const from: number = req.body.from ?? 0;
 
@@ -306,10 +344,15 @@ Router.get("/users", async (req, res) => {
 });
 
 // ANCHOR: get user
+// Limit request
+const getUserLimitter = rateLimitter({
+    windowMs: 1 * 60 * 1000,
+    max: 100, // 100 per 1 minute
+});
 /**
  *  Get user by received id
  */
-Router.get("/user/:id", async (req, res, next) => {
+Router.get("/user/:id", getUserLimitter, async (req, res, next) => {
     // Get id from params
     const id = req.params.id;
 
@@ -351,52 +394,63 @@ Router.get("/user/:id", async (req, res, next) => {
 });
 
 // ANCHOR: set user avatar
+// Limit request
+const setUserAvatarLimitter = rateLimitter({
+    windowMs: 1 * 60 * 1000,
+    max: 100, // 100 per 1 minute
+});
 /**
  *  This function upload resized photo to storage and update photo url field in user model
  */
-Router.post("/user/setAvatar", upload.single("photoUrl"), async (req, res) => {
-    const userId = req.body.userId;
+Router.post(
+    "/user/setAvatar",
+    setUserAvatarLimitter,
+    upload.single("photoUrl"),
+    async (req, res) => {
+        const userId = req.body.userId;
 
-    if (!userId) {
-        return res.status(412).json({
-            success: false,
-            error: "empty_body",
-            message: "No userId found in body",
-        });
-    }
-
-    // generate photo url
-    const photoUrl = process.env.url + req.file.path;
-
-    try {
-        const dbcode = await userServices.setUserAvatar(userId, photoUrl);
-
-        if (!dbcode.success) {
-            return res.status(500).json({
+        if (!userId) {
+            return res.status(412).json({
                 success: false,
-                error: dbcode.error,
-                message: dbcode.message,
+                error: "empty_body",
+                message: "No userId found in body",
             });
         }
 
-        return res.status(201).json({
-            success: true,
-        });
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json({
-            success: false,
-            error: "invalid_error",
-            message: e,
-        });
+        // generate photo url
+        const photoUrl = process.env.url + req.file.path;
+
+        try {
+            const dbcode = await userServices.setUserAvatar(userId, photoUrl);
+
+            if (!dbcode.success) {
+                return res.status(500).json({
+                    success: false,
+                    error: dbcode.error,
+                    message: dbcode.message,
+                });
+            }
+
+            return res.status(201).json({
+                success: true,
+            });
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({
+                success: false,
+                error: "invalid_error",
+                message: e,
+            });
+        }
     }
-});
+);
 
 // ANCHOR: Create
 /**
  * This function push received user to db
  */
 Router.post("/user", async (req, res) => {
+    console.log("123");
     // Get user from request body
     const user: UserObject = req.body;
 
@@ -434,7 +488,7 @@ Router.post("/user", async (req, res) => {
 
         // Check created user
         if (!dbcode.success) {
-            return res.status(500).json({
+            return res.status(501).json({
                 success: false,
                 error: dbcode.error,
                 message: dbcode.message,
