@@ -8,7 +8,7 @@ import { IUser } from "../types/models";
 const reqiredField = [true, "required_error"];
 const uniqueField = [true, "unique_error"];
 
-const user = new Schema({
+const UserSchema = new Schema({
     name: {
         type: String,
         required: reqiredField,
@@ -72,16 +72,22 @@ const user = new Schema({
     country: {
         type: String,
     },
-    consultations: {
-        type: [Consultation],
-        required: true,
-        default: [],
-    },
-    reviews: {
-        type: [Review],
-        required: true,
-        default: [],
-    },
+    consultations: [
+        {
+            // Store Array<ObjectId> of consultations
+            // We can get user with consultation running .populate("consultation")
+            type: Schema.Types.ObjectId,
+            ref: "Consultation",
+        },
+    ],
+    reviews: [
+        {
+            // Store Array<ObjectId> of reviews
+            // We can get user with reviews running .populate("review")
+            type: Schema.Types.ObjectId,
+            ref: "Review",
+        },
+    ],
     notificationEmail: {
         type: String,
         unique: true,
@@ -104,10 +110,13 @@ const user = new Schema({
         type: Date,
         required: true,
     },
-    favourites: {
-        type: [mongoose.Types.ObjectId],
-        default: [],
-    },
+    // List of favourites doctors
+    favourites: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Doctor",
+        },
+    ],
 });
 
-export default model<IUser>("User", user);
+export default model<IUser>("User", UserSchema);

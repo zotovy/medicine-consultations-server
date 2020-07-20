@@ -43,6 +43,7 @@ const sampleUser: UserObject = {
     id: undefined,
     name: "Иван",
     surname: "Иванов",
+    patronymic: "Иванович",
     photoUrl: "",
     phone: 79028319028,
     email: "ivanov_ivan@mail.ru",
@@ -57,6 +58,7 @@ const sampleUser: UserObject = {
     sendMailingsToEmail: true,
     createdAt: new Date(),
     lastActiveAt: new Date(),
+    favourites: [],
 };
 
 // Used to simulate http requests

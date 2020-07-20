@@ -1,5 +1,5 @@
 // @types
-import { UserObject } from "./models";
+import { UserObject, DoctorObject } from "./models";
 
 /**
  *  This type describe return object of UserServices.getUsers() function
@@ -69,7 +69,7 @@ export enum TValidationErrorType {
 /**
  * This type describe error object from UserServices.validateUser() function
  */
-export type TValidationErrors = {
+export type TUserValidationErrors = {
     name?: TValidationErrorType;
     surname?: TValidationErrorType;
     phone?: TValidationErrorType;
@@ -93,7 +93,7 @@ export type TValidateUser = {
     success: true | false;
 
     // Show error if failed
-    errors?: TValidationErrors;
+    errors?: TUserValidationErrors;
 };
 
 /**
@@ -143,7 +143,7 @@ export type TCreateUser = {
         | "not_validated_error";
 
     // Validation errors
-    errors?: TValidationErrors;
+    errors?: TUserValidationErrors;
 
     // Show error message if failed
     message?: string;
@@ -169,7 +169,7 @@ export type TUpdateUser = {
     user?: UserObject;
 
     // Return validation errors if failed validation
-    validationErrors?: TValidationErrors;
+    validationErrors?: TUserValidationErrors;
 };
 
 /**
@@ -189,4 +189,72 @@ export type TRemoveUser = {
     user?: UserObject;
 };
 
-// All types in one object
+//========================================================================================
+/*                                                                                      *
+ *                                        Doctor                                        *
+ *                                                                                      */
+//========================================================================================
+
+/**
+ *  This type describe existing doctor's speciality
+ */
+export enum TSpeciality {
+    "Педиатр",
+    "Терапевт",
+    "Дерматолог",
+    "Психолог",
+    "Дефектолог",
+    "Логопед",
+    "Диетолог",
+    "Аллерголог",
+}
+
+/**
+ * This type describe doctor validation errors
+ */
+export type TDoctorValidationErrors = TUserValidationErrors & {
+    speciality?: TValidationErrorType;
+    beginDoctorDate?: TValidationErrorType;
+    experience?: TValidationErrorType;
+    rating?: TValidationErrorType;
+    whosFavourite?: TValidationErrorType;
+    clientsReviews?: TValidationErrorType;
+    clientsConsultations?: TValidationErrorType;
+    sheldure?: TValidationErrorType;
+};
+
+/**
+ *  This type describe return type of DoctorServices.validate()
+ */
+export type TValidateDoctor = {
+    // Is operation going success
+    success: true | false;
+
+    // Show error if failed
+    errors?: TDoctorValidationErrors;
+};
+
+/**
+ * This type describe return type of DoctorServices.create()
+ */
+export type TCreateDoctor = {
+    // Is operation going success
+    success: true | false;
+
+    // Show error if failed
+    error?:
+        | "no_user_found_error"
+        | "invalid_error"
+        | "no_user_found"
+        | "created_doctor_is_null"
+        | "not_validated_error";
+
+    // Validation errors
+    errors?: TDoctorValidationErrors;
+
+    // Show error message if failed
+    message?: string;
+
+    // Return user if success
+    user?: DoctorObject;
+};

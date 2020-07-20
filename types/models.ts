@@ -21,13 +21,14 @@ export interface IUser extends Document {
     sex: boolean;
     city?: string;
     country?: string;
-    consultations: [];
-    reviews: [];
+    consultations: mongoose.Types.ObjectId[];
+    reviews: mongoose.Types.ObjectId[];
     notificationEmail: string;
     sendNotificationToEmail: boolean;
     sendMailingsToEmail: boolean;
     createdAt: Date;
     lastActiveAt: Date;
+    favourites: mongoose.Types.ObjectId[];
 }
 
 /**
@@ -45,38 +46,39 @@ export interface UserObject {
     sex: IUser["sex"];
     city?: IUser["city"];
     country?: IUser["country"];
-    consultations: IUser["consultations"];
-    reviews: IUser["reviews"];
+    consultations: mongoose.Types.ObjectId[];
+    reviews: mongoose.Types.ObjectId[];
     notificationEmail: IUser["notificationEmail"];
     sendNotificationToEmail: IUser["sendNotificationToEmail"];
     sendMailingsToEmail: IUser["sendMailingsToEmail"];
     createdAt: IUser["createdAt"];
     lastActiveAt: IUser["lastActiveAt"];
+    favourites: mongoose.Types.ObjectId[];
 }
 
 /**
  * Doctor interface model
  */
 export interface IDoctor extends IUser {
-    speciality: string;
+    speciality: string[];
     beginDoctorDate: Date;
-    experince: number;
+    experience: number;
     rating: number;
-    whosFavourite: [mongoose.Types.ObjectId];
-    clientReviews: [IReview];
-    clientConsultation: [IConsultation];
-    sheldure: [IAppointment];
+    whosFavourite: mongoose.Types.ObjectId[];
+    clientsReviews: mongoose.Types.ObjectId[];
+    clientsConsultations: mongoose.Types.ObjectId[];
+    sheldure: mongoose.Types.ObjectId[];
 }
 
-export interface DoctorObject {
+export interface DoctorObject extends UserObject {
     speciality: IDoctor["speciality"];
     beginDoctorDate: IDoctor["beginDoctorDate"];
-    experince: IDoctor["experince"];
+    experience: IDoctor["experience"];
     rating: IDoctor["rating"];
-    whosFavourite: [string];
-    clientReviews: [ReviewObject];
-    clientConsultation: [ConsultationObject];
-    sheldure: [AppointmentObject];
+    whosFavourite: mongoose.Types.ObjectId[];
+    clientsReviews: ReviewObject[] | mongoose.Types.ObjectId[];
+    clientsConsultations: ConsultationObject[] | mongoose.Types.ObjectId[];
+    sheldure: AppointmentObject[] | mongoose.Types.ObjectId[];
 }
 
 /**

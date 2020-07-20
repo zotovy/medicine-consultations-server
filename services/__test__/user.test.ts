@@ -27,6 +27,7 @@ const sampleUser: UserObject = {
     id: undefined,
     name: "Иван",
     surname: "Иванов",
+    patronymic: "Иванович",
     photoUrl: "",
     phone: 79028319028,
     email: "ivanov_ivan@mail.ru",
@@ -41,6 +42,7 @@ const sampleUser: UserObject = {
     sendMailingsToEmail: true,
     createdAt: new Date(),
     lastActiveAt: new Date(),
+    favourites: [], // will add later
 };
 
 describe("Test UserServices", () => {
@@ -534,6 +536,7 @@ describe("Test UserServices", () => {
                 id: undefined,
                 name: "Вера",
                 surname: "Баскова",
+                patronymic: "Сергеевна",
                 photoUrl: "someUrl",
                 phone: 79028319023,
                 email: "vera_is_cool@mail.ru",
@@ -548,6 +551,7 @@ describe("Test UserServices", () => {
                 sendMailingsToEmail: false,
                 createdAt: new Date(),
                 lastActiveAt: new Date(),
+                favourites: [], // will add later
             };
             const { _id } = await User.create(sampleUser);
             updated.id = String(_id);

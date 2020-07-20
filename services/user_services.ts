@@ -15,7 +15,7 @@ import {
     TSetUserAvatar,
     TUpdateUser,
     TValidateUser,
-    TValidationErrors,
+    TUserValidationErrors,
     TValidationErrorType,
 } from "../types/services";
 import { IUser, UserObject } from "../types/models";
@@ -136,7 +136,7 @@ class UserServices {
         user: any,
         needUnique: boolean = true
     ): Promise<TValidateUser> {
-        let errors: TValidationErrors = {};
+        let errors: TUserValidationErrors = {};
 
         const ErrorType = TValidationErrorType;
 
@@ -482,7 +482,7 @@ class UserServices {
                 };
             }
 
-            // saveuser to db
+            // save user to db
             await user.save();
 
             console.log(`successfully create user with id ${user._id}`);
