@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 import Doctor from "../models/doctor";
 
 // types
-import { DoctorObject, IDoctor } from "../types/models";
+import { DoctorObject, IDoctor, IUser } from "../types/models";
 
 import {
     TValidateDoctor,
@@ -12,6 +12,7 @@ import {
     TValidationErrorType,
     TSpeciality,
     TCreateDoctor,
+    TUpdateDoctor,
 } from "../types/services";
 
 // Services
@@ -20,10 +21,13 @@ import { IDoctorToDoctorObj } from "./types_services";
 
 class DoctorServices {
     // ANCHOR: validate doctor
-    validate = async (doctor: any): Promise<TValidateDoctor> => {
+    validate = async (
+        doctor: any,
+        needUnique: boolean = true
+    ): Promise<TValidateDoctor> => {
         // Doctor model is extended from User model,
         // so, if obj is not validate as user this will never validated as doctor
-        const responce = await UserServices.validateUser(doctor);
+        const responce = await UserServices.validateUser(doctor, needUnique);
 
         if (!responce.success) {
             return {
@@ -139,6 +143,7 @@ class DoctorServices {
                 success: false,
                 error: "not_validated_error",
                 errors: responce.errors,
+                message: "User is not validated",
             };
         }
 
@@ -162,6 +167,47 @@ class DoctorServices {
             success: true,
             user: IDoctorToDoctorObj(doctor),
         };
+    };
+
+    // ANCHOR: update doctor
+    update = async (data: DoctorObject): Promise<TUpdateDoctor> => {
+        const validation = await this.validate(data, false);
+
+        if (!validation.success) {
+            return {
+                success: false,
+                error: "not_validated_error",
+                validationErrors: validation.errors,
+                message: "Passing doctor object is not validated",
+            };
+        }
+
+        try {
+            const updated: IDoctor | null = await Doctor.findOneAndUpdate(
+                { _id: data.id },
+                data,
+                { new: true }
+            );
+
+            if (!updated) {
+                return {
+                    success: false,
+                    error: "updated_doctor_is_null",
+                    message: `Updated user is null. User with id=${data.id} does not exist`,
+                };
+            }
+
+            return {
+                success: true,
+                doctor: IDoctorToDoctorObj(updated),
+            };
+        } catch (e) {
+            return {
+                success: false,
+                error: "invalid_error",
+                message: "Invalid error happened",
+            };
+        }
     };
 }
 

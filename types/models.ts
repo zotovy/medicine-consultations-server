@@ -75,10 +75,10 @@ export interface DoctorObject extends UserObject {
     beginDoctorDate: IDoctor["beginDoctorDate"];
     experience: IDoctor["experience"];
     rating: IDoctor["rating"];
-    whosFavourite: mongoose.Types.ObjectId[];
-    clientsReviews: ReviewObject[] | mongoose.Types.ObjectId[];
-    clientsConsultations: ConsultationObject[] | mongoose.Types.ObjectId[];
-    sheldure: AppointmentObject[] | mongoose.Types.ObjectId[];
+    whosFavourite: IDoctor["whosFavourite"];
+    clientsReviews: IDoctor["clientsReviews"];
+    clientsConsultations: IDoctor["clientsConsultations"];
+    sheldure: IDoctor["sheldure"];
 }
 
 /**

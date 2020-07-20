@@ -173,15 +173,103 @@ describe("Test UserServices", () => {
         // ANCHOR: should create sample doctor
         /** Create doctor using doctor service. Expect this doctor in db */
         test("should create sample doctor", async () => {
+            //* Arrange
+            const user = sampleDoctor;
+
             //* Act
             const responce = await doctorServices.create(sampleDoctor);
+            user.id = responce?.user?.id;
 
             //* Assert
             expect(responce.success).toEqual(true);
-            expect({ ...responce.user, id: undefined }).toEqual(sampleDoctor);
+            expect(responce.user).toEqual(user);
             expect(responce.error).toBeFalsy();
             expect(responce.errors).toBeFalsy();
             expect(responce.message).toBeFalsy();
+
+            const users = (await Doctor.find({})).map((e) =>
+                IDoctorToDoctorObj(e)
+            );
+            expect(users).toEqual([user]);
+        });
+
+        // ANCHOR: shouldn't create dont'validated user
+        /** Passing empty user in function. Expect errors */
+        test("shouldn't create don`t validated user", async () => {
+            //* Act
+            // @ts-ignore
+            const responce = await doctorServices.create({});
+
+            //* Assert
+            expect(responce.success).toEqual(false);
+            expect(responce.user).toBeFalsy();
+            expect(responce.error).toEqual("not_validated_error");
+            expect(responce.errors).toBeTruthy();
+            expect(responce.message).toBeTruthy();
+
+            const users = await Doctor.find({});
+            expect(users).toEqual([]);
+        });
+    });
+    // /SECTION
+
+    // SECTION
+    describe("Update Doctor", () => {
+        // ANCHOR: should update sample user
+        /** Create user using mongoose. Function should update his */
+        test("should update sample user", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id), name: "Максим" };
+
+            //* Act
+            const response = await doctorServices.update(doctor);
+
+            //* Assert
+            expect(response.error).toBeFalsy();
+            expect(response.success).toBe(true);
+            expect(response.doctor).toEqual(doctor);
+            expect(response.validationErrors).toBeFalsy();
+
+            const dbDoctor = IDoctorToDoctorObj(
+                // @ts-ignore
+                await Doctor.findOne({ _id })
+            );
+            expect(dbDoctor).toEqual(doctor);
+        });
+
+        // ANCHOR: shouldn't update not validated user
+        /** Create user using mongoose. Function shouldn't update this user with invalid new */
+        test("shouldn't update not validated user", async () => {
+            //* Arrange
+            const doctor = { ...sampleDoctor, clientsConsultations: 123 };
+            const errors = { clientsConsultations: "type_error" };
+
+            //* Act
+            // @ts-ignore
+            const response = await doctorServices.update(doctor);
+
+            //* Assert
+            expect(response.success).toBe(false);
+            expect(response.error).toEqual("not_validated_error");
+            expect(response.doctor).toBeUndefined();
+            expect(response.validationErrors).toEqual(errors);
+        });
+
+        // ANCHOR: shouldn't update not existing doctor
+        /** Pass not existing doctor. Function shouldn't update this doctor */
+        test("shouldn't update not existing user", async () => {
+            //* Arrange
+            const doctor = { ...sampleDoctor, id: "123456789101" };
+
+            //* Act
+            const response = await doctorServices.update(doctor);
+
+            //* Assert
+            expect(response.success).toBe(false);
+            expect(response.error).toEqual("updated_doctor_is_null");
+            expect(response.doctor).toBeUndefined();
+            expect(response.validationErrors).toBeUndefined();
         });
     });
     // /SECTION

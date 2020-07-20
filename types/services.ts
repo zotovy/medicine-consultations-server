@@ -83,6 +83,7 @@ export type TUserValidationErrors = {
     sendNotificationToEmail?: TValidationErrorType;
     createdAt?: TValidationErrorType;
     lastActiveAt?: TValidationErrorType;
+    favourites?: TValidationErrorType;
 };
 
 /**
@@ -148,7 +149,7 @@ export type TCreateUser = {
     // Show error message if failed
     message?: string;
 
-    // Return user if success
+    // Return created user if success
     user?: UserObject;
 };
 
@@ -165,7 +166,7 @@ export type TUpdateUser = {
     // Show error message if failed
     message?: string;
 
-    // Return user if success
+    // Return updated user if success
     user?: UserObject;
 
     // Return validation errors if failed validation
@@ -257,4 +258,24 @@ export type TCreateDoctor = {
 
     // Return user if success
     user?: DoctorObject;
+};
+
+/**
+ * This type describe returned object from DoctorServices.updateUser() function
+ */
+export type TUpdateDoctor = {
+    // Is operation going success
+    success: true | false;
+
+    // Show error if failed
+    error?: "updated_doctor_is_null" | "invalid_error" | "not_validated_error";
+
+    // Show error message if failed
+    message?: string;
+
+    // Return updated doctor if success
+    doctor?: DoctorObject;
+
+    // Return validation errors if failed validation
+    validationErrors?: TDoctorValidationErrors;
 };

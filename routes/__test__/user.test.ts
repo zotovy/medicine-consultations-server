@@ -571,6 +571,7 @@ describe("Test user routes", () => {
                 sendMailingsToEmail: "type_error",
                 createdAt: "type_error",
                 lastActiveAt: "type_error",
+                favourites: "type_error",
             };
 
             const user = {
@@ -589,6 +590,7 @@ describe("Test user routes", () => {
                 sendMailingsToEmail: 123,
                 createdAt: 123,
                 lastActiveAt: 123,
+                favourites: 123,
             };
             //* Result
             const responce = await request

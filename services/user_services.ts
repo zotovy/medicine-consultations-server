@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 // Modules
 import User from "../models/user";
 
@@ -308,6 +310,20 @@ class UserServices {
             const parsed = Date.parse(user.lastActiveAt.toString());
             if (isNaN(parsed) || parsed === 0) {
                 errors.lastActiveAt = ErrorType.TypeError;
+            }
+        }
+
+        // Favourites
+        if (user.favourites == undefined || user.favourites == null) {
+            errors.favourites = ErrorType.RequiredError;
+        } else if (!Array.isArray(user.favourites)) {
+            errors.favourites = ErrorType.TypeError;
+        } else {
+            for (let i = 0; i < user.favourites.length; i++) {
+                if (!Types.ObjectId.isValid(user.favourites[i])) {
+                    errors.favourites = ErrorType.TypeError;
+                    break;
+                }
             }
         }
 
