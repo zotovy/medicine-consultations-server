@@ -13,6 +13,7 @@ import {
     TSpeciality,
     TCreateDoctor,
     TUpdateDoctor,
+    TRemoveDoctor,
 } from "../types/services";
 
 // Services
@@ -206,6 +207,53 @@ class DoctorServices {
                 success: false,
                 error: "invalid_error",
                 message: "Invalid error happened",
+            };
+        }
+    };
+
+    // ANCHOR: remove doctor
+    delete = async (id: string | Types.ObjectId): Promise<TRemoveDoctor> => {
+        const doctor: IDoctor | null = await Doctor.findOne({
+            _id: id,
+        });
+
+        // no doctor found
+        if (!doctor) {
+            console.log(`No user found with id = ${id}`);
+            return {
+                success: false,
+                error: "no_doctor_found",
+                message: `No user found with id = ${id}`,
+            };
+        }
+
+        let error: any;
+        let removed: IDoctor | undefined | null;
+
+        // remove doctor
+        removed = await doctor.deleteOne();
+
+        // error
+        if (error) {
+            console.error(error);
+            return {
+                success: false,
+                error: "invalid_error",
+                message: `invalid error when doctor.remove()`,
+            };
+        }
+
+        if (removed) {
+            console.log(`successfully delete doctor with id = ${id}`);
+            return {
+                success: true,
+                doctor: IDoctorToDoctorObj(removed),
+            };
+        } else {
+            return {
+                success: false,
+                error: "removed_doctor_is_null",
+                message: "Removed user is null",
             };
         }
     };

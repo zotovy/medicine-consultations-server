@@ -273,4 +273,43 @@ describe("Test UserServices", () => {
         });
     });
     // /SECTION
+
+    // SECTION
+    describe("Remove doctor", () => {
+        // ANCHOR: should remove sample doctor
+        /** Create doctor using mongoose. Function should remove it */
+        test("should remove sample doctor", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+
+            //* Act
+            const responce = await doctorServices.delete(String(_id));
+
+            //* Assert
+            expect(responce.error).toBeUndefined();
+            expect(responce.success).toEqual(true);
+            expect(responce.doctor).toEqual(doctor);
+
+            const doctors = await Doctor.find({});
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should return error on not existing uid
+        /** Pass invalid uid in function. Expect errors */
+        test("should return error on not existing uid", async () => {
+            //* Arrange
+            const id = "imfakeuserid";
+
+            //* Act
+            const responce = await doctorServices.delete(id);
+
+            //* Assert
+            expect(responce.success).toEqual(false);
+            expect(responce.error).toEqual("no_doctor_found");
+            expect(responce.doctor).toBeUndefined();
+            expect(responce.message).toBeDefined();
+        });
+    });
+    // SECTION
 });

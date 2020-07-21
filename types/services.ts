@@ -279,3 +279,20 @@ export type TUpdateDoctor = {
     // Return validation errors if failed validation
     validationErrors?: TDoctorValidationErrors;
 };
+
+/**
+ * This type describe returned object from DoctorServices.removeUser() function
+ */
+export type TRemoveDoctor = {
+    // Is operation going success
+    success: true | false;
+
+    // Return error if failed
+    error?: "no_doctor_found" | "invalid_error" | "removed_doctor_is_null";
+
+    // Return error message if failed
+    message?: string;
+
+    // Return doctor if success
+    doctor?: UserObject;
+};
