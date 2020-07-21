@@ -11,8 +11,6 @@ import { RefreshToken } from "../models/tokens";
 
 // @types
 import { UserObject } from "../types/models";
-import { info } from "console";
-import { report } from "process";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";

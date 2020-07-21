@@ -213,7 +213,7 @@ describe("Test UserServices", () => {
     });
     // /SECTION
 
-    // SECTION
+    // SECTION: update()
     describe("Update Doctor", () => {
         // ANCHOR: should update sample user
         /** Create user using mongoose. Function should update his */
@@ -274,7 +274,7 @@ describe("Test UserServices", () => {
     });
     // /SECTION
 
-    // SECTION
+    // SECTION: remove()
     describe("Remove doctor", () => {
         // ANCHOR: should remove sample doctor
         /** Create doctor using mongoose. Function should remove it */
@@ -311,5 +311,5 @@ describe("Test UserServices", () => {
             expect(responce.message).toBeDefined();
         });
     });
-    // SECTION
+    // /SECTION
 });

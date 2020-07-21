@@ -9,7 +9,6 @@ import app, { server } from "../../server";
 
 // @types
 import { UserObject } from "../../types/models";
-import { stringify } from "querystring";
 import { IUserToUserObj } from "../../services/types_services";
 
 /**
@@ -75,7 +74,7 @@ describe("Test user routes", () => {
     // By using mongoose.connect
     beforeAll(async () => {
         db = await mongoose.connect(
-            "mongodb://localhost/db",
+            "mongodb://localhost/test",
             {
                 useNewUrlParser: true,
                 useCreateIndex: false,
