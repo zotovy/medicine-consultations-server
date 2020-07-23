@@ -89,4 +89,32 @@ Router.delete("/doctor/:id", async (req, res) => {
     }
 });
 
+// ANCHOR: GET /doctor/:id
+Router.get("/doctor/:id", async (req, res) => {
+    const id = req.params.id;
+
+    if (!id || !Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            success: false,
+            error: "invalid_id_error",
+            message: `Invalid id were provide, id=${id}`,
+        });
+    }
+
+    const response = await doctorServices.getOne(id);
+
+    if (response.success) {
+        return res.status(200).json({
+            success: true,
+            doctor: response.doctor,
+        });
+    } else {
+        return res.status(400).json({
+            success: false,
+            error: response.error,
+            message: response.message,
+        });
+    }
+});
+
 export default Router;

@@ -281,4 +281,42 @@ describe("Test Doctor API", () => {
         });
     });
     // /SECTION
+
+    // SECTION: GET /doctor/:id
+    describe("GET /doctor/:id", () => {
+        // ANCHOR: should get sample doctor
+        test("should get sample doctor", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+
+            //* Act
+            const response = await request.get(`/api/doctor/${_id}`);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+            data.doctor = convertDoctorFields(data.doctor);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data).toEqual({ success: true, doctor });
+        });
+
+        // ANCHOR: should return error on unexisting doctor id
+        test("should return error on unexisting doctor id", async () => {
+            //* Arrange
+            const id = "hiimdoctorid";
+
+            //* Act
+            const response = await request.get(`/api/doctor/${id}`);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("no_doctor_found");
+            expect(data.message).toBeDefined();
+        });
+    });
+    // /SECTION
 });
