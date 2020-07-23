@@ -24,7 +24,7 @@ Router.post("/doctor", async (req, res) => {
     if (response.success) {
         return res.status(201).json({
             success: true,
-            uid: response.user?.id,
+            uid: response.doctor?.id,
         });
     }
 
@@ -33,6 +33,30 @@ Router.post("/doctor", async (req, res) => {
         error: response.error,
         message: response.message,
         validationErrors: response.errors,
+    });
+});
+
+// ANCHOR: PUT /doctor
+Router.put("/doctor", async (req, res) => {
+    const doctor = convertDoctorFields(req.body);
+
+    const oldDoctor = await doctorServices.getOne(doctor.id);
+    const newDoctor = { ...oldDoctor, ...doctor };
+
+    const response = await doctorServices.update(newDoctor);
+
+    if (response.success) {
+        return res.status(202).json({
+            success: true,
+            doctor: response.doctor,
+        });
+    }
+
+    return res.status(400).json({
+        success: false,
+        error: response.error,
+        message: response.message,
+        validationErrors: response.validationErrors,
     });
 });
 

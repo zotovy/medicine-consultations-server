@@ -61,7 +61,7 @@ const sampleDoctor: DoctorObject = {
     whosFavourite: [], // will add later
 };
 
-describe("Test UserServices", () => {
+describe("Test Doctor API", () => {
     let db: mongoose.Mongoose;
 
     // It's just so easy to connect to the MongoDB Memory Server
@@ -99,7 +99,7 @@ describe("Test UserServices", () => {
     // SECTION
     describe("POST /doctor", () => {
         // ANCHOR: should create sample doctor
-        test("should create sample user", async (done) => {
+        test("should create sample doctor", async (done) => {
             //* Arrange
             const doctor = sampleDoctor;
 
@@ -116,15 +116,15 @@ describe("Test UserServices", () => {
             expect(data).toEqual({ success: true, uid: data.uid });
             expect(status).toEqual(201);
 
-            const users = await Doctor.find({});
-            expect(users).toEqual([doctor]);
+            const newDoctor = await doctorServices.getOne(doctor.id);
+            expect(newDoctor.doctor).toEqual(doctor);
 
             done();
         });
 
         // ANCHOR: should return error on not validated user
         test("should return error on not validated user", async (done) => {
-            //* act
+            //* Act
             const response = await request
                 .post("/api/doctor")
                 .type("json")
@@ -141,6 +141,84 @@ describe("Test UserServices", () => {
 
             const users = await Doctor.find({});
             expect(users).toEqual([]);
+
+            done();
+        });
+    });
+    // /SECTION
+
+    // SECTION: PUT /doctor
+    describe("PUT /doctor", () => {
+        // ANCHOR: should update sample doctor
+        test("should update sample doctor", async (done) => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id), name: "Максим" };
+
+            //* Act
+            const response = await request
+                .put("/api/doctor")
+                .type("json")
+                .send(doctor);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+
+            data.doctor.beginDoctorDate = new Date(data.doctor.beginDoctorDate);
+            data.doctor.createdAt = new Date(data.doctor.createdAt);
+            data.doctor.lastActiveAt = new Date(data.doctor.lastActiveAt);
+
+            expect(data).toEqual({ success: true, doctor });
+            expect(status).toEqual(202);
+
+            const updated = await doctorServices.getOne(String(_id));
+            expect(updated.doctor).toEqual(doctor);
+
+            done();
+        });
+
+        // ANCHOR: shouldn't update doctor with errors
+        test("shouldn't update doctor with errors", async (done) => {
+            //* Act
+            const response = await request
+                .put("/api/doctor")
+                .type("json")
+                .send({});
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(data.success).toEqual(false);
+            expect(data.doctor).toBeFalsy();
+            expect(data.error).toEqual("not_validated_error");
+            expect(Object.keys(data.validationErrors).length).toEqual(14);
+            expect(data.message).toBeTruthy();
+
+            const users = await Doctor.find({});
+            expect(users).toEqual([]);
+
+            done();
+        });
+
+        // ANCHOR: shouldn't update not existing doctor
+        test("shouldn't update not existing doctor", async (done) => {
+            //* Arrange
+            const id = "imfakeuserid";
+
+            //* Act
+            const response = await request
+                .put("/api/doctor")
+                .type("json")
+                .send({ ...sampleDoctor, id: id });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(data.error).toEqual("updated_doctor_is_null");
+            expect(data.success).toEqual(false);
+            expect(data.message).toBeTruthy();
+            expect(status).toEqual(400);
 
             done();
         });
