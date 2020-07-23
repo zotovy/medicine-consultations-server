@@ -48,6 +48,54 @@ class DoctorServices {
         let errors: TDoctorValidationErrors = {};
         const ErrorType = TValidationErrorType;
 
+        // Education
+        if (!doctor.education) {
+            errors.education = ErrorType.RequiredError;
+        } else if (typeof doctor.education !== "string") {
+            errors.education = ErrorType.TypeError;
+        }
+
+        // Year education
+        if (doctor.yearEducation && doctor.yearEducation.length === 2) {
+            if (!Array.isArray(doctor.yearEducation)) {
+                errors.yearEducation = ErrorType.TypeError;
+            } else {
+                for (let i = 0; i < doctor.yearEducation.length; i++) {
+                    const parsed = Date.parse(
+                        doctor.yearEducation[i].toString()
+                    );
+                    if (isNaN(parsed) || parsed === 0) {
+                        errors.yearEducation = ErrorType.TypeError;
+                        break;
+                    }
+                }
+            }
+        } else errors.yearEducation = ErrorType.RequiredError;
+
+        // Blanck series
+        if (!doctor.blankSeries) {
+            errors.blankSeries = ErrorType.RequiredError;
+        } else if (typeof doctor.blankSeries !== "string") {
+            errors.blankSeries = ErrorType.TypeError;
+        }
+
+        // Blanck number
+        if (!doctor.blankNumber) {
+            errors.blankNumber = ErrorType.RequiredError;
+        } else if (typeof doctor.blankNumber !== "string") {
+            errors.blankNumber = ErrorType.TypeError;
+        }
+
+        // issueDate
+        if (!doctor.issueDate) {
+            errors.issueDate = ErrorType.RequiredError;
+        } else {
+            const parsed = Date.parse(doctor.issueDate.toString());
+            if (isNaN(parsed) || parsed === 0) {
+                errors.issueDate = ErrorType.TypeError;
+            }
+        }
+
         // Speciality
         if (doctor.speciality !== undefined && doctor.speciality !== null) {
             if (!Array.isArray(doctor.speciality)) {

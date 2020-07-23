@@ -42,6 +42,11 @@ const sampleDoctor: DoctorObject = {
     sendMailingsToEmail: true,
     createdAt: new Date(),
     lastActiveAt: new Date(),
+    blankNumber: "12345678",
+    blankSeries: "12345678",
+    education: "МГУ",
+    issueDate: new Date(),
+    yearEducation: [new Date(), new Date()],
     beginDoctorDate: new Date(),
     clientsConsultations: [], // will add later
     clientsReviews: [], // will add later
@@ -53,7 +58,7 @@ const sampleDoctor: DoctorObject = {
     whosFavourite: [], // will add later
 };
 
-describe("Test UserServices", () => {
+describe("Test Doctor services", () => {
     let db: mongoose.Mongoose;
 
     // It's just so easy to connect to the MongoDB Memory Server

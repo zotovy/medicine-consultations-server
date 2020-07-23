@@ -76,5 +76,10 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         sheldure: [...e.sheldure],
         speciality: [...e.speciality],
         whosFavourite: [...e.whosFavourite],
+        blankNumber: e.blankNumber,
+        blankSeries: e.blankSeries,
+        education: e.education,
+        issueDate: e.issueDate,
+        yearEducation: [...e.yearEducation],
     };
 }

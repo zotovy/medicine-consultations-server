@@ -60,6 +60,11 @@ export interface UserObject {
  * Doctor interface model
  */
 export interface IDoctor extends IUser {
+    education: string;
+    yearEducation: [Date, Date];
+    blankSeries: string;
+    blankNumber: string;
+    issueDate: Date;
     speciality: string[];
     beginDoctorDate: Date;
     experience: number;
@@ -71,6 +76,11 @@ export interface IDoctor extends IUser {
 }
 
 export interface DoctorObject extends UserObject {
+    education: IDoctor["education"];
+    yearEducation: IDoctor["yearEducation"];
+    blankSeries: IDoctor["blankSeries"];
+    blankNumber: IDoctor["blankNumber"];
+    issueDate: IDoctor["issueDate"];
     speciality: IDoctor["speciality"];
     beginDoctorDate: IDoctor["beginDoctorDate"];
     experience: IDoctor["experience"];

@@ -6,6 +6,26 @@ import User from "./user";
 import { IDoctor } from "../types/models";
 
 const Doctor = extendedSchema(User.schema, {
+    education: {
+        type: String,
+        required: true,
+    },
+    yearEducation: {
+        type: [Date, Date],
+        required: true,
+    },
+    blankSeries: {
+        type: String,
+        required: true,
+    },
+    blankNumber: {
+        type: String,
+        required: true,
+    },
+    issueDate: {
+        type: Date,
+        required: true,
+    },
     speciality: {
         type: [String],
         required: true,

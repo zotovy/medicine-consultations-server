@@ -214,6 +214,11 @@ export enum TSpeciality {
  * This type describe doctor validation errors
  */
 export type TDoctorValidationErrors = TUserValidationErrors & {
+    education?: TValidationErrorType;
+    yearEducation?: TValidationErrorType;
+    blankSeries?: TValidationErrorType;
+    blankNumber?: TValidationErrorType;
+    issueDate?: TValidationErrorType;
     speciality?: TValidationErrorType;
     beginDoctorDate?: TValidationErrorType;
     experience?: TValidationErrorType;

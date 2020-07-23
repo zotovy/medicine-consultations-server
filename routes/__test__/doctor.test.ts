@@ -50,6 +50,11 @@ const sampleDoctor: DoctorObject = {
     sendMailingsToEmail: true,
     createdAt: new Date(),
     lastActiveAt: new Date(),
+    blankNumber: "12345678",
+    blankSeries: "12345678",
+    education: "МГУ",
+    issueDate: new Date(),
+    yearEducation: [new Date(), new Date()],
     beginDoctorDate: new Date(),
     clientsConsultations: [], // will add later
     clientsReviews: [], // will add later
@@ -64,11 +69,19 @@ const sampleDoctor: DoctorObject = {
 // This function will convert lastActiveAt, createdAt & beginDoctorDate
 // from String --> Date and return new doctorObj
 const convertDoctorFields = (doctor: any) => {
-    if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
+    if (
+        doctor.lastActiveAt &&
+        doctor.createdAt &&
+        doctor.beginDoctorDate &&
+        doctor.yearEducation
+    ) {
         // Convert String --> new Date
         doctor.lastActiveAt = new Date(doctor.lastActiveAt);
         doctor.createdAt = new Date(doctor.createdAt);
         doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
+        doctor.issueDate = new Date(doctor.issueDate);
+        doctor.yearEducation[0] = new Date(doctor.yearEducation[0]);
+        doctor.yearEducation[1] = new Date(doctor.yearEducation[1]);
     }
     return doctor;
 };
@@ -145,6 +158,7 @@ describe("Test Doctor API", () => {
             const data = JSON.parse(response.text);
 
             //* Assert
+            expect(status).toEqual(400);
             expect(data.success).toEqual(false);
             expect(data.uid).toBeFalsy();
             expect(data.error).toEqual("not_validated_error");
@@ -174,13 +188,9 @@ describe("Test Doctor API", () => {
                 .send(doctor);
             const status = response.status;
             const data = JSON.parse(response.text);
+            data.doctor = convertDoctorFields(data.doctor);
 
             //* Assert
-
-            data.doctor.beginDoctorDate = new Date(data.doctor.beginDoctorDate);
-            data.doctor.createdAt = new Date(data.doctor.createdAt);
-            data.doctor.lastActiveAt = new Date(data.doctor.lastActiveAt);
-
             expect(data).toEqual({ success: true, doctor });
             expect(status).toEqual(202);
 
