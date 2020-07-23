@@ -310,6 +310,6 @@ export type TGetOneDoctor = {
     // Show error message if failed
     message?: string;
 
-    // Return user if success
+    // Return doctor if success
     doctor?: UserObject;
 };

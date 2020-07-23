@@ -1,6 +1,7 @@
 import express from "express";
 import rateLimitter from "express-rate-limit";
 import doctorServices from "../services/doctor_services";
+import { Types } from "mongoose";
 
 // Used to process the http request
 const Router = express.Router();
@@ -58,6 +59,34 @@ Router.put("/doctor", async (req, res) => {
         message: response.message,
         validationErrors: response.validationErrors,
     });
+});
+
+// ANCHOR: DELETE /doctor
+Router.delete("/doctor/:id", async (req, res) => {
+    const id = req.params.id;
+
+    if (!id || !Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            success: false,
+            error: "invalid_id_error",
+            message: `Invalid id were provide, id=${id}`,
+        });
+    }
+
+    const response = await doctorServices.delete(id);
+
+    if (response.success) {
+        return res.status(203).json({
+            success: true,
+            doctor: response.doctor,
+        });
+    } else {
+        return res.status(400).json({
+            success: false,
+            error: response.error,
+            message: response.message,
+        });
+    }
 });
 
 export default Router;

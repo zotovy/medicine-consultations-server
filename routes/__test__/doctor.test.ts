@@ -61,6 +61,18 @@ const sampleDoctor: DoctorObject = {
     whosFavourite: [], // will add later
 };
 
+// This function will convert lastActiveAt, createdAt & beginDoctorDate
+// from String --> Date and return new doctorObj
+const convertDoctorFields = (doctor: any) => {
+    if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
+        // Convert String --> new Date
+        doctor.lastActiveAt = new Date(doctor.lastActiveAt);
+        doctor.createdAt = new Date(doctor.createdAt);
+        doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
+    }
+    return doctor;
+};
+
 describe("Test Doctor API", () => {
     let db: mongoose.Mongoose;
 
@@ -219,6 +231,51 @@ describe("Test Doctor API", () => {
             expect(data.success).toEqual(false);
             expect(data.message).toBeTruthy();
             expect(status).toEqual(400);
+
+            done();
+        });
+    });
+    // /SECTION
+
+    // SECTION: DELETE /doctor
+    describe("DELETE /doctor", () => {
+        // ANCHOR: should delete sample doctor
+        test("should delete sample doctor", async (done) => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+
+            //* Act
+            const response = await request.delete(`/api/doctor/${_id}`);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+            data.doctor = convertDoctorFields(data.doctor);
+
+            //* Assert
+            expect(status).toEqual(203);
+            expect(data).toEqual({ success: true, doctor });
+
+            const doctors = await Doctor.find({});
+            expect(doctors).toEqual([]);
+
+            done();
+        });
+
+        // ANCHOR: should return error on not existing doctor
+        test("should return error on not existing doctor", async (done) => {
+            //* Arrange
+            const id = "hiimdoctorid";
+
+            //* Act
+            const response = await request.delete(`/api/doctor/${id}`);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("no_doctor_found");
+            expect(data.message).toBeDefined();
 
             done();
         });
