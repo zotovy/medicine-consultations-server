@@ -174,23 +174,23 @@ describe("Test UserServices", () => {
         /** Create doctor using doctor service. Expect this doctor in db */
         test("should create sample doctor", async () => {
             //* Arrange
-            const user = sampleDoctor;
+            const doctor = sampleDoctor;
 
             //* Act
             const responce = await doctorServices.create(sampleDoctor);
-            user.id = responce?.user?.id;
+            doctor.id = responce?.doctor?.id;
 
             //* Assert
             expect(responce.success).toEqual(true);
-            expect(responce.user).toEqual(user);
+            expect(responce.doctor).toEqual(doctor);
             expect(responce.error).toBeFalsy();
             expect(responce.errors).toBeFalsy();
             expect(responce.message).toBeFalsy();
 
-            const users = (await Doctor.find({})).map((e) =>
+            const doctors = (await Doctor.find({})).map((e) =>
                 IDoctorToDoctorObj(e)
             );
-            expect(users).toEqual([user]);
+            expect(doctors).toEqual([doctor]);
         });
 
         // ANCHOR: shouldn't create dont'validated user
@@ -202,7 +202,7 @@ describe("Test UserServices", () => {
 
             //* Assert
             expect(responce.success).toEqual(false);
-            expect(responce.user).toBeFalsy();
+            expect(responce.doctor).toBeFalsy();
             expect(responce.error).toEqual("not_validated_error");
             expect(responce.errors).toBeTruthy();
             expect(responce.message).toBeTruthy();
@@ -308,6 +308,37 @@ describe("Test UserServices", () => {
             expect(responce.success).toEqual(false);
             expect(responce.error).toEqual("no_doctor_found");
             expect(responce.doctor).toBeUndefined();
+            expect(responce.message).toBeDefined();
+        });
+    });
+    // /SECTION
+
+    // SECTION: getOne()
+    describe("Get one doctor", () => {
+        // ANCHOR: should get sample doctor
+        test("should get sample doctor", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+
+            //* Act
+            const response = await doctorServices.getOne(_id);
+
+            //* Assert
+            expect(response).toEqual({ success: true, doctor });
+        });
+
+        // ANCHOR: should return error on unexisting doctor id
+        test("should return error on unexisting doctor id", async () => {
+            //* Arrange
+            const id = "hiimdoctorid";
+
+            //* Act
+            const responce = await doctorServices.getOne(id);
+
+            //* Assert
+            expect(responce.success).toEqual(false);
+            expect(responce.error).toEqual("no_doctor_found");
             expect(responce.message).toBeDefined();
         });
     });

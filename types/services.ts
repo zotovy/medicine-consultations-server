@@ -119,7 +119,7 @@ export type TGetUserById = {
     success: true | false;
 
     // Show error if failed
-    error?: "no_user_found_error" | "invalid_error" | "no_user_found";
+    error?: "no_user_found_error" | "invalid_error";
 
     // Show error message if failed
     message?: string;
@@ -257,7 +257,7 @@ export type TCreateDoctor = {
     message?: string;
 
     // Return user if success
-    user?: DoctorObject;
+    doctor?: DoctorObject;
 };
 
 /**
@@ -294,5 +294,22 @@ export type TRemoveDoctor = {
     message?: string;
 
     // Return doctor if success
+    doctor?: UserObject;
+};
+
+/**
+ * This type describe error object from UserServices.getUserById() function
+ */
+export type TGetOneDoctor = {
+    // Is operation going success
+    success: true | false;
+
+    // Show error if failed
+    error?: "invalid_error" | "no_doctor_found";
+
+    // Show error message if failed
+    message?: string;
+
+    // Return user if success
     doctor?: UserObject;
 };

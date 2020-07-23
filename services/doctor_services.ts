@@ -14,6 +14,7 @@ import {
     TCreateDoctor,
     TUpdateDoctor,
     TRemoveDoctor,
+    TGetOneDoctor,
 } from "../types/services";
 
 // Services
@@ -26,6 +27,13 @@ class DoctorServices {
         doctor: any,
         needUnique: boolean = true
     ): Promise<TValidateDoctor> => {
+        if (!doctor) {
+            return {
+                success: false,
+                errors: {},
+            };
+        }
+
         // Doctor model is extended from User model,
         // so, if obj is not validate as user this will never validated as doctor
         const responce = await UserServices.validateUser(doctor, needUnique);
@@ -139,7 +147,7 @@ class DoctorServices {
         // validate doctor type
         const responce = await this.validate(data);
 
-        if (!responce.success) {
+        if (!responce.success || responce.errors === {}) {
             return {
                 success: false,
                 error: "not_validated_error",
@@ -166,7 +174,7 @@ class DoctorServices {
 
         return {
             success: true,
-            user: IDoctorToDoctorObj(doctor),
+            doctor: IDoctorToDoctorObj(doctor),
         };
     };
 
@@ -256,6 +264,32 @@ class DoctorServices {
                 message: "Removed user is null",
             };
         }
+    };
+
+    // ANCHOR: get one
+    getOne = async (id: string | Types.ObjectId): Promise<TGetOneDoctor> => {
+        if (!Types.ObjectId.isValid(id)) {
+            return {
+                success: false,
+                error: "no_doctor_found",
+                message: "Invalid Id were provide",
+            };
+        }
+
+        const doctor: IDoctor | null = await Doctor.findById(id);
+
+        if (!doctor) {
+            return {
+                success: false,
+                error: "no_doctor_found",
+                message: "Invalid Id were provide",
+            };
+        }
+
+        return {
+            success: true,
+            doctor: IDoctorToDoctorObj(doctor),
+        };
     };
 }
 
