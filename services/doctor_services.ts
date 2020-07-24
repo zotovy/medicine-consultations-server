@@ -1,10 +1,10 @@
 /// <reference path="../declaration/mongoose-extended-schema.d.ts" />
 
 import { Types } from "mongoose";
-import Doctor from "../models/doctor";
+import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 
 // types
-import { DoctorObject, IDoctor, IUser } from "../types/models";
+import { DoctorObject, IDoctor, BecomeDoctorObj } from "../types/models";
 
 import {
     TValidateDoctor,
@@ -15,6 +15,7 @@ import {
     TUpdateDoctor,
     TRemoveDoctor,
     TGetOneDoctor,
+    TSaveBecomeDoctorRequest,
 } from "../types/services";
 
 // Services
@@ -338,6 +339,45 @@ class DoctorServices {
             success: true,
             doctor: IDoctorToDoctorObj(doctor),
         };
+    };
+
+    // ANCHOR: save become doctor request
+    saveBecomeDoctorRequest = async (
+        request: BecomeDoctorObj
+    ): Promise<TSaveBecomeDoctorRequest> => {
+        try {
+            const email = request.email;
+
+            if (email) {
+                const founded = await BecomeDoctorRequest.find({ email });
+
+                if (founded.length >= 3) {
+                    return {
+                        success: false,
+                        error: "requests_limit_error",
+                        message:
+                            "Exceeded the limit of request per one email (3)",
+                    };
+                }
+            } else {
+                return {
+                    success: true,
+                };
+            }
+
+            await BecomeDoctorRequest.create(request);
+
+            return {
+                success: true,
+            };
+        } catch (e) {
+            console.error(e);
+            return {
+                success: false,
+                error: "invalid_error",
+                message: "Invalid error happened",
+            };
+        }
     };
 }
 

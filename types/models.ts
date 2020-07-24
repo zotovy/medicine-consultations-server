@@ -73,6 +73,11 @@ export interface IDoctor extends IUser {
     clientsReviews: mongoose.Types.ObjectId[];
     clientsConsultations: mongoose.Types.ObjectId[];
     sheldure: mongoose.Types.ObjectId[];
+    passportIssuedByWhom: string;
+    passportSeries: string;
+    passportIssueDate: string;
+    workExperience: string;
+    workPlaces: string;
 }
 
 export interface DoctorObject extends UserObject {
@@ -89,6 +94,11 @@ export interface DoctorObject extends UserObject {
     clientsReviews: IDoctor["clientsReviews"];
     clientsConsultations: IDoctor["clientsConsultations"];
     sheldure: IDoctor["sheldure"];
+    passportIssuedByWhom: IDoctor["passportIssuedByWhom"];
+    passportSeries: IDoctor["passportSeries"];
+    passportIssueDate: IDoctor["passportIssueDate"];
+    workExperience: IDoctor["workExperience"];
+    workPlaces: IDoctor["workPlaces"];
 }
 
 /**
@@ -163,25 +173,48 @@ export interface SpecialityType {
 }
 
 /**
- *  Become Doctor Request
+ *  Become Doctor Request mongoose interface
  *  Send by client when user submit form to become a doctor
  */
 export interface IBecomeDoctor extends Document {
-    name: string;
-    surname: string;
-    phone: string;
-    email: string;
-    password: string;
-    education: string;
-    speciality: string;
-    yearEducation: string;
-    blankSeries: string;
-    blankNumber: string;
-    issueDate: string;
-    experience: string;
-    passportIssuedByWhom: string;
-    passportSeries: string;
-    passportIssueDate: string;
-    workExperience: string;
-    workPlaces: string;
+    name?: string;
+    surname?: string;
+    phone?: string;
+    email?: string;
+    password?: string;
+    education?: string;
+    speciality?: string;
+    yearEducation?: string;
+    blankSeries?: string;
+    blankNumber?: string;
+    issueDate?: string;
+    experience?: string;
+    passportIssuedByWhom?: string;
+    passportSeries?: string;
+    passportIssueDate?: string;
+    workExperience?: string;
+    workPlaces?: string;
+}
+
+/**
+ * Become Doctor Request Object
+ */
+export interface BecomeDoctorObj {
+    name?: IBecomeDoctor["name"];
+    surname?: IBecomeDoctor["surname"];
+    phone?: IBecomeDoctor["phone"];
+    email?: IBecomeDoctor["email"];
+    password?: IBecomeDoctor["password"];
+    education?: IBecomeDoctor["education"];
+    speciality?: IBecomeDoctor["speciality"];
+    yearEducation?: IBecomeDoctor["yearEducation"];
+    blankSeries?: IBecomeDoctor["blankSeries"];
+    blankNumber?: IBecomeDoctor["blankNumber"];
+    issueDate?: IBecomeDoctor["issueDate"];
+    experience?: IBecomeDoctor["experience"];
+    passportIssuedByWhom?: IBecomeDoctor["passportIssuedByWhom"];
+    passportSeries?: IBecomeDoctor["passportSeries"];
+    passportIssueDate?: IBecomeDoctor["passportIssueDate"];
+    workExperience?: IBecomeDoctor["workExperience"];
+    workPlaces?: IBecomeDoctor["workPlaces"];
 }

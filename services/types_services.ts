@@ -5,6 +5,8 @@ import {
     DoctorObject,
     IReview,
     ReviewObject,
+    BecomeDoctorObj,
+    IBecomeDoctor,
 } from "../types/models";
 
 /**
@@ -81,5 +83,58 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         education: e.education,
         issueDate: e.issueDate,
         yearEducation: [...e.yearEducation],
+        passportIssueDate: e.passportIssueDate,
+        passportIssuedByWhom: e.passportIssuedByWhom,
+        passportSeries: e.passportSeries,
+        workExperience: e.workExperience,
+        workPlaces: e.workPlaces,
+    };
+}
+/**
+ * Convert DoctorObject --> BecomeDoctorObj
+ */
+export function DoctorObjToBecomeDoctorObj(e: DoctorObject): BecomeDoctorObj {
+    return {
+        name: e.name,
+        surname: e.surname,
+        phone: e.phone.toString(),
+        email: e.email,
+        password: e.password,
+        education: e.education,
+        speciality: e.speciality.join(", "),
+        yearEducation: e.yearEducation.join(","),
+        blankSeries: e.blankSeries,
+        blankNumber: e.blankNumber,
+        issueDate: e.issueDate.toString(),
+        experience: e.experience.toString() + " дней",
+        passportIssueDate: e.passportIssueDate,
+        passportIssuedByWhom: e.passportIssuedByWhom,
+        passportSeries: e.passportSeries,
+        workExperience: e.workExperience,
+        workPlaces: e.workPlaces,
+    };
+}
+
+export function IBecomeDoctorToBecomeDoctorObj(
+    e: IBecomeDoctor
+): BecomeDoctorObj {
+    return {
+        name: e.name,
+        surname: e.surname,
+        phone: e.phone,
+        email: e.email,
+        password: e.password,
+        education: e.education,
+        speciality: e.speciality,
+        yearEducation: e.yearEducation,
+        blankSeries: e.blankSeries,
+        blankNumber: e.blankNumber,
+        issueDate: e.issueDate,
+        experience: e.experience,
+        passportIssueDate: e.passportIssueDate,
+        passportIssuedByWhom: e.passportIssuedByWhom,
+        passportSeries: e.passportSeries,
+        workExperience: e.workExperience,
+        workPlaces: e.workPlaces,
     };
 }

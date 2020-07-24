@@ -34,6 +34,26 @@ const Doctor = extendedSchema(User.schema, {
         type: Date,
         required: true,
     },
+    passportIssuedByWhom: {
+        type: String,
+        required: true,
+    },
+    passportSeries: {
+        type: String,
+        required: true,
+    },
+    passportIssueDate: {
+        type: String,
+        required: true,
+    },
+    workExperience: {
+        type: String,
+        required: true,
+    },
+    workPlaces: {
+        type: String,
+        required: true,
+    },
     experience: Number, // in days
     rating: {
         type: Number, // from 0 to 5
@@ -73,74 +93,23 @@ const Doctor = extendedSchema(User.schema, {
 export default model<IDoctor>("Doctor", Doctor);
 
 const BecomeDoctorRequestSchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-    },
-    surname: {
-        type: String,
-        required: true,
-    },
-    phone: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    education: {
-        type: String,
-        required: true,
-    },
-    speciality: {
-        type: String,
-        required: true,
-    },
-    yearEducation: {
-        type: String,
-        required: true,
-    },
-    blankSeries: {
-        type: String,
-        required: true,
-    },
-    blankNumber: {
-        type: String,
-        required: true,
-    },
-    issueDate: {
-        type: String,
-        required: true,
-    },
-    experience: {
-        type: String,
-        required: true,
-    },
-    passportIssuedByWhom: {
-        type: String,
-        required: true,
-    },
-    passportSeries: {
-        type: String,
-        required: true,
-    },
-    passportIssueDate: {
-        type: String,
-        required: true,
-    },
-    workExperience: {
-        type: String,
-        required: true,
-    },
-    workPlaces: {
-        type: String,
-        required: true,
-    },
+    name: String,
+    surname: String,
+    phone: String,
+    email: String,
+    password: String,
+    education: String,
+    speciality: String,
+    yearEducation: String,
+    blankSeries: String,
+    blankNumber: String,
+    issueDate: String,
+    experience: String,
+    passportIssuedByWhom: String,
+    passportSeries: String,
+    passportIssueDate: String,
+    workExperience: String,
+    workPlaces: String,
 });
 
 export const BecomeDoctorRequest = model<IBecomeDoctor>(

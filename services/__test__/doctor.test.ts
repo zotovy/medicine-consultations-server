@@ -1,14 +1,19 @@
 /// <reference types="../../node_modules/@types/jest/index" />
 
 import mongoose from "mongoose";
-import Doctor from "../../models/doctor";
+import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 
 // Testable
 import doctorServices from "../doctor_services";
 
 // @types
-import { DoctorObject } from "../../types/models";
-import { IDoctorToDoctorObj } from "../types_services";
+import { DoctorObject, BecomeDoctorObj } from "../../types/models";
+import {
+    IDoctorToDoctorObj,
+    DoctorObjToBecomeDoctorObj,
+    IBecomeDoctorToBecomeDoctorObj,
+} from "../types_services";
+import doctor_services from "../doctor_services";
 
 /**
  *  ? This test module testing user services
@@ -56,6 +61,11 @@ const sampleDoctor: DoctorObject = {
     sheldure: [], // will add later
     speciality: [],
     whosFavourite: [], // will add later
+    passportIssueDate: "21.11.2015",
+    passportIssuedByWhom: "МВД г. Москвы",
+    passportSeries: "123123",
+    workExperience: "1 год",
+    workPlaces: "Городская поликлиника №1 г. Москва",
 };
 
 describe("Test Doctor services", () => {
@@ -88,6 +98,7 @@ describe("Test Doctor services", () => {
     // Remove all date from mongodb after each test case
     afterEach(async () => {
         await Doctor.remove({});
+        await BecomeDoctorRequest.remove({});
     });
 
     // SECTION: validate()
@@ -345,6 +356,49 @@ describe("Test Doctor services", () => {
             expect(responce.success).toEqual(false);
             expect(responce.error).toEqual("no_doctor_found");
             expect(responce.message).toBeDefined();
+        });
+    });
+    // /SECTION
+
+    // SECTION
+    describe("save become doctor request", () => {
+        const sampleRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
+            sampleDoctor
+        );
+
+        // ANCHOR: should save sample doctor request
+        test("should save sample doctor request", async () => {
+            //* Act
+            const response = await doctor_services.saveBecomeDoctorRequest(
+                sampleRequest
+            );
+
+            //* Assert
+            expect(response).toEqual({ success: true });
+            const raw = await BecomeDoctorRequest.find({});
+            const request = IBecomeDoctorToBecomeDoctorObj(raw[0]);
+
+            expect(sampleRequest).toEqual(request);
+        });
+
+        // ANCHOR: should return error on exceeding the limit
+        test("should return error on exceeding the limit", async () => {
+            //* Arrange
+            await BecomeDoctorRequest.create(sampleRequest);
+            await BecomeDoctorRequest.create(sampleRequest);
+            await BecomeDoctorRequest.create(sampleRequest);
+
+            //* Act
+            const response = await doctor_services.saveBecomeDoctorRequest(
+                sampleRequest
+            );
+
+            //* Assert
+            expect(response.success).toEqual(false);
+            expect(response.error).toEqual("requests_limit_error");
+            expect(response.message).toBeDefined();
+            const raw = await BecomeDoctorRequest.find({});
+            expect(raw.length).toEqual(3);
         });
     });
     // /SECTION

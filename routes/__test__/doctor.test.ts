@@ -64,6 +64,11 @@ const sampleDoctor: DoctorObject = {
     sheldure: [], // will add later
     speciality: [],
     whosFavourite: [], // will add later
+    passportIssueDate: "21.11.2015",
+    passportIssuedByWhom: "МВД г. Москвы",
+    passportSeries: "123123",
+    workExperience: "1 год",
+    workPlaces: "Городская поликлиника №1 г. Москва",
 };
 
 // This function will convert lastActiveAt, createdAt & beginDoctorDate

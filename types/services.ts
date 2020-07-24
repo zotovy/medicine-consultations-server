@@ -318,3 +318,17 @@ export type TGetOneDoctor = {
     // Return doctor if success
     doctor?: UserObject;
 };
+
+/**
+ * This type describe error object from UserServices.saveBecomeDoctorRequest() function
+ */
+export type TSaveBecomeDoctorRequest = {
+    // Is operation going success
+    success: true | false;
+
+    // Show error if failed
+    error?: "invalid_error" | "requests_limit_error";
+
+    // Show error message if failed
+    message?: string;
+};
