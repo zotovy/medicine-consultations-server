@@ -102,20 +102,20 @@ describe("Test UserServices", () => {
             expect(await User.find({})).toEqual([]);
             const create1 = await User.create(sampleUser);
             user1.id = String(create1._id);
-            const responce1 = await userServices.getUsers();
-            const result1: UserObject[] | undefined = responce1.users;
+            const response1 = await userServices.getUsers();
+            const result1: UserObject[] | undefined = response1.users;
 
             // Test 2 users
             const create2 = await User.create(user2);
             user2.id = String(create2._id);
-            const responce2 = await userServices.getUsers();
-            const result2: UserObject[] | undefined = responce2.users;
+            const response2 = await userServices.getUsers();
+            const result2: UserObject[] | undefined = response2.users;
 
             // Test 3 users
             const create3 = await User.create(user3);
             user3.id = String(create3._id);
-            const responce3 = await userServices.getUsers();
-            const result3: UserObject[] | undefined = responce3.users;
+            const response3 = await userServices.getUsers();
+            const result3: UserObject[] | undefined = response3.users;
 
             // Prepare answers
             const answer1: UserObject[] = [user1];
@@ -123,17 +123,17 @@ describe("Test UserServices", () => {
             const answer3: UserObject[] = [user1, user2, user3];
 
             //* Checking
-            expect(responce1.success).toBe(true);
-            expect(responce2.success).toBe(true);
-            expect(responce3.success).toBe(true);
+            expect(response1.success).toBe(true);
+            expect(response2.success).toBe(true);
+            expect(response3.success).toBe(true);
 
-            expect(responce1.message).toBeUndefined();
-            expect(responce2.message).toBeUndefined();
-            expect(responce3.message).toBeUndefined();
+            expect(response1.message).toBeUndefined();
+            expect(response2.message).toBeUndefined();
+            expect(response3.message).toBeUndefined();
 
-            expect(responce1.error).toBeUndefined();
-            expect(responce2.error).toBeUndefined();
-            expect(responce3.error).toBeUndefined();
+            expect(response1.error).toBeUndefined();
+            expect(response2.error).toBeUndefined();
+            expect(response3.error).toBeUndefined();
 
             expect(result1).toEqual(answer1);
             expect(result2).toEqual(answer2);
@@ -150,13 +150,13 @@ describe("Test UserServices", () => {
             const { _id } = await User.create(sampleUser);
             await User.remove({ _id: _id });
 
-            const responce = await userServices.getUsers();
-            const result = responce.users;
+            const response = await userServices.getUsers();
+            const result = response.users;
 
             //* Checking
-            expect(responce.success).toBe(true);
-            expect(responce.message).toBeUndefined();
-            expect(responce.error).toBeUndefined();
+            expect(response.success).toBe(true);
+            expect(response.message).toBeUndefined();
+            expect(response.error).toBeUndefined();
             expect(result).toEqual(answer);
         });
 
@@ -173,13 +173,13 @@ describe("Test UserServices", () => {
             updatedUser.id = String(_id);
             const answer: UserObject[] = [updatedUser];
 
-            const responce = await userServices.getUsers();
-            const result = responce.users;
+            const response = await userServices.getUsers();
+            const result = response.users;
 
             //* Checking
-            expect(responce.success).toBe(true);
-            expect(responce.message).toBeUndefined();
-            expect(responce.error).toBeUndefined();
+            expect(response.success).toBe(true);
+            expect(response.message).toBeUndefined();
+            expect(response.error).toBeUndefined();
             expect(result).toEqual(answer);
         });
     });
@@ -197,17 +197,17 @@ describe("Test UserServices", () => {
             //* Result
             const { _id } = await User.create(sampleUser);
 
-            const responce = await userServices.checkUserEmailAndPassword(
+            const response = await userServices.checkUserEmailAndPassword(
                 email,
                 password
             );
-            const id = responce.id;
+            const id = response.id;
 
             //* Checking
-            expect(responce.success).toBe(true);
-            expect(responce.message).toBeUndefined();
-            expect(responce.error).toBeUndefined();
-            expect(responce.id).toBeDefined();
+            expect(response.success).toBe(true);
+            expect(response.message).toBeUndefined();
+            expect(response.error).toBeUndefined();
+            expect(response.id).toBeDefined();
             expect(id).toStrictEqual(_id);
         });
 
@@ -224,16 +224,16 @@ describe("Test UserServices", () => {
             //* Result
             const { _id } = await User.create(sampleUser);
 
-            const responce = await userServices.checkUserEmailAndPassword(
+            const response = await userServices.checkUserEmailAndPassword(
                 email,
                 password
             );
 
             //* Checking
-            expect(responce.success).toBe(false);
-            expect(responce.message).toBeDefined();
-            expect(responce.error).toEqual("invalid_email");
-            expect(responce.id).toBeUndefined();
+            expect(response.success).toBe(false);
+            expect(response.message).toBeDefined();
+            expect(response.error).toEqual("invalid_email");
+            expect(response.id).toBeUndefined();
         });
         // ANCHOR: shouldn't validate wrong password
         /**
@@ -248,16 +248,16 @@ describe("Test UserServices", () => {
             //* Result
             const { _id } = await User.create(sampleUser);
 
-            const responce = await userServices.checkUserEmailAndPassword(
+            const response = await userServices.checkUserEmailAndPassword(
                 email,
                 password
             );
 
             //* Checking
-            expect(responce.success).toBe(false);
-            expect(responce.message).toBeDefined();
-            expect(responce.error).toEqual("invalid_password");
-            expect(responce.id).toBeUndefined();
+            expect(response.success).toBe(false);
+            expect(response.message).toBeDefined();
+            expect(response.error).toEqual("invalid_password");
+            expect(response.id).toBeUndefined();
         });
     });
     // /SECTION
@@ -273,11 +273,11 @@ describe("Test UserServices", () => {
         /** Function must validate sample user */
         test("should validate sample user", async () => {
             //* Result
-            const responce = await userServices.validateUser(sampleUser);
+            const response = await userServices.validateUser(sampleUser);
 
             //* Checking
-            expect(responce.errors).toBeUndefined();
-            expect(responce.success).toBe(true);
+            expect(response.errors).toBeUndefined();
+            expect(response.success).toBe(true);
         });
 
         // ANCHOR: shouldn't validate unique error
@@ -291,11 +291,11 @@ describe("Test UserServices", () => {
 
             //* Result
             await User.create(sampleUser);
-            const responce = await userServices.validateUser(sampleUser);
+            const response = await userServices.validateUser(sampleUser);
 
             //* Checking
-            expect(responce.errors).toEqual(errors);
-            expect(responce.success).toBe(false);
+            expect(response.errors).toEqual(errors);
+            expect(response.success).toBe(false);
         });
 
         // ANCHOR: shouldn't validate type error
@@ -339,11 +339,11 @@ describe("Test UserServices", () => {
             };
 
             //* Result
-            const responce = await userServices.validateUser(user);
+            const response = await userServices.validateUser(user);
 
             //* Checking
-            expect(responce.errors).toEqual(errors);
-            expect(responce.success).toBe(false);
+            expect(response.errors).toEqual(errors);
+            expect(response.success).toBe(false);
         });
 
         // ANCHOR: shouldn't validate length error
@@ -364,11 +364,11 @@ describe("Test UserServices", () => {
             };
 
             //* Result
-            const responce = await userServices.validateUser(user);
+            const response = await userServices.validateUser(user);
 
             //* Checking
-            expect(responce.errors).toEqual(errors);
-            expect(responce.success).toBe(false);
+            expect(response.errors).toEqual(errors);
+            expect(response.success).toBe(false);
         });
 
         // ANCHOR: shouldn't validate incorrect email
@@ -386,18 +386,18 @@ describe("Test UserServices", () => {
             };
 
             //* Result
-            const responce = await userServices.validateUser(user);
+            const response = await userServices.validateUser(user);
 
             //* Checking
-            expect(responce.errors).toEqual(errors);
-            expect(responce.success).toBe(false);
+            expect(response.errors).toEqual(errors);
+            expect(response.success).toBe(false);
         });
     });
     // /SECTION
 
     // SECTION: setUserAvatar
     describe("test setUserAvatar()", () => {
-        // ANCHOR: setUserAvatar()
+        // ANCHOR: should set avatar
         /** Create sample user. Function should update userAvatar. Checking by User.findOne()  */
         test("should set avatar", async () => {
             //* Given
@@ -410,11 +410,11 @@ describe("Test UserServices", () => {
                 _id,
                 avatarUrl
             );
-            const responce = await User.findOne({ _id: _id });
+            const response = await User.findOne({ _id: _id });
 
             //* Checking
             expect(success).toBe(true);
-            expect(responce?.photoUrl).toEqual(avatarUrl);
+            expect(response?.photoUrl).toEqual(avatarUrl);
         });
 
         // ANCHOR: should return error on unexisting user
@@ -450,13 +450,13 @@ describe("Test UserServices", () => {
             const answer = { ...sampleUser, id: String(_id) };
 
             //* Result
-            const responce = await userServices.getUserById(_id);
-            const user: UserObject | undefined = responce.user;
+            const response = await userServices.getUserById(_id);
+            const user: UserObject | undefined = response.user;
 
             //* Checking
-            expect(responce.success).toBe(true);
-            expect(responce.message).toBeUndefined();
-            expect(responce.error).toBeUndefined();
+            expect(response.success).toBe(true);
+            expect(response.message).toBeUndefined();
+            expect(response.error).toBeUndefined();
             expect(user).toBeDefined();
             expect(user).toEqual(answer);
         });
@@ -468,13 +468,13 @@ describe("Test UserServices", () => {
             const id = "123456789101";
 
             //* Result
-            const responce = await userServices.getUserById(id);
+            const response = await userServices.getUserById(id);
 
             //* Checking
-            expect(responce.success).toBe(false);
-            expect(responce.error).toBe("no_user_found_error");
-            expect(responce.message).toBeDefined();
-            expect(responce.user).toBeUndefined();
+            expect(response.success).toBe(false);
+            expect(response.error).toBe("no_user_found_error");
+            expect(response.message).toBeDefined();
+            expect(response.user).toBeUndefined();
         });
     });
     // /SECTION
@@ -485,11 +485,11 @@ describe("Test UserServices", () => {
         /** Function should create user and return user */
         test("should create sample user", async () => {
             //* Result
-            const responce = await userServices.createUser(sampleUser);
-            const success: boolean = responce.success;
-            const user: UserObject | undefined = responce.user;
-            const error: string | undefined = responce.error;
-            const message: string | undefined = responce.message;
+            const response = await userServices.createUser(sampleUser);
+            const success: boolean = response.success;
+            const user: UserObject | undefined = response.user;
+            const error: string | undefined = response.error;
+            const message: string | undefined = response.message;
 
             const answer = { ...sampleUser, id: user?.id };
 
@@ -512,17 +512,17 @@ describe("Test UserServices", () => {
             await User.create(sampleUser);
 
             //* Result
-            const responce = await userServices.createUser(sampleUser);
-            const success: boolean = responce.success;
-            const user: UserObject | undefined = responce.user;
-            const error: string | undefined = responce.error;
-            const message: string | undefined = responce.message;
+            const response = await userServices.createUser(sampleUser);
+            const success: boolean = response.success;
+            const user: UserObject | undefined = response.user;
+            const error: string | undefined = response.error;
+            const message: string | undefined = response.message;
 
             //* Checking
             expect(success).toBe(false);
             expect(user).toBeUndefined();
             expect(error).toEqual("not_validated_error");
-            expect(responce.errors).toEqual(errors);
+            expect(response.errors).toEqual(errors);
             expect(message).toBeDefined();
         });
     });
@@ -559,15 +559,15 @@ describe("Test UserServices", () => {
             updated.id = String(_id);
 
             //* Result
-            const responce = await userServices.updateUser(updated);
-            const user: UserObject | undefined = responce.user;
+            const response = await userServices.updateUser(updated);
+            const user: UserObject | undefined = response.user;
 
             //* Checking
-            expect(responce.success).toBe(true);
+            expect(response.success).toBe(true);
             expect(user).toEqual(updated);
-            expect(responce.error).toBeUndefined();
-            expect(responce.message).toBeUndefined();
-            expect(responce.validationErrors).toBeUndefined();
+            expect(response.error).toBeUndefined();
+            expect(response.message).toBeUndefined();
+            expect(response.validationErrors).toBeUndefined();
         });
 
         // ANCHOR: shouldn't update user with not unique new email
@@ -618,15 +618,15 @@ describe("Test UserServices", () => {
 
             //* Result
             // update user-2
-            const responce = await userServices.updateUser(updated);
-            const user: UserObject | undefined = responce.user;
+            const response = await userServices.updateUser(updated);
+            const user: UserObject | undefined = response.user;
 
             //* Checking
-            expect(responce.success).toBe(false);
+            expect(response.success).toBe(false);
             expect(user).toBeUndefined();
-            expect(responce.error).toEqual("not_validated_error");
-            expect(responce.validationErrors).toEqual(errors);
-            expect(responce.message).toBeDefined();
+            expect(response.error).toEqual("not_validated_error");
+            expect(response.validationErrors).toEqual(errors);
+            expect(response.message).toBeDefined();
         });
     });
     // /SECTION
@@ -641,14 +641,14 @@ describe("Test UserServices", () => {
             const user = { ...sampleUser, id: String(_id) };
 
             //* Result
-            const responce = await userServices.removeUser(_id);
+            const response = await userServices.removeUser(_id);
             const users = await User.find({});
 
             //* Checking
-            expect(responce.success).toBe(true);
-            expect(responce.user).toEqual(user);
-            expect(responce.error).toBeUndefined();
-            expect(responce.message).toBeUndefined();
+            expect(response.success).toBe(true);
+            expect(response.user).toEqual(user);
+            expect(response.error).toBeUndefined();
+            expect(response.message).toBeUndefined();
             expect(users.length).toEqual(0);
         });
 
@@ -659,12 +659,12 @@ describe("Test UserServices", () => {
             const id: string = "123456789101";
 
             //* Result
-            const responce = await userServices.removeUser(id);
+            const response = await userServices.removeUser(id);
 
             //* Checking
-            expect(responce.success).toBe(false);
-            expect(responce.error).toEqual("no_user_found");
-            expect(responce.message).toBeDefined();
+            expect(response.success).toBe(false);
+            expect(response.error).toEqual("no_user_found");
+            expect(response.message).toBeDefined();
         });
     });
     // /SECTION

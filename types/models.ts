@@ -161,3 +161,27 @@ export interface ISpeciality extends Document {
 export interface SpecialityType {
     name: ISpeciality["name"];
 }
+
+/**
+ *  Become Doctor Request
+ *  Send by client when user submit form to become a doctor
+ */
+export interface IBecomeDoctor extends Document {
+    name: string;
+    surname: string;
+    phone: string;
+    email: string;
+    password: string;
+    education: string;
+    speciality: string;
+    yearEducation: string;
+    blankSeries: string;
+    blankNumber: string;
+    issueDate: string;
+    experience: string;
+    passportIssuedByWhom: string;
+    passportSeries: string;
+    passportIssueDate: string;
+    workExperience: string;
+    workPlaces: string;
+}

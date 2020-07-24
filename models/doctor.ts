@@ -1,9 +1,9 @@
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import extendedSchema from "mongoose-extend-schema";
 
 // Will extends Doctor model from user
 import User from "./user";
-import { IDoctor } from "../types/models";
+import { IDoctor, IBecomeDoctor } from "../types/models";
 
 const Doctor = extendedSchema(User.schema, {
     education: {
@@ -71,3 +71,79 @@ const Doctor = extendedSchema(User.schema, {
 });
 
 export default model<IDoctor>("Doctor", Doctor);
+
+const BecomeDoctorRequestSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    surname: {
+        type: String,
+        required: true,
+    },
+    phone: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    education: {
+        type: String,
+        required: true,
+    },
+    speciality: {
+        type: String,
+        required: true,
+    },
+    yearEducation: {
+        type: String,
+        required: true,
+    },
+    blankSeries: {
+        type: String,
+        required: true,
+    },
+    blankNumber: {
+        type: String,
+        required: true,
+    },
+    issueDate: {
+        type: String,
+        required: true,
+    },
+    experience: {
+        type: String,
+        required: true,
+    },
+    passportIssuedByWhom: {
+        type: String,
+        required: true,
+    },
+    passportSeries: {
+        type: String,
+        required: true,
+    },
+    passportIssueDate: {
+        type: String,
+        required: true,
+    },
+    workExperience: {
+        type: String,
+        required: true,
+    },
+    workPlaces: {
+        type: String,
+        required: true,
+    },
+});
+
+export const BecomeDoctorRequest = model<IBecomeDoctor>(
+    "BecomeDoctorRequest",
+    BecomeDoctorRequestSchema
+);
