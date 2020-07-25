@@ -1,3 +1,4 @@
 .env
 .env.dev
 node_modules
+logs
