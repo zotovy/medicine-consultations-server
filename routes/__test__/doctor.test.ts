@@ -2,15 +2,18 @@
 
 import supertest from "supertest";
 import mongoose from "mongoose";
-import Doctor from "../../models/doctor";
+import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 import app, { server } from "../../server";
 
 // Testable
 import doctorServices from "../../services/doctor_services";
 
 // @types
-import { DoctorObject } from "../../types/models";
-import { IDoctorToDoctorObj } from "../../services/types_services";
+import { DoctorObject, BecomeDoctorObj } from "../../types/models";
+import {
+    IDoctorToDoctorObj,
+    DoctorObjToBecomeDoctorObj,
+} from "../../services/types_services";
 
 /**
  *  ? This test module testing user services
@@ -71,6 +74,10 @@ const sampleDoctor: DoctorObject = {
     workPlaces: "Городская поликлиника №1 г. Москва",
 };
 
+const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
+    sampleDoctor
+);
+
 // This function will convert lastActiveAt, createdAt & beginDoctorDate
 // from String --> Date and return new doctorObj
 const convertDoctorFields = (doctor: any) => {
@@ -124,6 +131,7 @@ describe("Test Doctor API", () => {
     // Remove all date from mongodb after each test case
     afterEach(async () => {
         await Doctor.remove({});
+        await BecomeDoctorRequest.remove({});
     });
 
     // SECTION
@@ -331,6 +339,51 @@ describe("Test Doctor API", () => {
             expect(data.success).toEqual(false);
             expect(data.error).toEqual("no_doctor_found");
             expect(data.message).toBeDefined();
+        });
+    });
+    // /SECTION
+
+    // SECTION
+    describe("POST /doctor-request/send", () => {
+        // ANCHOR: should save sample request
+        test("should save sample request", async (done) => {
+            //* Act
+            const response = await request
+                .post(`/api/doctor-request/send`)
+                .type("json")
+                .send(sampleBecomeDoctorRequest);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(201);
+            expect(data).toEqual({ success: true });
+
+            done();
+        });
+
+        // ANCHOR: should return error on exceeding the limit
+        test("should return error on exceeding the limit", async () => {
+            //* Arrange
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+
+            //* Act
+            const response = await request
+                .post(`/api/doctor-request/send`)
+                .type("json")
+                .send(sampleBecomeDoctorRequest);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("requests_limit_error");
+            expect(data.message).toBeDefined();
+            const raw = await BecomeDoctorRequest.find({});
+            expect(raw.length).toEqual(3);
         });
     });
     // /SECTION

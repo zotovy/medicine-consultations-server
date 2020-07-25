@@ -117,4 +117,31 @@ Router.get("/doctor/:id", async (req, res) => {
     }
 });
 
+// ANCHOR: POST /doctor-request/send
+Router.post("/doctor-request/send", async (req, res) => {
+    const request = req.body;
+
+    if (!request) {
+        return res.status(400).json({
+            success: false,
+            error: "no_body_found",
+            message: "Invalid  ",
+        });
+    }
+
+    const response = await doctorServices.saveBecomeDoctorRequest(request);
+
+    if (response.success) {
+        return res.status(201).json({
+            success: true,
+        });
+    } else {
+        return res.status(400).json({
+            success: false,
+            error: response.error,
+            message: response.message,
+        });
+    }
+});
+
 export default Router;
