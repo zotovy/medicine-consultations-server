@@ -15,9 +15,9 @@ import { IUserToUserObj } from "../../services/types_services";
  *  ? This test module testing user routes
  *
  *  Every test have similar structure consisting of 3 parts
- *  • Given —— or answer, data which  must be received after runnig test object
- *  • Result —— received object after running test obj
- *  • Checking —— process of comparisons giving and result. May have more comparisons such as amount of function calls
+ *  • Arrange —— or answer, data which  must be received after runnig test object
+ *  • Act —— received object after running test obj
+ *  • Access —— process of comparisons giving and Act. May have more comparisons such as amount of function calls
  *
  *  The test module is considered passed if all test cases were passed correctly
  *  All test modules will run by `npm run test` after commiting to master. Changes will apply only if all tests were passed
@@ -109,10 +109,10 @@ describe("Test user routes", () => {
          * Decode received tokens by jwt.verify() and compare with primal id
          */
         test("should generate tokens to sample user", async (done) => {
-            //* Given
+            //* Arrange
             const id: string = "123456789101";
 
-            //* Result
+            //* Act
             const responce = await request
                 .post("/api/generate-token")
                 .type("json")
@@ -121,7 +121,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(200);
             expect(data).toBeDefined();
             expect(data.success).toBe(true);
@@ -147,12 +147,12 @@ describe("Test user routes", () => {
         // ANCHOR: should return error on no provided id in body
         /** Trying to send request with no id provided. Function should return error with status 412 */
         test("should return error on no provided id in body", async (done) => {
-            //* Result
+            //* Act
             const responce = await request.post("/api/generate-token");
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(412);
             expect(data.success).toEqual(false);
             expect(data.tokens).toBeUndefined();
@@ -170,11 +170,11 @@ describe("Test user routes", () => {
          * Pass email & password to function. Expect correct id
          */
         test("should validate simple user", async (done) => {
-            //* Given
+            //* Arrange
             const { _id } = await User.create(sampleUser);
             const answer = String(_id);
 
-            //* Result
+            //* Act
             const responce = await request
                 .post("/api/login-user")
                 .type("json")
@@ -185,7 +185,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(200);
             expect(data.success).toEqual(true);
             expect(data.id).toEqual(answer);
@@ -211,12 +211,12 @@ describe("Test user routes", () => {
         // ANCHOR: should return error on email,password = undefined
         /** Doesn't pass any email or password. Expect errors */
         test("should validate simple user", async (done) => {
-            //* Result
+            //* Act
             const responce = await request.post("/api/login-user");
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(412);
             expect(data.success).toEqual(false);
             expect(data.error).toEqual("empty_body");
@@ -237,12 +237,12 @@ describe("Test user routes", () => {
          * 3. Check new received tokens using jwt
          */
         test("should generate correct new tokens", async (done) => {
-            //* Given
+            //* Arrange
             const id = "123456789";
             const old_refresh = jwt.sign(id, process.env.jwt_refresh ?? "");
             await RefreshToken.create({ value: old_refresh });
 
-            //* Result
+            //* Act
             const responce = await request
                 .post("/api/token")
                 .type("json")
@@ -250,7 +250,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(201);
             expect(data.success).toEqual(true);
             expect(data.tokens.access).toBeDefined();
@@ -275,10 +275,10 @@ describe("Test user routes", () => {
         // ANCHOR: Should return error on invalid token
         /** Pass invalid refresh token. Function should return error with status 400 */
         test("Should return error on invalid token", async (done) => {
-            //* Given
+            //* Arrange
             const token = "some.invalid.token";
 
-            //* Result
+            //* Act
             const responce = await request
                 .post("/api/token")
                 .type("json")
@@ -286,7 +286,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toBe(400);
             expect(data.success).toEqual(false);
             expect(data.error).toEqual("invalid_token");
@@ -302,7 +302,7 @@ describe("Test user routes", () => {
         // ANCHOR: should get three users
         /** Create users using mongoose. Function should return this three users */
         test("should get three users", async (done) => {
-            //* Given
+            //* Arrange
             const user1: UserObject = { ...sampleUser };
             const user2: UserObject = {
                 ...sampleUser,
@@ -330,7 +330,7 @@ describe("Test user routes", () => {
             // Generate expected answer
             const answer = [user1, user2, user3];
 
-            //* Result
+            //* Act
             const responce = await request.get("/api/users");
             const status = responce.status;
             const data = JSON.parse(responce.text);
@@ -343,7 +343,7 @@ describe("Test user routes", () => {
             data.users[1].lastActiveAt = new Date(data.users[1].lastActiveAt);
             data.users[2].lastActiveAt = new Date(data.users[2].lastActiveAt);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(200);
             expect(data.success).toEqual(true);
             expect(data.users).toEqual(answer);
@@ -361,7 +361,7 @@ describe("Test user routes", () => {
          */
 
         test("Should return from 1 to 2 user", async (done) => {
-            //* Given
+            //* Arrange
             const user1: UserObject = sampleUser;
             const user2: UserObject = {
                 ...sampleUser,
@@ -387,7 +387,7 @@ describe("Test user routes", () => {
             // Generate expected answer
             const answer = [user2];
 
-            //* Result
+            //* Act
             const responce = await request.get("/api/users").type("json").send({
                 from: 1,
                 amount: 1,
@@ -399,7 +399,7 @@ describe("Test user routes", () => {
             data.users[0].createdAt = new Date(data.users[0].createdAt);
             data.users[0].lastActiveAt = new Date(data.users[0].lastActiveAt);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(200);
             expect(data.users).toEqual(answer);
             expect(data.error).toBeUndefined();
@@ -411,12 +411,12 @@ describe("Test user routes", () => {
         // ANCHOR: should return empty array
         /** Storage is empty. Function should return empty array */
         test("should return empty array", async (done) => {
-            //* Result
+            //* Act
             const responce = await request.get("/api/users");
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(200);
             expect(data.users).toEqual([]);
             expect(data.error).toBeUndefined();
@@ -432,7 +432,7 @@ describe("Test user routes", () => {
          * Function should return empty array
          * */
         test("should return empty array on from = 123", async (done) => {
-            //* Result
+            //* Act
             const responce = await request
                 .get("/api/users")
                 .type("json")
@@ -440,7 +440,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toEqual(200);
             expect(data.users).toEqual([]);
             expect(data.error).toBeUndefined();
@@ -456,11 +456,11 @@ describe("Test user routes", () => {
         // ANCHOR: should get sample user
         /** Create user using mongoose. Function should return this user */
         test("should get sample user", async (done) => {
-            //* Given
+            //* Arrange
             const { _id } = await User.create(sampleUser);
             const user = { ...sampleUser, id: String(_id) };
 
-            //* Result
+            //* Act
             const responce = await request
                 .get(`/api/user/${_id}`)
                 .type("json")
@@ -472,7 +472,7 @@ describe("Test user routes", () => {
             data.user.createdAt = new Date(data.user.createdAt);
             data.user.lastActiveAt = new Date(data.user.lastActiveAt);
 
-            //* Checking
+            //* Access
             expect(status).toBe(200);
             expect(data.success).toEqual(true);
             expect(data.user).toEqual(user);
@@ -483,10 +483,10 @@ describe("Test user routes", () => {
         // ANCHOR: shouldn't get not existing user
         /** Trying to get user using random id. Function shoud return error */
         test("shouldn't get not existing user", async (done) => {
-            //* Given
+            //* Arrange
             const id: string = "123456789101";
 
-            //* Result
+            //* Act
             const responce = await request
                 .get(`/api/user/${id}`)
                 .type("json")
@@ -494,7 +494,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toBe(404);
             expect(data.success).toBe(false);
             expect(data.error).toBe("no_user_found_error");
@@ -514,9 +514,9 @@ describe("Test user routes", () => {
     // SECTION: POST /user
     describe("Test POST /user", () => {
         // ANCHOR: should create sample user
-        /** Function create sample user. We check the result using mongoose */
+        /** Function create sample user. We check the Act using mongoose */
         test("should create sample user", async (done) => {
-            //* Result
+            //* Act
             const responce = await request
                 .post(`/api/user`)
                 .type("json")
@@ -524,7 +524,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
 
             // Convert String Date ---> Date
             data.user.createdAt = new Date(data.user.createdAt);
@@ -555,7 +555,7 @@ describe("Test user routes", () => {
         // ANCHOR: shouldn't create not validated user
         /** Pass invalid user to function. Function should return error  */
         test("shouldn't create not validated user", async (done) => {
-            //* Given
+            //* Arrange
             const errors = {
                 name: "type_error",
                 surname: "type_error",
@@ -591,7 +591,7 @@ describe("Test user routes", () => {
                 lastActiveAt: 123,
                 favourites: 123,
             };
-            //* Result
+            //* Act
             const responce = await request
                 .post(`/api/user`)
                 .type("json")
@@ -599,7 +599,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             const users = await User.find({});
 
             expect(status).toBe(400);
@@ -615,12 +615,12 @@ describe("Test user routes", () => {
         // ANCHOR: should return error on empty body
         /** Pass nothing in function. Should return error */
         test("should return error on empty body", async (done) => {
-            //* Result
+            //* Act
             const responce = await request.post(`/api/user`);
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             const users = await User.find({});
 
             expect(status).toBe(412);
@@ -639,7 +639,7 @@ describe("Test user routes", () => {
         // ANCHOR: should update simple user
         /** Create user using mongoose. Function should update this user. */
         test("should update simple user", async (done) => {
-            //* Given
+            //* Arrange
             const { _id } = await User.create(sampleUser);
             const newUser = {
                 ...sampleUser,
@@ -647,7 +647,7 @@ describe("Test user routes", () => {
                 id: String(_id),
             };
 
-            //* Result
+            //* Act
             const responce = await request
                 .put(`/api/user/${_id}`)
                 .type("json")
@@ -657,7 +657,7 @@ describe("Test user routes", () => {
             expect(status).toBe(200);
             expect(data.success).toEqual(true);
 
-            //* Checking
+            //* Access
 
             // Convert String Date ---> Date
             data.user.createdAt = new Date(data.user.createdAt);
@@ -677,7 +677,7 @@ describe("Test user routes", () => {
          * with the same email as the user-2
          */
         test("shouldn't update user with not unique fields", async (done) => {
-            //* Given
+            //* Arrange
             const user2 = {
                 ...sampleUser,
                 email: "someemail@mail.com",
@@ -717,7 +717,7 @@ describe("Test user routes", () => {
             const { _id } = await User.create(user2); // user-2
             updated.id = _id;
 
-            //* Result
+            //* Act
             const responce = await request
                 .put(`/api/user/${_id}`)
                 .type("json")
@@ -725,7 +725,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toBe(412);
             expect(data.success).toBe(false);
             expect(data.user).toBeUndefined();
@@ -739,11 +739,11 @@ describe("Test user routes", () => {
         // ANCHOR: should return error on not existing uid
         /** Trying to call function with not existing user id. Function should return error */
         test("should return error on not existing uid", async (done) => {
-            //* Given
+            //* Arrange
             const id = "123456789101";
             const user = { ...sampleUser, id };
 
-            //* Result
+            //* Act
             const responce = await request
                 .put(`/api/user/${id}`)
                 .type("json")
@@ -751,7 +751,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toBe(500);
             expect(data.success).toBe(false);
             expect(data.user).toBeUndefined();
@@ -768,16 +768,16 @@ describe("Test user routes", () => {
         // ANCHOR: should delete sample user
         /** Create sampleUser using mongoose. Function should delete it */
         test("should delete sample user", async (done) => {
-            //* Given
+            //* Arrange
             const { _id } = await User.create(sampleUser);
             const user: UserObject = { ...sampleUser, id: String(_id) };
 
-            //* Result
+            //* Act
             const responce = await request.delete(`/api/user/${_id}`);
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
 
             // Convert String Date ---> Date
             data.user.createdAt = new Date(data.user.createdAt);
@@ -798,15 +798,15 @@ describe("Test user routes", () => {
         // ANCHOR: should return error on not existing uid
         /** Trying to pass not existing user id ti function. Expect errors */
         test("should return error on not existing uid", async (done) => {
-            //* Given
+            //* Arrange
             const id = "123456789101";
 
-            //* Result
+            //* Act
             const responce = await request.delete(`/api/user/${id}`);
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Checking
+            //* Access
             expect(status).toBe(500);
             expect(data.success).toBe(false);
             expect(data.user).toBeUndefined();

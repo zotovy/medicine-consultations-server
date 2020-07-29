@@ -1,22 +1,25 @@
 /// <reference types="../../node_modules/@types/jest/index" />
 
+import supertest from "supertest";
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
+import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 import Admin from "../../models/admin";
-import Doctor from "../../models/doctor";
+import app, { server } from "../../server";
 
 // Testable
-import adminServices from "../admin_services";
+import adminServices from "../../services/admin_services";
 
 // @types
 import {
+    DoctorObject,
+    BecomeDoctorObj,
     AdminObj,
     AdminRole,
-    BecomeDoctorObj,
-    DoctorObject,
 } from "../../types/models";
-import { DoctorObjToBecomeDoctorObj } from "../types_services";
-import { BecomeDoctorRequest } from "../../models/doctor";
+import {
+    IDoctorToDoctorObj,
+    DoctorObjToBecomeDoctorObj,
+} from "../../services/types_services";
 
 /**
  *  ? This test module testing admin services
@@ -29,6 +32,12 @@ import { BecomeDoctorRequest } from "../../models/doctor";
  *  The test module is considered passed if all test cases were passed correctly
  *  All test modules will run by `npm run test` after commiting to master. Changes will apply only if all tests were passed
  */
+
+// Fix @types
+declare function done(): any;
+
+// Used to simulate http requests
+const request = supertest(app);
 
 // Sample user will use or modify for some cases
 const sampleAdmin: AdminObj = {
@@ -65,7 +74,7 @@ const sampleDoctor: DoctorObject = {
     blankNumber: "12345678",
     blankSeries: "12345678",
     education: "МГУ",
-    issueDate: "21.11.2015",
+    issueDate: "12.11.2015",
     yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
     clientsConsultations: [], // will add later
@@ -83,7 +92,9 @@ const sampleDoctor: DoctorObject = {
     workPlaces: "Городская поликлиника №1 г. Москва",
 };
 
-const sampleRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(sampleDoctor);
+const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
+    sampleDoctor
+);
 
 process.env.MODE = "testing";
 process.env.url = "localhost:5000/";
@@ -97,7 +108,19 @@ process.env.jwt_refresh = "test-refresh-string";
 process.env.jwt_admin_access = "test-admin-access-string";
 process.env.jwt_admin_refresh = "test-admin-refresh-string";
 
-describe("Test Admin services", () => {
+// This function will convert lastActiveAt, createdAt & beginDoctorDate
+// from String --> Date and return new doctorObj
+const convertDoctorFields = (doctor: any) => {
+    if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
+        // Convert String --> new Date
+        doctor.lastActiveAt = new Date(doctor.lastActiveAt);
+        doctor.createdAt = new Date(doctor.createdAt);
+        doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
+    }
+    return doctor;
+};
+
+describe("Test Doctor API", () => {
     let db: mongoose.Mongoose;
 
     // It's just so easy to connect to the MongoDB Memory Server
@@ -122,102 +145,61 @@ describe("Test Admin services", () => {
     // Close MongodDB connection after all test cases have done
     afterAll(async () => {
         db.disconnect();
+        db.connection.dropDatabase();
+        server?.close();
+        done();
     });
 
     // Remove all date from mongodb after each test case
     afterEach(async () => {
-        await Admin.remove({});
         await Doctor.remove({});
         await BecomeDoctorRequest.remove({});
+        await Admin.remove({});
     });
 
-    // SECTION login()
-    describe("login()", () => {
-        // ANCHOR: should login sample admin
-        test("should login sample admin", async () => {
+    // SECTION: POST /admin/login
+    describe("POST /admin/login", () => {
+        // ANCHOR: should login admin
+        test("should login admin", async (done) => {
             //* Arrange
             const { _id } = await Admin.create(sampleAdmin);
-            const id = String(_id);
-            const admin = { ...sampleAdmin, id };
+            const admin = { ...sampleAdmin, id: String(_id) };
 
             //* Act
-            const response = await adminServices.login(
-                sampleAdmin.username,
-                sampleAdmin.password
-            );
+            const response = await request
+                .post("/api/admin/login")
+                .type("json")
+                .send({ username: admin.username, password: admin.password });
+            const status = response.status;
+            const data = JSON.parse(response.text);
 
             //* Assert
-            expect(response.success).toEqual(true);
-            expect(response.admin).toEqual(admin);
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(data.admin).toEqual(admin);
+            expect(data.tokens).toBeDefined();
 
-            const jwt_access: string = process.env.jwt_admin_access ?? "-";
-            const jwt_refresh: string = process.env.jwt_admin_refresh ?? "-";
-
-            // Verify tokens
-            const id_access: any = jwt.verify(
-                response.tokens?.access ?? "",
-                jwt_access
-            );
-            const id_refresh: any = jwt.verify(
-                response.tokens?.refresh ?? "",
-                jwt_refresh
-            );
-
-            expect(id_access.id).toEqual(id);
-            expect(id_refresh.id).toEqual(id);
+            done();
         });
 
-        // ANCHOR: shouldn't login error admin
+        // ANCHOR: shouldn't login admin with incorrected data
         test("shouldn't login error admin", async () => {
             //* Arrange
-            const { _id } = await Admin.create(sampleAdmin);
-            const id = String(_id);
-            const admin = { ...sampleAdmin, id };
+            await Admin.create(sampleAdmin);
 
             //* Act
-            const response = await adminServices.login(
-                "fake_username",
-                "fake_password"
-            );
+            const response = await request
+                .post("/api/admin/login")
+                .type("json")
+                .send({ username: "fake_username", password: "fake_password" });
+            const status = response.status;
+            const data = JSON.parse(response.text);
 
             //* Assert
-            expect(response.success).toEqual(false);
-            expect(response.admin).toBeUndefined();
-            expect(response.tokens).toBeUndefined();
-        });
-    });
-    // /SECTION
-
-    // SECTION: submitBecomeDoctorRequests()
-    describe("submitBecomeDoctorRequests()", () => {
-        // ANCHOR: should submit sample request
-        test("should submit sample request", async () => {
-            //* Arrange
-            const id = (await BecomeDoctorRequest.create(sampleRequest)).id;
-
-            //* Act
-            const response = await adminServices.submitBecomeDoctorRequests(id);
-
-            //* Assert
-            expect(response.success).toEqual(true);
-
-            const requests = await BecomeDoctorRequest.find({});
-            const doctors = await Doctor.find({});
-
-            expect(requests).toEqual([]);
-            expect(doctors.length).toEqual(1);
-        });
-
-        // ANCHOR: shouldn't submit request with invalid id
-        test("shouldn't submit request with invalid id", async () => {
-            //* Arrange
-            const id = "123456789101";
-
-            //* Act
-            const response = await adminServices.submitBecomeDoctorRequests(id);
-
-            //* Assert
-            expect(response.success).toEqual(false);
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.admin).toBeUndefined();
+            expect(data.tokens).toBeUndefined();
         });
     });
     // /SECTION
