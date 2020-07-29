@@ -61,10 +61,10 @@ export interface UserObject {
  */
 export interface IDoctor extends IUser {
     education: string;
-    yearEducation: [Date, Date];
+    yearEducation: string;
     blankSeries: string;
     blankNumber: string;
-    issueDate: Date;
+    issueDate: string;
     speciality: string[];
     beginDoctorDate: Date;
     experience: number;
@@ -181,6 +181,7 @@ export interface IBecomeDoctor extends Document {
     surname?: string;
     phone?: string;
     email?: string;
+    sex?: boolean;
     password?: string;
     education?: string;
     speciality?: string;
@@ -204,6 +205,7 @@ export interface BecomeDoctorObj {
     surname?: IBecomeDoctor["surname"];
     phone?: IBecomeDoctor["phone"];
     email?: IBecomeDoctor["email"];
+    sex?: IBecomeDoctor["sex"];
     password?: IBecomeDoctor["password"];
     education?: IBecomeDoctor["education"];
     speciality?: IBecomeDoctor["speciality"];
@@ -217,4 +219,32 @@ export interface BecomeDoctorObj {
     passportIssueDate?: IBecomeDoctor["passportIssueDate"];
     workExperience?: IBecomeDoctor["workExperience"];
     workPlaces?: IBecomeDoctor["workPlaces"];
+}
+
+/**
+ * Admin Role
+ */
+export enum AdminRole {
+    King = "King",
+    Admin = "admin",
+    Developer = "Developer",
+}
+
+export interface IAdmin extends Document {
+    username: string;
+    password: string;
+    email: string;
+    name: string;
+    photoUrl: string;
+    role: AdminRole;
+}
+
+export interface AdminObj {
+    id: IAdmin["id"];
+    username: IAdmin["username"];
+    password: IAdmin["password"];
+    email: IAdmin["email"];
+    name: IAdmin["name"];
+    photoUrl: IAdmin["photoUrl"];
+    role: IAdmin["role"];
 }

@@ -7,6 +7,8 @@ import {
     ReviewObject,
     BecomeDoctorObj,
     IBecomeDoctor,
+    IAdmin,
+    AdminObj,
 } from "../types/models";
 
 /**
@@ -82,7 +84,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         blankSeries: e.blankSeries,
         education: e.education,
         issueDate: e.issueDate,
-        yearEducation: [...e.yearEducation],
+        yearEducation: e.yearEducation.toString(),
         passportIssueDate: e.passportIssueDate,
         passportIssuedByWhom: e.passportIssuedByWhom,
         passportSeries: e.passportSeries,
@@ -99,10 +101,11 @@ export function DoctorObjToBecomeDoctorObj(e: DoctorObject): BecomeDoctorObj {
         surname: e.surname,
         phone: e.phone.toString(),
         email: e.email,
+        sex: e.sex,
         password: e.password,
         education: e.education,
         speciality: e.speciality.join(", "),
-        yearEducation: e.yearEducation.join(","),
+        yearEducation: e.yearEducation,
         blankSeries: e.blankSeries,
         blankNumber: e.blankNumber,
         issueDate: e.issueDate.toString(),
@@ -123,6 +126,7 @@ export function IBecomeDoctorToBecomeDoctorObj(
         surname: e.surname,
         phone: e.phone,
         email: e.email,
+        sex: e.sex,
         password: e.password,
         education: e.education,
         speciality: e.speciality,
@@ -136,5 +140,20 @@ export function IBecomeDoctorToBecomeDoctorObj(
         passportSeries: e.passportSeries,
         workExperience: e.workExperience,
         workPlaces: e.workPlaces,
+    };
+}
+
+/**
+ * Convert IAdmin --> AdminObj
+ */
+export function IAdminToAdminObj(e: IAdmin): AdminObj {
+    return {
+        id: String(e.id),
+        email: e.email,
+        name: e.name,
+        password: e.password,
+        photoUrl: e.photoUrl,
+        role: e.role,
+        username: e.username,
     };
 }

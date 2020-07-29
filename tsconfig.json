@@ -82,7 +82,7 @@
         "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
     },
 
-    "include": ["*.ts", "server.ts", "jest-preload.js", "declaration/mongoose-extended-schema.d.ts"],
+    "include": ["*.ts", "*.d.ts", "server.ts", "jest-preload.js", "declaration/mongoose-extended-schema.d.ts"],
     "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
     "typeAcquisition": {
         "include": ["jest"]

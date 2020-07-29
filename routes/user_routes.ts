@@ -11,6 +11,7 @@ import { RefreshToken } from "../models/tokens";
 
 // @types
 import { UserObject } from "../types/models";
+import logger from "../logger";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -382,7 +383,7 @@ Router.get("/user/:id", getUserLimitter, async (req, res, next) => {
             user: dbcode.user,
         });
     } catch (e) {
-        console.log(e);
+        logger.e(e, e.stack);
         return res.status(500).json({
             success: false,
             error: "invalid_error",
@@ -433,7 +434,8 @@ Router.post(
                 success: true,
             });
         } catch (e) {
-            console.log(e);
+            logger.e(e, e.stack);
+
             return res.status(500).json({
                 success: false,
                 error: "invalid_error",
@@ -448,7 +450,6 @@ Router.post(
  * This function push received user to db
  */
 Router.post("/user", async (req, res) => {
-    console.log("123");
     // Get user from request body
     const user: UserObject = req.body;
 
@@ -459,7 +460,7 @@ Router.post("/user", async (req, res) => {
     // no body
     // 2 - createdAt & lastActiveAt aslo in user obj
     if (!user || Object.keys(user).length === 2) {
-        console.log("body is null");
+        logger.w("body is null");
         return res.status(412).json({
             success: false,
             error: "empty_body",
@@ -471,7 +472,7 @@ Router.post("/user", async (req, res) => {
     const isValidated = await userServices.validateUser(user);
 
     if (!isValidated.success) {
-        console.log("user is not validated");
+        logger.w("user is not validated");
         return res.status(400).json({
             success: false,
             error: "not_validated_error",
@@ -513,7 +514,7 @@ Router.post("/user", async (req, res) => {
             },
         });
     } catch (e) {
-        console.log(e);
+        logger.e(e, e.trace);
         return res.status(500).json({
             success: false,
             error: "invalid_error",
@@ -583,7 +584,7 @@ Router.put("/user/:id", async (req, res, next) => {
             user: dbcode.user,
         });
     } catch (e) {
-        console.log(e);
+        logger.e(e, e.trace);
         return res.status(500).json({
             success: false,
             error: "invalid_error",
@@ -626,6 +627,7 @@ Router.delete("/user/:id", async (req, res, next) => {
             user: dbcode.user,
         });
     } catch (e) {
+        logger.e(e, e.trace);
         return res.status(500).json({
             success: false,
             error: "invalid_error",

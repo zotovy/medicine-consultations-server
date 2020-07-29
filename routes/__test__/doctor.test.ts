@@ -56,8 +56,8 @@ const sampleDoctor: DoctorObject = {
     blankNumber: "12345678",
     blankSeries: "12345678",
     education: "МГУ",
-    issueDate: new Date(),
-    yearEducation: [new Date(), new Date()],
+    issueDate: "12.11.2015",
+    yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
     clientsConsultations: [], // will add later
     clientsReviews: [], // will add later
@@ -81,19 +81,11 @@ const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
 // This function will convert lastActiveAt, createdAt & beginDoctorDate
 // from String --> Date and return new doctorObj
 const convertDoctorFields = (doctor: any) => {
-    if (
-        doctor.lastActiveAt &&
-        doctor.createdAt &&
-        doctor.beginDoctorDate &&
-        doctor.yearEducation
-    ) {
+    if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
         // Convert String --> new Date
         doctor.lastActiveAt = new Date(doctor.lastActiveAt);
         doctor.createdAt = new Date(doctor.createdAt);
         doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
-        doctor.issueDate = new Date(doctor.issueDate);
-        doctor.yearEducation[0] = new Date(doctor.yearEducation[0]);
-        doctor.yearEducation[1] = new Date(doctor.yearEducation[1]);
     }
     return doctor;
 };

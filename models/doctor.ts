@@ -11,7 +11,7 @@ const Doctor = extendedSchema(User.schema, {
         required: true,
     },
     yearEducation: {
-        type: [Date, Date],
+        type: String,
         required: true,
     },
     blankSeries: {
@@ -23,7 +23,7 @@ const Doctor = extendedSchema(User.schema, {
         required: true,
     },
     issueDate: {
-        type: Date,
+        type: String,
         required: true,
     },
     speciality: {
@@ -97,6 +97,7 @@ const BecomeDoctorRequestSchema = new Schema({
     surname: String,
     phone: String,
     email: String,
+    sex: Boolean,
     password: String,
     education: String,
     speciality: String,

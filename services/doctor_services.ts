@@ -21,6 +21,7 @@ import {
 // Services
 import UserServices from "./user_services";
 import { IDoctorToDoctorObj } from "./types_services";
+import logger from "../logger";
 
 class DoctorServices {
     // ANCHOR: validate doctor
@@ -37,12 +38,12 @@ class DoctorServices {
 
         // Doctor model is extended from User model,
         // so, if obj is not validate as user this will never validated as doctor
-        const responce = await UserServices.validateUser(doctor, needUnique);
+        const response = await UserServices.validateUser(doctor, needUnique);
 
-        if (!responce.success) {
+        if (!response.success) {
             return {
                 success: false,
-                errors: responce.errors,
+                errors: response.errors,
             };
         }
 
@@ -57,21 +58,11 @@ class DoctorServices {
         }
 
         // Year education
-        if (doctor.yearEducation && doctor.yearEducation.length === 2) {
-            if (!Array.isArray(doctor.yearEducation)) {
-                errors.yearEducation = ErrorType.TypeError;
-            } else {
-                for (let i = 0; i < doctor.yearEducation.length; i++) {
-                    const parsed = Date.parse(
-                        doctor.yearEducation[i].toString()
-                    );
-                    if (isNaN(parsed) || parsed === 0) {
-                        errors.yearEducation = ErrorType.TypeError;
-                        break;
-                    }
-                }
-            }
-        } else errors.yearEducation = ErrorType.RequiredError;
+        if (!doctor.yearEducation) {
+            errors.yearEducation = ErrorType.RequiredError;
+        } else if (typeof doctor.yearEducation !== "string") {
+            errors.yearEducation = ErrorType.TypeError;
+        }
 
         // Blanck series
         if (!doctor.blankSeries) {
@@ -91,8 +82,7 @@ class DoctorServices {
         if (!doctor.issueDate) {
             errors.issueDate = ErrorType.RequiredError;
         } else {
-            const parsed = Date.parse(doctor.issueDate.toString());
-            if (isNaN(parsed) || parsed === 0) {
+            if (typeof doctor.issueDate !== "string") {
                 errors.issueDate = ErrorType.TypeError;
             }
         }
@@ -194,13 +184,14 @@ class DoctorServices {
     // ANCHOR: create doctor
     create = async (data: DoctorObject): Promise<TCreateDoctor> => {
         // validate doctor type
-        const responce = await this.validate(data);
+        const response = await this.validate(data);
 
-        if (!responce.success || responce.errors === {}) {
+        if (!response.success || response.errors === {}) {
+            logger.w(`user is not validated, errors=${response.errors}`);
             return {
                 success: false,
                 error: "not_validated_error",
-                errors: responce.errors,
+                errors: response.errors,
                 message: "User is not validated",
             };
         }
@@ -208,7 +199,7 @@ class DoctorServices {
         const doctor: IDoctor = new Doctor(data);
 
         if (!doctor) {
-            console.log(`created doctor is null data = ${data}`);
+            logger.w(`created doctor is null data = ${data}`);
             return {
                 success: false,
                 error: "created_doctor_is_null",
@@ -219,7 +210,7 @@ class DoctorServices {
         // save doctor to db
         await doctor.save();
 
-        console.log(`successfully create doctor with id ${doctor._id}`);
+        logger.i(`successfully create doctor with id ${doctor._id}`);
 
         return {
             success: true,
@@ -232,6 +223,7 @@ class DoctorServices {
         const validation = await this.validate(data, false);
 
         if (!validation.success) {
+            logger.w(`user is not validated, errors=${validation.errors}`);
             return {
                 success: false,
                 error: "not_validated_error",
@@ -248,6 +240,9 @@ class DoctorServices {
             );
 
             if (!updated) {
+                logger.w(
+                    `Updated user is null. User with id=${data.id} does not exist`
+                );
                 return {
                     success: false,
                     error: "updated_doctor_is_null",
@@ -260,6 +255,7 @@ class DoctorServices {
                 doctor: IDoctorToDoctorObj(updated),
             };
         } catch (e) {
+            logger.e(e, e.stack);
             return {
                 success: false,
                 error: "invalid_error",
@@ -276,7 +272,7 @@ class DoctorServices {
 
         // no doctor found
         if (!doctor) {
-            console.log(`No user found with id = ${id}`);
+            logger.w(`No user found with id = ${id}`);
             return {
                 success: false,
                 error: "no_doctor_found",
@@ -292,7 +288,7 @@ class DoctorServices {
 
         // error
         if (error) {
-            console.error(error);
+            logger.e(error, error.trace);
             return {
                 success: false,
                 error: "invalid_error",
@@ -301,12 +297,13 @@ class DoctorServices {
         }
 
         if (removed) {
-            console.log(`successfully delete doctor with id = ${id}`);
+            logger.i(`successfully remove user with id=${removed.id}`);
             return {
                 success: true,
                 doctor: IDoctorToDoctorObj(removed),
             };
         } else {
+            logger.w(`Removed user is null, id=${id}`);
             return {
                 success: false,
                 error: "removed_doctor_is_null",
@@ -318,6 +315,7 @@ class DoctorServices {
     // ANCHOR: get one
     getOne = async (id: string | Types.ObjectId): Promise<TGetOneDoctor> => {
         if (!Types.ObjectId.isValid(id)) {
+            logger.w(`Invalid Id were provide, id=${id}`);
             return {
                 success: false,
                 error: "no_doctor_found",
@@ -328,6 +326,7 @@ class DoctorServices {
         const doctor: IDoctor | null = await Doctor.findById(id);
 
         if (!doctor) {
+            logger.w(`No doctor found, id=${id}`);
             return {
                 success: false,
                 error: "no_doctor_found",
@@ -335,6 +334,7 @@ class DoctorServices {
             };
         }
 
+        logger.i(`successfully get user, id=${id}`);
         return {
             success: true,
             doctor: IDoctorToDoctorObj(doctor),
@@ -352,6 +352,9 @@ class DoctorServices {
                 const founded = await BecomeDoctorRequest.find({ email });
 
                 if (founded.length >= 3) {
+                    logger.i(
+                        `Exceeded the limit of request per one email=${email} (3)`
+                    );
                     return {
                         success: false,
                         error: "requests_limit_error",
@@ -360,6 +363,7 @@ class DoctorServices {
                     };
                 }
             } else {
+                logger.i(`no email found, ignore become doctor request`);
                 return {
                     success: true,
                 };
@@ -367,11 +371,12 @@ class DoctorServices {
 
             await BecomeDoctorRequest.create(request);
 
+            logger.i(`successfully save become doctor request for ${email}`);
             return {
                 success: true,
             };
         } catch (e) {
-            console.error(e);
+            logger.e(e, e.trace);
             return {
                 success: false,
                 error: "invalid_error",

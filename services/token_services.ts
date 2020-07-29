@@ -1,9 +1,12 @@
 import jwt from "jsonwebtoken";
+import { AccessToken } from "../models/tokens";
+import logger from "../logger";
 
 class TokenServices {
     // ANCHOR: generate token
     /** Generate and returh token for received user id */
     generateToken = (id: string, key: string): string => {
+        logger.i(`generate ${key} token for ${id}`);
         return jwt.sign(
             {
                 id,
@@ -20,10 +23,17 @@ class TokenServices {
      * Middleware to auth-required routes
      * Validate token and run next() if success
      */
-    authenticateToken = (req: any, res: any, next: Function): void => {
+    authenticateToken = async (
+        req: any,
+        res: any,
+        next: Function
+    ): Promise<void> => {
         const header: string | undefined = req.headers.auth;
 
         if (!header) {
+            logger.w(
+                "User must be authorize to go to this page but no token was found"
+            );
             return res.status(401).json({
                 success: false,
                 error: "not_authorize",
@@ -41,11 +51,25 @@ class TokenServices {
 
         // No token
         if (!token) {
+            logger.i("no token were provide");
             return res.status(401).json({
                 success: false,
                 error: "not_authorize",
                 message:
                     "User must be authorize to go to this page but no token was found",
+            });
+        }
+
+        const founded = await AccessToken.find({ value: token });
+
+        // No token in DB
+        if (founded.length === 0) {
+            logger.i("invalid token was provide");
+            return res.status(401).json({
+                success: false,
+                error: "not_authorize",
+                message:
+                    "User must be authorize to go to this page but invalid token were provide",
             });
         }
 

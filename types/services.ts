@@ -1,5 +1,5 @@
 // @types
-import { UserObject, DoctorObject } from "./models";
+import { UserObject, DoctorObject, AdminRole, AdminObj } from "./models";
 
 /**
  *  This type describe return object of UserServices.getUsers() function
@@ -331,4 +331,35 @@ export type TSaveBecomeDoctorRequest = {
 
     // Show error message if failed
     message?: string;
+};
+
+//========================================================================================
+/*                                                                                      *
+ *                                        ADMINS                                        *
+ *                                                                                      */
+//========================================================================================
+
+/**
+ * This type describe error object from AdminServices.login() function
+ */
+export type TLoginAdmin = {
+    // Is operation going success
+    success: boolean;
+
+    // Admin object
+    admin?: AdminObj;
+
+    // Tokens
+    tokens?: {
+        access: string;
+        refresh: string;
+    };
+};
+
+/**
+ * This type describe error object from AdminServices.submitBecomeDoctorRequests() function
+ */
+export type TSubmitBecomeDoctorRequests = {
+    // Is operation going success
+    success: boolean;
 };

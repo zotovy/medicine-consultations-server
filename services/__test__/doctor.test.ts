@@ -16,7 +16,7 @@ import {
 import doctor_services from "../doctor_services";
 
 /**
- *  ? This test module testing user services
+ *  ? This test module testing doctor services
  *
  *  Every test have similar structure consisting of 3 parts
  *  • Arrange  —— initializes objects and sets the value of data passed to the method for the test.
@@ -50,8 +50,8 @@ const sampleDoctor: DoctorObject = {
     blankNumber: "12345678",
     blankSeries: "12345678",
     education: "МГУ",
-    issueDate: new Date(),
-    yearEducation: [new Date(), new Date()],
+    issueDate: "21.11.2015",
+    yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
     clientsConsultations: [], // will add later
     clientsReviews: [], // will add later
