@@ -39,7 +39,8 @@
         "multer-sharp": "^0.6.2",
         "nodemailer": "^6.4.10",
         "path": "^0.12.7",
-        "pino": "^6.4.1"
+        "pino": "^6.4.1",
+        "react-protected-route-component": "^0.1.1"
     },
     "devDependencies": {
         "@types/cors": "^2.8.6",

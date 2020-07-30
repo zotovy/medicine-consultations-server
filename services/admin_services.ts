@@ -1,15 +1,31 @@
 import Admin from "../models/admin";
+import jwt from "jsonwebtoken";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 
-import { TLoginAdmin, TSubmitBecomeDoctorRequests } from "../types/services";
+import {
+    TLoginAdmin,
+    TSubmitBecomeDoctorRequests,
+    TCheckAccessToken,
+} from "../types/services";
 import tokenServices from "../services/token_services";
 import { IAdminToAdminObj } from "./types_services";
 import logger from "../logger";
-import { DoctorObject } from "../types/models";
 import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
-import { access } from "fs";
+import admin from "../models/admin";
 
 class AdminServices {
+    // constructor() {
+    //     Admin.create({
+    //         email: "the1ime@yandex.ru",
+    //         name: "Yaroslav",
+    //         password: "12345678",
+    //         photoUrl:
+    //             "https://preview.redd.it/yzs6bt84uvc51.jpg?width=640&height=480&crop=smart&auto=webp&s=a3d986c90b8b09c9217a2f189b105158e2116e75",
+    //         role: AdminRole.Developer,
+    //         username: "panda.code",
+    //     });
+    // }
+
     // ANCHOR: login
     login = async (
         username: string,
@@ -129,6 +145,33 @@ class AdminServices {
                 success: false,
             };
         }
+    };
+
+    // ANCHOR: check access token
+    checkAccessToken = async (
+        adminId: string,
+        token: string
+    ): Promise<TCheckAccessToken> => {
+        // @ts-ignore
+        const response = jwt.verify(
+            token,
+            process.env.jwt_admin_access ?? "",
+            (e, data) => {
+                if (e) {
+                    return e;
+                }
+                return data;
+            }
+        );
+
+        // @ts-ignore
+        const id = response?.id;
+
+        if (!id) return false;
+
+        const founded = await AdminAccessToken.find({});
+
+        return adminId === id && adminId.length !== 0 && founded.length === 1;
     };
 }
 

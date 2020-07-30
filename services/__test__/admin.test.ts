@@ -240,4 +240,76 @@ describe("Test Admin services", () => {
         });
     });
     // /SECTION
+
+    // SECTION: checkAccessToken
+    describe("checkAccessToken()", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+
+            //* Act
+            const isOk = await adminServices.checkAccessToken(
+                String(_id),
+                tokens?.access ?? ""
+            );
+
+            //* Assert
+            expect(isOk).toEqual(true);
+        });
+
+        // ANCHOR: shouldn't validate invalid token
+        test("shouldn't validate invalid token", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+
+            //* Act
+            const isOk = await adminServices.checkAccessToken(
+                String(_id),
+                "1.2.3"
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate invalid id
+        test("shouldn't validate invalid id", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+
+            //* Act
+            const isOk = await adminServices.checkAccessToken(
+                "some-id",
+                tokens?.access ?? ""
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate id which not in db
+        test("shouldn't validate id which not in db", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+
+            //* Act
+            const isOk = await adminServices.checkAccessToken(
+                _id,
+                "123.123.123"
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+    });
+    // /SECTION
 });

@@ -363,3 +363,8 @@ export type TSubmitBecomeDoctorRequests = {
     // Is operation going success
     success: boolean;
 };
+
+/**
+ *
+ */
+export type TCheckAccessToken = boolean;
