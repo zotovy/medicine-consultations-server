@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 import Admin from "../../models/admin";
 import app, { server } from "../../server";
+import jwt from "jsonwebtoken";
 
 // Testable
 import adminServices from "../../services/admin_services";
@@ -282,7 +283,7 @@ describe("Test Doctor API", () => {
 
             //* Act
             const response = await request
-                .post("/api/admin/token/check-access")
+                .get("/api/admin/token/check-access")
                 .type("json")
                 .send({ id: String(_id), token: tokens?.access });
             const status = response.status;
@@ -290,7 +291,7 @@ describe("Test Doctor API", () => {
 
             //* Assert
             expect(status).toEqual(200);
-            expect(data.success).toEqual(true);
+            expect(data.isOk).toEqual(true);
         });
 
         // ANCHOR: shouldn't validate invalid token
@@ -300,7 +301,7 @@ describe("Test Doctor API", () => {
 
             //* Act
             const response = await request
-                .post("/api/admin/token/check-access")
+                .get("/api/admin/token/check-access")
                 .type("json")
                 .send({ id: String(_id), token: "1.2.3" });
             const status = response.status;
@@ -308,7 +309,55 @@ describe("Test Doctor API", () => {
 
             //* Assert
             expect(status).toEqual(400);
-            expect(data.success).toEqual(false);
+            expect(data.isOk).toEqual(false);
+        });
+    });
+    // /SECTION
+
+    // SECTION: POST /admin/token/is-expired
+    describe("POST /admin/token/is-expired", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", async () => {
+            //* Arrange
+            const token = jwt.sign("test", process.env.jwt_admin_access ?? "");
+
+            //* Act
+            const response = await request
+                .get("/api/admin/token/is-expired")
+                .type("json")
+                .send({ token });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.expired).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate expired token
+        test("shouldn't validate expired token", async () => {
+            //* Arrange
+            const token = jwt.sign(
+                { test: "test" },
+                process.env.jwt_admin_access ?? "",
+                {
+                    expiresIn: "1s",
+                    algorithm: "HS256",
+                }
+            );
+
+            //* Act
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const response = await request
+                .get("/api/admin/token/is-expired")
+                .type("json")
+                .send({ token });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.expired).toEqual(true);
         });
     });
     // /SECTION

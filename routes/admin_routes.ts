@@ -70,7 +70,7 @@ Router.post(
 );
 
 // ANCHOR: POST /token/check-access
-Router.post("/token/check-access", async (req, res) => {
+Router.get("/token/check-access", async (req, res) => {
     // Get token & id
     const { token, id } = req.body;
 
@@ -85,15 +85,28 @@ Router.post("/token/check-access", async (req, res) => {
 
     // return response
     return res.status(isOk ? 200 : 400).json({
-        success: isOk,
+        isOk,
     });
 });
 
 // ANCHOR: POST /token/is-expired
-Router.post("/token/is-expired", async (req, res) => {
+Router.get("/token/is-expired", async (req, res) => {
     // Get token
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({
+            success: false,
+        });
+    }
+
     // Check token
+    const isExpired = adminServices.isTokenExpired(token);
+
     // return response
+    return res.status(200).json({
+        expired: isExpired,
+    });
 });
 
 export default Router;
