@@ -37,6 +37,7 @@ Router.post("/login", async (req, res) => {
     });
 });
 
+// ANCHOR: POST /become-doctor-request/submit
 Router.post(
     "/become-doctor-request/submit",
     tokenServices.authAdminToken,
@@ -67,5 +68,32 @@ Router.post(
         });
     }
 );
+
+// ANCHOR: POST /token/check-access
+Router.post("/token/check-access", async (req, res) => {
+    // Get token & id
+    const { token, id } = req.body;
+
+    if (!token || !id) {
+        return res.status(400).json({
+            success: false,
+        });
+    }
+
+    // Check token
+    const isOk = await adminServices.checkAccessToken(id, token);
+
+    // return response
+    return res.status(isOk ? 200 : 400).json({
+        success: isOk,
+    });
+});
+
+// ANCHOR: POST /token/is-expired
+Router.post("/token/is-expired", async (req, res) => {
+    // Get token
+    // Check token
+    // return response
+});
 
 export default Router;

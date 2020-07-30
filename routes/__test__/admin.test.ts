@@ -20,6 +20,7 @@ import {
     IDoctorToDoctorObj,
     DoctorObjToBecomeDoctorObj,
 } from "../../services/types_services";
+import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
 
 /**
  *  ? This test module testing admin services
@@ -155,6 +156,8 @@ describe("Test Doctor API", () => {
         await Doctor.remove({});
         await BecomeDoctorRequest.remove({});
         await Admin.remove({});
+        await AdminAccessToken.remove({});
+        await AdminRefreshToken.remove({});
     });
 
     // SECTION: POST /admin/login
@@ -264,6 +267,49 @@ describe("Test Doctor API", () => {
             expect(data.success).toEqual(false);
         });
     });
+    // /SECTION
 
+    // SECTION: POST /admin/token/check-access
+    describe("POST /admin/token/check-access", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+
+            //* Act
+            const response = await request
+                .post("/api/admin/token/check-access")
+                .type("json")
+                .send({ id: String(_id), token: tokens?.access });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+        });
+
+        // ANCHOR: shouldn't validate invalid token
+        test("shouldn't validate invalid token", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+
+            //* Act
+            const response = await request
+                .post("/api/admin/token/check-access")
+                .type("json")
+                .send({ id: String(_id), token: "1.2.3" });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+        });
+    });
     // /SECTION
 });
