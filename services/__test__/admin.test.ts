@@ -312,4 +312,40 @@ describe("Test Admin services", () => {
         });
     });
     // /SECTION
+
+    // SECTION: isTokenExpired
+    describe("Is token expired", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", () => {
+            //* Arrange
+            const token = jwt.sign("test", process.env.jwt_admin_access ?? "");
+
+            //* Act
+            const isExpired = adminServices.isTokenExpired(token);
+
+            //* Assert
+            expect(isExpired).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate expired token
+        test("shouldn't validate expired token", async () => {
+            //* Arrange
+            const token = jwt.sign(
+                { test: "test" },
+                process.env.jwt_admin_access ?? "",
+                {
+                    expiresIn: "1s",
+                    algorithm: "HS256",
+                }
+            );
+
+            //* Act
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const isExpired = adminServices.isTokenExpired(token);
+
+            //* Assert
+            expect(isExpired).toEqual(true);
+        });
+    });
+    // /SECTION
 });

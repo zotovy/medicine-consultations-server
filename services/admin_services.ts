@@ -157,7 +157,7 @@ class AdminServices {
             token,
             process.env.jwt_admin_access ?? "",
             (e, data) => {
-                if (e) {
+                if (e?.name && e.name !== "TokenExpiredError") {
                     return e;
                 }
                 return data;
@@ -172,6 +172,23 @@ class AdminServices {
         const founded = await AdminAccessToken.find({});
 
         return adminId === id && adminId.length !== 0 && founded.length === 1;
+    };
+
+    // ANCHOR: is Token Exprired
+    isTokenExpired = (token: string): boolean => {
+        const isOk = jwt.verify(
+            token,
+            process.env.jwt_admin_access ?? "",
+            (e) => {
+                if (e?.name === "TokenExpiredError") {
+                    return true;
+                }
+                return false;
+            }
+        );
+
+        // @ts-ignore
+        return isOk;
     };
 }
 
