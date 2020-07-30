@@ -59,6 +59,7 @@ class TokenServices {
 
         // No token
         if (!token) {
+            console.info(1);
             logger.i("no token were provide");
             return res.status(401).json({
                 success: false,
@@ -72,6 +73,7 @@ class TokenServices {
 
         // No token in DB
         if (founded.length === 0) {
+            console.info(213);
             logger.i("invalid token was provide");
             return res.status(401).json({
                 success: false,

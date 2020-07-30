@@ -203,4 +203,67 @@ describe("Test Doctor API", () => {
         });
     });
     // /SECTION
+
+    // SECTION POST /admin/become-doctor-request/submit
+
+    describe("POST /admin/become-doctor-request/submit", () => {
+        // ANCHOR: should submit sample request
+        test("should submit sample request", async () => {
+            //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+
+            const id = (
+                await BecomeDoctorRequest.create(sampleBecomeDoctorRequest)
+            ).id;
+
+            //* Act
+            const response = await request
+                .post("/api/admin/become-doctor-request/submit")
+                .set("auth", "Bearer " + tokens?.access ?? "")
+                .type("json")
+                .send({ id });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+
+            const requests = await BecomeDoctorRequest.find({});
+            const doctors = await Doctor.find({});
+
+            expect(requests).toEqual([]);
+            expect(doctors.length).toEqual(1);
+        });
+
+        // ANCHOR: shouldn't submit request with invalid id
+        test("shouldn't submit request with invalid id", async () => {
+            //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+            const id = "123456789101";
+
+            //* Act
+            const response = await request
+                .post("/api/admin/become-doctor-request/submit")
+                .set("auth", "Bearer " + tokens?.access ?? "")
+                .type("json")
+                .send({ id });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+        });
+    });
+
+    // /SECTION
 });

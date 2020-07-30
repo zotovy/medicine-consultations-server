@@ -6,6 +6,8 @@ import tokenServices from "../services/token_services";
 import { IAdminToAdminObj } from "./types_services";
 import logger from "../logger";
 import { DoctorObject } from "../types/models";
+import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
+import { access } from "fs";
 
 class AdminServices {
     // ANCHOR: login
@@ -23,13 +25,16 @@ class AdminServices {
             }
 
             const accessToken = tokenServices.generateToken(
-                founded.id,
+                founded.id.toString(),
                 "jwt_admin_access"
             );
             const refreshToken = tokenServices.generateToken(
-                founded.id,
+                founded.id.toString(),
                 "jwt_admin_refresh"
             );
+
+            await AdminAccessToken.create({ value: accessToken });
+            await AdminRefreshToken.create({ value: refreshToken });
 
             return {
                 success: true,

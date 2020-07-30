@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 /**
  *  Refresh Token model interface
@@ -231,6 +231,7 @@ export enum AdminRole {
 }
 
 export interface IAdmin extends Document {
+    id: string | Types.ObjectId;
     username: string;
     password: string;
     email: string;
@@ -240,11 +241,27 @@ export interface IAdmin extends Document {
 }
 
 export interface AdminObj {
-    id: IAdmin["id"];
+    id?: IAdmin["id"];
     username: IAdmin["username"];
     password: IAdmin["password"];
     email: IAdmin["email"];
     name: IAdmin["name"];
     photoUrl: IAdmin["photoUrl"];
     role: IAdmin["role"];
+}
+
+export interface IAdminHistory extends Document {
+    id: string | Types.ObjectId;
+    adminId: string;
+    whatDid: string;
+    payload: string;
+    timestamp: Date;
+}
+
+export interface AdminHistoryProject {
+    id: IAdminHistory["id"];
+    adminId: IAdminHistory["adminId"];
+    whatDid: IAdminHistory["whatDid"];
+    payload: Object;
+    timestamp: IAdminHistory["timestamp"];
 }

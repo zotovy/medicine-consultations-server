@@ -17,6 +17,8 @@ import {
 } from "../../types/models";
 import { DoctorObjToBecomeDoctorObj } from "../types_services";
 import { BecomeDoctorRequest } from "../../models/doctor";
+import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
+import { access } from "fs";
 
 /**
  *  ? This test module testing admin services
@@ -129,6 +131,8 @@ describe("Test Admin services", () => {
         await Admin.remove({});
         await Doctor.remove({});
         await BecomeDoctorRequest.remove({});
+        await AdminAccessToken.remove({});
+        await AdminRefreshToken.remove({});
     });
 
     // SECTION login()
@@ -163,6 +167,15 @@ describe("Test Admin services", () => {
                 jwt_refresh
             );
 
+            const accessToken = await AdminAccessToken.find({
+                value: response.tokens?.access ?? "",
+            });
+            const refreshToken = await AdminRefreshToken.find({
+                value: response.tokens?.refresh ?? "",
+            });
+            expect(accessToken).toBeDefined();
+            expect(refreshToken).toBeDefined();
+
             expect(id_access.id).toEqual(id);
             expect(id_refresh.id).toEqual(id);
         });
@@ -184,6 +197,12 @@ describe("Test Admin services", () => {
             expect(response.success).toEqual(false);
             expect(response.admin).toBeUndefined();
             expect(response.tokens).toBeUndefined();
+
+            const accessTokens = await AdminAccessToken.find({});
+            const refreshTokens = await AdminRefreshToken.find({});
+
+            expect(accessTokens.length).toEqual(0);
+            expect(refreshTokens.length).toEqual(0);
         });
     });
     // /SECTION

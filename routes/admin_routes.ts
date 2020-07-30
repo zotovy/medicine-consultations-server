@@ -37,4 +37,35 @@ Router.post("/login", async (req, res) => {
     });
 });
 
+Router.post(
+    "/become-doctor-request/submit",
+    tokenServices.authAdminToken,
+    async (req, res) => {
+        // Extract request id
+        const requestId = req.body.id;
+
+        if (!requestId) {
+            return res.status(400).json({
+                success: false,
+            });
+        }
+
+        // Run service function
+        const serviceResponse = await adminServices.submitBecomeDoctorRequests(
+            requestId
+        );
+
+        if (!serviceResponse.success) {
+            return res.status(400).json({
+                success: false,
+            });
+        }
+
+        // Return success
+        return res.status(200).json({
+            success: true,
+        });
+    }
+);
+
 export default Router;
