@@ -72,7 +72,7 @@ Router.post(
 // ANCHOR: POST /token/check-access
 Router.get("/token/check-access", async (req, res) => {
     // Get token & id
-    const { token, id } = req.body;
+    const { token, id } = req.query;
 
     if (!token || !id) {
         return res.status(400).json({
@@ -81,7 +81,10 @@ Router.get("/token/check-access", async (req, res) => {
     }
 
     // Check token
-    const isOk = await adminServices.checkAccessToken(id, token);
+    const isOk = await adminServices.checkAccessToken(
+        id.toString(),
+        token.toString()
+    );
 
     // return response
     return res.status(isOk ? 200 : 400).json({
@@ -92,7 +95,7 @@ Router.get("/token/check-access", async (req, res) => {
 // ANCHOR: POST /token/is-expired
 Router.get("/token/is-expired", async (req, res) => {
     // Get token
-    const { token } = req.body;
+    const { token } = req.query;
 
     if (!token) {
         return res.status(400).json({
@@ -101,7 +104,7 @@ Router.get("/token/is-expired", async (req, res) => {
     }
 
     // Check token
-    const isExpired = adminServices.isTokenExpired(token);
+    const isExpired = adminServices.isTokenExpired(token.toString());
 
     // return response
     return res.status(200).json({

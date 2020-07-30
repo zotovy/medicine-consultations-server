@@ -270,8 +270,8 @@ describe("Test Doctor API", () => {
     });
     // /SECTION
 
-    // SECTION: POST /admin/token/check-access
-    describe("POST /admin/token/check-access", () => {
+    // SECTION: GET /admin/token/check-access
+    describe("GET /admin/token/check-access", () => {
         // ANCHOR: should validate sample token
         test("should validate sample token", async () => {
             //* Arrange
@@ -284,8 +284,7 @@ describe("Test Doctor API", () => {
             //* Act
             const response = await request
                 .get("/api/admin/token/check-access")
-                .type("json")
-                .send({ id: String(_id), token: tokens?.access });
+                .query({ id: String(_id), token: tokens?.access });
             const status = response.status;
             const data = JSON.parse(response.text);
 
@@ -302,8 +301,7 @@ describe("Test Doctor API", () => {
             //* Act
             const response = await request
                 .get("/api/admin/token/check-access")
-                .type("json")
-                .send({ id: String(_id), token: "1.2.3" });
+                .query({ id: String(_id), token: "1.2.3" });
             const status = response.status;
             const data = JSON.parse(response.text);
 
@@ -314,8 +312,8 @@ describe("Test Doctor API", () => {
     });
     // /SECTION
 
-    // SECTION: POST /admin/token/is-expired
-    describe("POST /admin/token/is-expired", () => {
+    // SECTION: GET /admin/token/is-expired
+    describe("GET /admin/token/is-expired", () => {
         // ANCHOR: should validate sample token
         test("should validate sample token", async () => {
             //* Arrange
@@ -324,8 +322,8 @@ describe("Test Doctor API", () => {
             //* Act
             const response = await request
                 .get("/api/admin/token/is-expired")
-                .type("json")
-                .send({ token });
+                .query({ token });
+
             const status = response.status;
             const data = JSON.parse(response.text);
 
@@ -350,8 +348,7 @@ describe("Test Doctor API", () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             const response = await request
                 .get("/api/admin/token/is-expired")
-                .type("json")
-                .send({ token });
+                .query({ token });
             const status = response.status;
             const data = JSON.parse(response.text);
 
