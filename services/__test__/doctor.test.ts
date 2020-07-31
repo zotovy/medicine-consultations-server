@@ -376,9 +376,10 @@ describe("Test Doctor services", () => {
             //* Assert
             expect(response).toEqual({ success: true });
             const raw = await BecomeDoctorRequest.find({});
+            const answer = { ...sampleRequest, id: raw[0].id };
             const request = IBecomeDoctorToBecomeDoctorObj(raw[0]);
 
-            expect(sampleRequest).toEqual(request);
+            expect(answer).toEqual(request);
         });
 
         // ANCHOR: should return error on exceeding the limit

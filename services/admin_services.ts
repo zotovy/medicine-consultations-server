@@ -9,11 +9,16 @@ import {
     TCheckRefreshToken,
 } from "../types/services";
 import tokenServices from "../services/token_services";
-import { IAdminToAdminObj } from "./types_services";
+import {
+    IAdminToAdminObj,
+    IBecomeDoctorToBecomeDoctorObj,
+} from "./types_services";
 import logger from "../logger";
 import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
 import admin from "../models/admin";
 import token_services from "../services/token_services";
+import { BecomeDoctorObj, IBecomeDoctor } from "../types/models";
+import { request } from "http";
 
 class AdminServices {
     // constructor() {
@@ -218,6 +223,26 @@ class AdminServices {
         await AdminRefreshToken.create({ value: refresh });
 
         return { access, refresh };
+    };
+
+    // ANCHOR: getBecomeDoctorsRequest
+    getAllBecomeDoctorsRequests = async (
+        amount: number = 50,
+        from: number = 0
+    ): Promise<Array<BecomeDoctorObj>> => {
+        try {
+            const raw: Array<IBecomeDoctor> = await BecomeDoctorRequest.find({})
+                .skip(from)
+                .limit(amount);
+            const requests: Array<BecomeDoctorObj> = raw.map(
+                (e: IBecomeDoctor) => IBecomeDoctorToBecomeDoctorObj(e)
+            );
+
+            return requests;
+        } catch (e) {
+            logger.e(e, e.stack);
+            return [];
+        }
     };
 }
 

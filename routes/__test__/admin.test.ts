@@ -22,6 +22,7 @@ import {
     DoctorObjToBecomeDoctorObj,
 } from "../../services/types_services";
 import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
+import token_services from "../../services/token_services";
 
 /**
  *  ? This test module testing admin services
@@ -110,16 +111,14 @@ process.env.jwt_refresh = "test-refresh-string";
 process.env.jwt_admin_access = "test-admin-access-string";
 process.env.jwt_admin_refresh = "test-admin-refresh-string";
 
-// This function will convert lastActiveAt, createdAt & beginDoctorDate
-// from String --> Date and return new doctorObj
-const convertDoctorFields = (doctor: any) => {
-    if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
-        // Convert String --> new Date
-        doctor.lastActiveAt = new Date(doctor.lastActiveAt);
-        doctor.createdAt = new Date(doctor.createdAt);
-        doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
-    }
-    return doctor;
+const getAuthAdminHeader = async () => {
+    const { _id } = await Admin.create(sampleAdmin);
+    const token = await token_services.generateToken(
+        String(_id),
+        "jwt_admin_access"
+    );
+
+    return `Bearer ${token}`;
 };
 
 describe("Test Doctor API", () => {

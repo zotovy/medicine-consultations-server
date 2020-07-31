@@ -4,6 +4,7 @@ import adminServices from "../services/admin_services";
 import tokenServices from "../services/token_services";
 import { IAdminToAdminObj } from "../services/types_services";
 import token_services from "../services/token_services";
+import { parse } from "path";
 
 // Used to process the http request
 const Router = express.Router();
@@ -37,6 +38,36 @@ Router.post("/login", async (req, res) => {
         tokens: serviceResponse.tokens,
     });
 });
+
+// ANCHOR: GET /become-doctor-request/
+Router.get(
+    "/become-doctor-requests",
+    tokenServices.authAdminToken,
+    async (req, res) => {
+        // Get amount & from
+        const amount: number = parseInt(
+            (req.query?.amount as string | undefined) ?? "20"
+        );
+        const from: number = parseInt(
+            (req.query?.amount as string | undefined) ?? "0"
+        );
+
+        // Get requests
+        const requests = await adminServices.getAllBecomeDoctorsRequests(
+            amount,
+            from
+        );
+
+        // Send requests
+        return res.status(200).json({
+            success: true,
+            hasRequests: requests.length === 0,
+            from,
+            amount,
+            requests,
+        });
+    }
+);
 
 // ANCHOR: POST /become-doctor-request/submit
 Router.post(

@@ -201,6 +201,7 @@ export interface IBecomeDoctor extends Document {
  * Become Doctor Request Object
  */
 export interface BecomeDoctorObj {
+    id?: string;
     name?: IBecomeDoctor["name"];
     surname?: IBecomeDoctor["surname"];
     phone?: IBecomeDoctor["phone"];

@@ -122,6 +122,7 @@ export function IBecomeDoctorToBecomeDoctorObj(
     e: IBecomeDoctor
 ): BecomeDoctorObj {
     return {
+        id: e.id,
         name: e.name,
         surname: e.surname,
         phone: e.phone,

@@ -462,4 +462,89 @@ describe("Test Admin services", () => {
         });
     });
     // /SECTION
+
+    // SECTION: getAllBecomeDoctorRequests
+    describe("getAllBecomeDoctorRequests()", () => {
+        // ANCHOR: should get 3 requests
+        test("should get 3 users", async () => {
+            //* Arrange
+            const request1: BecomeDoctorObj = { ...sampleRequest };
+            const request2: BecomeDoctorObj = {
+                ...sampleRequest,
+                name: "Максим",
+                email: "mail1@mail.com",
+            };
+            const request3: BecomeDoctorObj = {
+                ...sampleRequest,
+                name: "Евгений",
+                email: "mail2@mail.com",
+            };
+
+            //* Act
+            // Test 1 user
+            expect(await BecomeDoctorRequest.find({})).toEqual([]);
+            const create1 = await BecomeDoctorRequest.create(request1);
+            const result1 = await adminServices.getAllBecomeDoctorsRequests();
+            request1.id = String(create1._id);
+
+            // Test 2 users
+            const create2 = await BecomeDoctorRequest.create(request2);
+            const result2 = await adminServices.getAllBecomeDoctorsRequests();
+            request2.id = String(create2._id);
+
+            // Test 3 users
+            const create3 = await BecomeDoctorRequest.create(request3);
+            const result3 = await adminServices.getAllBecomeDoctorsRequests();
+            request3.id = String(create3._id);
+
+            // Prepare answers
+            const answer1: BecomeDoctorObj[] = [request1];
+            const answer2: BecomeDoctorObj[] = [request1, request2];
+            const answer3: BecomeDoctorObj[] = [request1, request2, request3];
+
+            //* Assert
+            expect(result1).toEqual(answer1);
+            expect(result2).toEqual(answer2);
+            expect(result3).toEqual(answer3);
+        });
+
+        // ANCHOR: shouldn't get request after deleting
+        test("shouldn't get user after deleting", async () => {
+            //* Arrange
+            const answer: [] = [];
+
+            //* Act
+            const { _id } = await BecomeDoctorRequest.create(sampleRequest);
+            await BecomeDoctorRequest.remove({ _id: _id });
+
+            const result = await adminServices.getAllBecomeDoctorsRequests();
+
+            //* Assert
+            expect(result).toEqual(answer);
+        });
+
+        // ANCHOR: should get updated request
+        /** Create and update user. Function must return array with updated user */
+        test("should get updated user", async () => {
+            //* Given
+            const updatedUser: BecomeDoctorObj = {
+                ...sampleRequest,
+                name: "Максим",
+            };
+
+            //* Result
+            const { _id } = await BecomeDoctorRequest.create(sampleRequest);
+            await BecomeDoctorRequest.updateOne({ _id: _id }, updatedUser);
+
+            updatedUser.id = String(_id);
+            const answer: BecomeDoctorObj[] = [updatedUser];
+
+            const result = await adminServices.getAllBecomeDoctorsRequests();
+
+            //* Checking
+
+            expect(result).toEqual(answer);
+        });
+    });
+    // /SECTION
 });
