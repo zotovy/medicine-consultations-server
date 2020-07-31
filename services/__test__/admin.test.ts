@@ -313,6 +313,78 @@ describe("Test Admin services", () => {
     });
     // /SECTION
 
+    // SECTION: checkRefreshToken
+    describe("checkRefreshToken()", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+
+            //* Act
+            const isOk = await adminServices.checkRefreshToken(
+                String(_id),
+                tokens?.refresh ?? ""
+            );
+
+            //* Assert
+            expect(isOk).toEqual(true);
+        });
+
+        // ANCHOR: shouldn't validate invalid token
+        test("shouldn't validate invalid token", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+
+            //* Act
+            const isOk = await adminServices.checkRefreshToken(
+                String(_id),
+                "1.2.3"
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate invalid id
+        test("shouldn't validate invalid id", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+
+            //* Act
+            const isOk = await adminServices.checkRefreshToken(
+                "some-id",
+                tokens?.refresh ?? ""
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate id which not in db
+        test("shouldn't validate id which not in db", async () => {
+            //* Arrange
+            const { _id } = await Admin.create(sampleAdmin);
+
+            //* Act
+            const isOk = await adminServices.checkRefreshToken(
+                _id,
+                "123.123.123"
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+    });
+    // /SECTION
+
     // SECTION: isTokenExpired
     describe("Is token expired", () => {
         // ANCHOR: should validate sample token
@@ -345,6 +417,48 @@ describe("Test Admin services", () => {
 
             //* Assert
             expect(isExpired).toEqual(true);
+        });
+    });
+    // /SECTION
+
+    // SECTION: generateTokens
+    describe("generateTokens()", () => {
+        // ANCHOR: should generate new tokens
+        test("should generate new tokens", async () => {
+            //* Arrange
+            const adminId = "123456789101";
+            const oldAccess = jwt.sign(
+                adminId,
+                process.env.jwt_admin_access ?? ""
+            );
+            const oldRefresh = jwt.sign(
+                adminId,
+                process.env.jwt_admin_refresh ?? ""
+            );
+            await AdminAccessToken.create({ value: oldAccess });
+            await AdminRefreshToken.create({ value: oldRefresh });
+
+            //* Act
+            const response = await adminServices.generateTokenAndDeleteOld(
+                adminId,
+                oldAccess,
+                oldRefresh
+            );
+
+            //* Assert
+            expect(response.access).toBeDefined();
+            expect(response.refresh).toBeDefined();
+
+            const isAccessOk = await adminServices.checkAccessToken(
+                adminId,
+                response.access
+            );
+            const isRefreshOk = await adminServices.checkRefreshToken(
+                adminId,
+                response.refresh
+            );
+            expect(isAccessOk).toEqual(true);
+            expect(isRefreshOk).toEqual(true);
         });
     });
     // /SECTION

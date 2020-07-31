@@ -22,6 +22,9 @@ import {
 } from "../types/services";
 import { IUser, UserObject } from "../types/models";
 import { error, info } from "console";
+import { AccessToken, RefreshToken } from "../models/tokens";
+import token_services from "./token_services";
+import logger from "../logger";
 
 class UserServices {
     /**
@@ -615,6 +618,59 @@ class UserServices {
             };
         }
     }
+
+    // ANCHOR: check refresh token
+    checkAccessToken = async (
+        userId: string,
+        token: string
+    ): Promise<boolean> =>
+        await token_services.checkToken("jwt_access", userId, token);
+
+    // ANCHOR: check refresh token
+    checkRefreshToken = async (
+        userId: string,
+        token: string
+    ): Promise<boolean> =>
+        await token_services.checkToken("jwt_refresh", userId, token);
+
+    // ANCHOR: generateNewTokens
+    generateNewTokens = async (userId: string) => {
+        // Generate news token
+        const access = token_services.generateToken(userId, "jwt_access");
+        const refresh = token_services.generateToken(userId, "jwt_refresh");
+
+        // Add new tokens to db
+        await AccessToken.create({ value: access });
+        await RefreshToken.create({ value: refresh });
+
+        return { access, refresh };
+    };
+
+    // ANCHOR: generate new tokens
+    generateTokenAndDeleteOld = async (
+        userId: string,
+        oldAccessToken: string,
+        oldRefreshToken: string
+    ): Promise<{ access: string; refresh: string }> => {
+        // Shortcut for loggin
+        const onError = (where: "Access" | "Refresh", e: any) => {
+            logger.e(
+                `Error while remove ${where} token. userId="${userId}",
+                 oldAccessToken="${oldAccessToken}", oldRefreshToken="${oldRefreshToken}".
+                 Trace = ${e}`
+            );
+        };
+
+        // Delete old
+        await AccessToken.remove({ value: oldAccessToken }, (e) =>
+            onError("Access", e)
+        );
+        await RefreshToken.remove({ value: oldRefreshToken }, (e) =>
+            onError("Refresh", e)
+        );
+
+        return await this.generateNewTokens(userId);
+    };
 }
 
 export default new UserServices();

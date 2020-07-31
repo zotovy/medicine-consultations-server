@@ -9,6 +9,7 @@ import userServices from "../user_services";
 // @types
 import { UserObject } from "../../types/models";
 import { IUserToUserObj } from "../types_services";
+import { AccessToken, RefreshToken } from "../../models/tokens";
 
 /**
  *  ? This test module testing user services
@@ -21,6 +22,18 @@ import { IUserToUserObj } from "../types_services";
  *  The test module is considered passed if all test cases were passed correctly
  *  All test modules will run by `npm run test` after commiting to master. Changes will apply only if all tests were passed
  */
+
+process.env.MODE = "testing";
+process.env.url = "localhost:5000/";
+process.env.port = "5000";
+process.env.mongodb_url = "mongodb://localhost/db";
+process.env.useNewUrlParser = "true";
+process.env.useFindAndModify = "false";
+process.env.useUnifiedTopology = "true";
+process.env.jwt_access = "test-access-string";
+process.env.jwt_refresh = "test-refresh-string";
+process.env.jwt_admin_access = "test-admin-access-string";
+process.env.jwt_admin_refresh = "test-admin-refresh-string";
 
 // Sample user will use or modify for some cases
 const sampleUser: UserObject = {
@@ -52,7 +65,7 @@ describe("Test UserServices", () => {
     // By using mongoose.connect
     beforeAll(async () => {
         db = await mongoose.connect(
-            "mongodb://localhost/db",
+            "mongodb://localhost/test",
             {
                 useNewUrlParser: true,
                 useCreateIndex: true,
@@ -75,6 +88,8 @@ describe("Test UserServices", () => {
     // Remove all date from mongodb after each test case
     afterEach(async () => {
         await User.remove({});
+        await AccessToken.remove({});
+        await RefreshToken.remove({});
     });
 
     // SECTION: getUsers()
@@ -668,4 +683,163 @@ describe("Test UserServices", () => {
         });
     });
     // /SECTION
+
+    // SECTION: checkAccessToken
+    describe("checkAccessToken()", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", async () => {
+            //* Arrange
+            const id = "123456789101";
+            const { access } = await userServices.generateNewTokens(id);
+
+            //* Act
+            const isOk = await userServices.checkAccessToken(id, access ?? "");
+
+            //* Assert
+            expect(isOk).toEqual(true);
+        });
+
+        // ANCHOR: shouldn't validate invalid token
+        test("shouldn't validate invalid token", async () => {
+            //* Arrange
+            const id = "123456789101";
+
+            //* Act
+            const isOk = await userServices.checkAccessToken(id, "1.2.3");
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate invalid id
+        test("shouldn't validate invalid id", async () => {
+            //* Arrange
+            const id = "123456789101";
+            const { access } = await userServices.generateNewTokens(id);
+
+            //* Act
+            const isOk = await userServices.checkAccessToken("some-id", access);
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate id which not in db
+        test("shouldn't validate id which not in db", async () => {
+            //* Arrange
+            const id = "123456789101";
+
+            //* Act
+            const isOk = await userServices.checkAccessToken(id, "123.123.123");
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+    });
+    // /SECTION
+
+    // SECTION: checkRefreshToken
+    describe("checkRefreshToken()", () => {
+        // ANCHOR: should validate sample token
+        test("should validate sample token", async () => {
+            //* Arrange
+            const id = "123456789101";
+            const { refresh } = await userServices.generateNewTokens(id);
+
+            //* Act
+            const isOk = await userServices.checkRefreshToken(
+                id,
+                refresh ?? ""
+            );
+
+            //* Assert
+            expect(isOk).toEqual(true);
+        });
+
+        // ANCHOR: shouldn't validate invalid token
+        test("shouldn't validate invalid token", async () => {
+            //* Arrange
+            const id = "123456789101";
+
+            //* Act
+            const isOk = await userServices.checkRefreshToken(id, "1.2.3");
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate invalid id
+        test("shouldn't validate invalid id", async () => {
+            //* Arrange
+            const id = "123456789101";
+            const { refresh } = await userServices.generateNewTokens(id);
+
+            //* Act
+            const isOk = await userServices.checkRefreshToken(
+                "some-id",
+                refresh ?? ""
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+
+        // ANCHOR: shouldn't validate id which not in db
+        test("shouldn't validate id which not in db", async () => {
+            //* Arrange
+            const id = "123456789101";
+
+            //* Act
+            const isOk = await userServices.checkRefreshToken(
+                id,
+                "123.123.123"
+            );
+
+            //* Assert
+            expect(isOk).toEqual(false);
+        });
+    });
+    // /SECTION
+
+    // // SECTION: generateTokens
+    // describe("generateTokens()", () => {
+    //     // ANCHOR: should generate new tokens
+    //     test("should generate new tokens", async () => {
+    //         //* Arrange
+    //         const adminId = "123456789101";
+    //         const oldAccess = jwt.sign(
+    //             adminId,
+    //             process.env.jwt_admin_access ?? ""
+    //         );
+    //         const oldRefresh = jwt.sign(
+    //             adminId,
+    //             process.env.jwt_admin_refresh ?? ""
+    //         );
+    //         await AccessToken.create({ value: oldAccess });
+    //         await RefreshToken.create({ value: oldRefresh });
+
+    //         //* Act
+    //         const response = await userServices.generateTokenAndDeleteOld(
+    //             adminId,
+    //             oldAccess,
+    //             oldRefresh
+    //         );
+
+    //         //* Assert
+    //         expect(response.access).toBeDefined();
+    //         expect(response.refresh).toBeDefined();
+
+    //         const isAccessOk = await userServices.checkAccessToken(
+    //             adminId,
+    //             response.access
+    //         );
+    //         const isRefreshOk = await userServices.checkRefreshToken(
+    //             adminId,
+    //             response.refresh
+    //         );
+    //         expect(isAccessOk).toEqual(true);
+    //         expect(isRefreshOk).toEqual(true);
+    //     });
+    // });
+    // // /SECTION
 });

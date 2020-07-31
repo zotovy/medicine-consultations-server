@@ -358,4 +358,83 @@ describe("Test Doctor API", () => {
         });
     });
     // /SECTION
+
+    // SECTION: POST admin/token/update-tokens
+
+    describe("POST /admin/token/update-tokens", () => {
+        // ANCHOR: should generate correct new tokens
+        test("should generate correct new tokens", async (done) => {
+            //* Arrange
+            const id = "123456789";
+            const old_access = jwt.sign(id, process.env.jwt_admin_access ?? "");
+            const old_refresh = jwt.sign(
+                id,
+                process.env.jwt_admin_refresh ?? ""
+            );
+            await AdminAccessToken.create({ value: old_access });
+            await AdminRefreshToken.create({ value: old_refresh });
+
+            //* Act
+            const responce = await request
+                .post("/api/admin/token/update-tokens")
+                .type("json")
+                .send({
+                    accessToken: old_access,
+                    refreshToken: old_refresh,
+                    adminId: id,
+                });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Access
+            expect(status).toEqual(201);
+            expect(data.success).toEqual(true);
+            expect(data.tokens.access).toBeDefined();
+            expect(data.tokens.refresh).toBeDefined();
+
+            // Verify tokens
+            const id_access: any = jwt.verify(
+                data.tokens.access,
+                process.env.jwt_admin_access ?? ""
+            );
+            const id_refresh: any = jwt.verify(
+                data.tokens.refresh,
+                process.env.jwt_admin_refresh ?? ""
+            );
+
+            expect(id_access.id).toEqual(id);
+            expect(id_refresh.id).toEqual(id);
+
+            done();
+        });
+
+        // ANCHOR: Should return error on invalid token
+        test("Should return error on invalid token", async (done) => {
+            //* Arrange
+            const id = "123456789101";
+            const old_access_token = "some.invalid.access.token";
+            const old_refresh_token = "some.invalid.refresh.token";
+
+            //* Act
+            const responce = await request
+                .post("/api/admin/token/update-tokens")
+                .type("json")
+                .send({
+                    accessToken: old_access_token,
+                    refreshToken: old_refresh_token,
+                    adminId: id,
+                });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Access
+            expect(status).toBe(400);
+            expect(data.success).toEqual(false);
+            expect(data.tokens).toBeUndefined();
+
+            done();
+        });
+    });
+
+    // /SECTION
 });

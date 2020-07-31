@@ -10,6 +10,7 @@ import app, { server } from "../../server";
 // @types
 import { UserObject } from "../../types/models";
 import { IUserToUserObj } from "../../services/types_services";
+import user_services from "../../services/user_services";
 
 /**
  *  ? This test module testing user routes
@@ -111,12 +112,15 @@ describe("Test user routes", () => {
         test("should generate tokens to sample user", async (done) => {
             //* Arrange
             const id: string = "123456789101";
+            const { refresh, access } = await user_services.generateNewTokens(
+                id
+            );
 
             //* Act
             const responce = await request
                 .post("/api/generate-token")
                 .type("json")
-                .send({ id });
+                .send({ id, accessToken: access, refreshToken: refresh });
 
             const status = responce.status;
             const data = JSON.parse(responce.text);
@@ -239,14 +243,19 @@ describe("Test user routes", () => {
         test("should generate correct new tokens", async (done) => {
             //* Arrange
             const id = "123456789";
-            const old_refresh = jwt.sign(id, process.env.jwt_refresh ?? "");
-            await RefreshToken.create({ value: old_refresh });
+            const { refresh, access } = await user_services.generateNewTokens(
+                id
+            );
 
             //* Act
             const responce = await request
                 .post("/api/token")
                 .type("json")
-                .send({ token: old_refresh });
+                .send({
+                    userId: id,
+                    accessToken: access,
+                    refreshToken: refresh,
+                });
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
@@ -276,13 +285,13 @@ describe("Test user routes", () => {
         /** Pass invalid refresh token. Function should return error with status 400 */
         test("Should return error on invalid token", async (done) => {
             //* Arrange
-            const token = "some.invalid.token";
+            const id = "123456789";
 
             //* Act
             const responce = await request
                 .post("/api/token")
                 .type("json")
-                .send({ token: token });
+                .send({ userId: id, accessToken: "123", refreshToken: "456" });
             const status = responce.status;
             const data = JSON.parse(responce.text);
 

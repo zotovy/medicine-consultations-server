@@ -59,17 +59,17 @@ const upload = multer({
 /**
  * Generate and returh token for received user id
  */
-export const generateToken = (id: string, key: string): string => {
-    return jwt.sign(
-        {
-            id,
-        },
-        process.env[key] ?? "",
-        {
-            expiresIn: "30m",
-        }
-    );
-};
+// export const generateToken = (id: string, key: string): string => {
+//     return jwt.sign(
+//         {
+//             id,
+//         },
+//         process.env[key] ?? "",
+//         {
+//             expiresIn: "30m",
+//         }
+//     );
+// };
 
 // ANCHOR: authenticate token
 /**
@@ -133,8 +133,10 @@ const generateTokenLimitter = rateLimitter({
  */
 Router.post("/generate-token", generateTokenLimitter, async (req, res) => {
     const id: string | undefined = req.body?.id;
+    const accessToken: string | undefined = req.body?.accessToken;
+    const refreshToken: string | undefined = req.body?.refreshToken;
 
-    if (!id) {
+    if (!id || !accessToken || !refreshToken) {
         return res.status(412).json({
             success: false,
             error: "empty_body",
@@ -142,8 +144,11 @@ Router.post("/generate-token", generateTokenLimitter, async (req, res) => {
         });
     }
 
-    const accessToken: string = jwt.sign({ id }, process.env.jwt_access ?? "");
-    const refreshToken: string = jwt.sign(
+    const newAccessToken: string = jwt.sign(
+        { id },
+        process.env.jwt_access ?? ""
+    );
+    const newRefreshToken: string = jwt.sign(
         { id },
         process.env.jwt_refresh ?? ""
     );
@@ -151,8 +156,8 @@ Router.post("/generate-token", generateTokenLimitter, async (req, res) => {
     return res.status(200).json({
         success: true,
         tokens: {
-            access: accessToken,
-            refresh: refreshToken,
+            access: newAccessToken,
+            refresh: newRefreshToken,
         },
     });
 });
@@ -191,16 +196,12 @@ Router.post("/login-user", loginTokenLimitter, async (req, res) => {
         });
     }
 
-    const accessToken: string = generateToken(dbcode.id ?? "", "jwt_access");
-    const refreshToken: string = generateToken(dbcode.id ?? "", "jwt_refresh");
+    const tokens = await userServices.generateNewTokens(dbcode.id ?? "");
 
     return res.status(200).json({
         success: true,
         id: dbcode.id,
-        tokens: {
-            access: accessToken,
-            refresh: refreshToken,
-        },
+        tokens,
     });
 });
 
@@ -235,71 +236,40 @@ const tokenLimitter = rateLimitter({
  * This function generate new access & refresh token by receiver refresh token
  */
 Router.post("/token", tokenLimitter, async (req, res) => {
-    const token = req.body?.token;
+    const accessToken = req.body?.accessToken;
+    const refreshToken = req.body?.refreshToken;
+    const userId = req.body?.userId;
 
-    if (!token) {
+    if (!accessToken || !refreshToken || !userId) {
         return res.status(412).json({
             success: false,
             error: "empty_body",
-            message: "No token found in body",
+            message: "No tokens or userId found in body",
         });
     }
 
-    // Is given refresh token in valid token's base
-    const founded = await RefreshToken.find({
-        value: token,
-    });
+    const isOk =
+        (await userServices.checkRefreshToken(userId, refreshToken)) &&
+        (await userServices.checkAccessToken(userId, accessToken));
 
-    if (founded.length == 0) {
+    if (!isOk) {
         return res.status(400).json({
             success: false,
             error: "invalid_token",
-            message: "Invalid token were given",
+            message: "Token didn't verified",
         });
     }
 
-    // Verify token
-    jwt.verify(
-        token,
-        process.env.jwt_refresh ?? "",
-        async (err: any, userId: any) => {
-            if (err) {
-                return res.status(400).json({
-                    success: false,
-                    error: err,
-                    message: "Token didn't verified",
-                });
-            }
-
-            const newAccessToken: string = generateToken(userId, "jwt_access");
-            const newRefreshToken: string = generateToken(
-                userId,
-                "jwt_refresh"
-            );
-
-            await RefreshToken.findOneAndUpdate(
-                { value: token },
-                { value: newRefreshToken },
-                (err) => {
-                    if (err) {
-                        return res.status(400).json({
-                            success: false,
-                            error: "invalid_token",
-                            message: "Token doesn't match any user",
-                        });
-                    }
-                }
-            );
-
-            return res.status(201).json({
-                success: true,
-                tokens: {
-                    access: newAccessToken,
-                    refresh: newRefreshToken,
-                },
-            });
-        }
+    const tokens = await userServices.generateTokenAndDeleteOld(
+        userId,
+        accessToken,
+        refreshToken
     );
+
+    return res.status(201).json({
+        success: true,
+        tokens,
+    });
 });
 
 // ANCHOR: Get all users
@@ -494,24 +464,14 @@ Router.post("/user", async (req, res) => {
             });
         }
 
-        // generate access token
-        const accessToken = generateToken(dbcode.user?.id, "jwt_access");
-
-        // generate refresh token
-        const refreshToken = generateToken(dbcode.user?.id, "jwt_refresh");
-
-        // push refresh token to db
-        await RefreshToken.create({
-            value: refreshToken,
-        });
+        const tokens = await userServices.generateNewTokens(
+            dbcode.user?.id ?? ""
+        );
 
         return res.status(201).json({
             success: true,
             user: dbcode.user,
-            tokens: {
-                access: accessToken,
-                refresh: refreshToken,
-            },
+            tokens,
         });
     } catch (e) {
         logger.e(e, e.trace);

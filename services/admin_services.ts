@@ -6,12 +6,14 @@ import {
     TLoginAdmin,
     TSubmitBecomeDoctorRequests,
     TCheckAccessToken,
+    TCheckRefreshToken,
 } from "../types/services";
 import tokenServices from "../services/token_services";
 import { IAdminToAdminObj } from "./types_services";
 import logger from "../logger";
 import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
 import admin from "../models/admin";
+import token_services from "../services/token_services";
 
 class AdminServices {
     // constructor() {
@@ -147,32 +149,19 @@ class AdminServices {
         }
     };
 
-    // ANCHOR: check access token
+    // ANCHOR: check refresh token
     checkAccessToken = async (
         adminId: string,
         token: string
-    ): Promise<TCheckAccessToken> => {
-        // @ts-ignore
-        const response = jwt.verify(
-            token,
-            process.env.jwt_admin_access ?? "",
-            (e, data) => {
-                if (e?.name && e.name !== "TokenExpiredError") {
-                    return e;
-                }
-                return data;
-            }
-        );
+    ): Promise<boolean> =>
+        await tokenServices.checkToken("jwt_admin_access", adminId, token);
 
-        // @ts-ignore
-        const id = response?.id;
-
-        if (!id) return false;
-
-        const founded = await AdminAccessToken.find({});
-
-        return adminId === id && adminId.length !== 0 && founded.length === 1;
-    };
+    // ANCHOR: check refresh token
+    checkRefreshToken = async (
+        adminId: string,
+        token: string
+    ): Promise<boolean> =>
+        await tokenServices.checkToken("jwt_admin_refresh", adminId, token);
 
     // ANCHOR: is Token Exprired
     isTokenExpired = (token: string): boolean => {
@@ -189,6 +178,46 @@ class AdminServices {
 
         // @ts-ignore
         return isOk;
+    };
+
+    // ANCHOR: generate new tokens
+    generateTokenAndDeleteOld = async (
+        adminId: string,
+        oldAccessToken: string,
+        oldRefreshToken: string
+    ): Promise<{ access: string; refresh: string }> => {
+        // Shortcut for loggin
+        const onError = (where: "Access" | "Refresh", e: any) => {
+            logger.e(
+                `Error while remove ${where} admin token. adminId="${adminId}",
+                 oldAccessToken="${oldAccessToken}", oldRefreshToken="${oldRefreshToken}".
+                 Trace = ${e}`
+            );
+        };
+
+        // Delete old
+        await AdminAccessToken.remove({ value: oldAccessToken }, (e) =>
+            onError("Access", e)
+        );
+        await AdminRefreshToken.remove({ value: oldRefreshToken }, (e) =>
+            onError("Refresh", e)
+        );
+
+        // Generate news token
+        const access = token_services.generateToken(
+            adminId,
+            "jwt_admin_access"
+        );
+        const refresh = token_services.generateToken(
+            adminId,
+            "jwt_admin_refresh"
+        );
+
+        // Add new tokens to db
+        await AdminAccessToken.create({ value: access });
+        await AdminRefreshToken.create({ value: refresh });
+
+        return { access, refresh };
     };
 }
 

@@ -1,5 +1,10 @@
 import jwt from "jsonwebtoken";
-import { AccessToken, AdminAccessToken } from "../models/tokens";
+import {
+    AccessToken,
+    AdminAccessToken,
+    RefreshToken,
+    AdminRefreshToken,
+} from "../models/tokens";
 import logger from "../logger";
 import { error } from "console";
 
@@ -8,13 +13,16 @@ class TokenServices {
     /** Generate and returh token for received user id */
     generateToken = (id: string, key: string): string => {
         logger.i(`generate ${key} token for ${id}`);
+
+        let expiresIn: string = key.includes("access") ? "30m" : "1y";
+
         return jwt.sign(
             {
                 id,
             },
             process.env[key] ?? "",
             {
-                expiresIn: "30m",
+                expiresIn,
             }
         );
     };
@@ -59,7 +67,6 @@ class TokenServices {
 
         // No token
         if (!token) {
-            console.info(1);
             logger.i("no token were provide");
             return res.status(401).json({
                 success: false,
@@ -73,7 +80,6 @@ class TokenServices {
 
         // No token in DB
         if (founded.length === 0) {
-            console.info(213);
             logger.i("invalid token was provide");
             return res.status(401).json({
                 success: false,
@@ -171,6 +177,65 @@ class TokenServices {
                 next();
             }
         );
+    };
+
+    // ANCHOR: check token
+    checkToken = async (
+        key:
+            | "jwt_access"
+            | "jwt_refresh"
+            | "jwt_admin_access"
+            | "jwt_admin_refresh",
+        adminId: string,
+        token: string
+    ): Promise<boolean> => {
+        // @ts-ignore
+        const response = jwt.verify(
+            token,
+            process.env[key] ?? "",
+            (e: any, data: any) => {
+                if (e?.name && e.name !== "TokenExpiredError") {
+                    return e;
+                }
+                return data;
+            }
+        );
+
+        let id: string | undefined;
+
+        if (typeof response === "string") {
+            // @ts-ignore
+            id = response;
+        } else {
+            // @ts-ignore
+            id = response?.id;
+        }
+
+        if (!id) {
+            return false;
+        }
+
+        let founded: Array<any> = [];
+
+        switch (key) {
+            case "jwt_access":
+                founded = await AccessToken.find({ value: token });
+                break;
+            case "jwt_refresh":
+                founded = await RefreshToken.find({ value: token });
+                break;
+            case "jwt_admin_access":
+                founded = await AdminAccessToken.find({ value: token });
+                break;
+            case "jwt_admin_refresh":
+                founded = await AdminRefreshToken.find({ value: token });
+                break;
+        }
+
+        // console.info(key, adminId === id, adminId.length !== 0, founded);
+
+        // @ts-ignore
+        return adminId === id && adminId.length !== 0 && founded.length === 1;
     };
 }
 

@@ -364,7 +364,6 @@ export type TSubmitBecomeDoctorRequests = {
     success: boolean;
 };
 
-/**
- *
- */
 export type TCheckAccessToken = boolean;
+
+export type TCheckRefreshToken = boolean;
