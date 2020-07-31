@@ -117,6 +117,7 @@ const getAuthAdminHeader = async () => {
         String(_id),
         "jwt_admin_access"
     );
+    await AdminAccessToken.create({ value: token });
 
     return `Bearer ${token}`;
 };
@@ -435,5 +436,165 @@ describe("Test Doctor API", () => {
         });
     });
 
+    // /SECTION
+
+    // SECTION: GET /become-doctor-requests
+    describe("GET /become-doctor-requests", () => {
+        // ANCHOR: should get 3 requests
+        test("should get three users", async (done) => {
+            //* Arrange
+            const header = await getAuthAdminHeader();
+            const request1: BecomeDoctorObj = { ...sampleBecomeDoctorRequest };
+            const request2: BecomeDoctorObj = {
+                ...sampleBecomeDoctorRequest,
+                name: "Максим",
+                email: "mail1@mail.com",
+            };
+            const request3: BecomeDoctorObj = {
+                ...sampleBecomeDoctorRequest,
+                name: "Евгений",
+                email: "mail2@mail.com",
+            };
+
+            // Create admins using mongoose
+            const create1 = await BecomeDoctorRequest.create(request1);
+            const create2 = await BecomeDoctorRequest.create(request2);
+            const create3 = await BecomeDoctorRequest.create(request3);
+
+            // Update admin id
+            request1.id = String(create1._id);
+            request2.id = String(create2._id);
+            request3.id = String(create3._id);
+
+            // Generate expected answer
+            const answer = [request1, request2, request3];
+
+            //* Act
+            const responce = await request
+                .get("/api/admin/become-doctor-requests")
+                .set("auth", header);
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Access
+            expect(data.message).toBeUndefined();
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(data.requests).toEqual(answer);
+            expect(data.error).toBeUndefined();
+            expect(data.from).toEqual(0);
+            expect(data.to).toEqual(20);
+
+            done();
+        });
+
+        // ANCHOR: Should return from 1 to 2 requests
+        test("Should return from 1 to 2 requests", async (done) => {
+            //* Arrange
+            const header = await getAuthAdminHeader();
+            const request1: BecomeDoctorObj = { ...sampleBecomeDoctorRequest };
+            const request2: BecomeDoctorObj = {
+                ...sampleBecomeDoctorRequest,
+                name: "Максим",
+                email: "mail1@mail.com",
+            };
+            const request3: BecomeDoctorObj = {
+                ...sampleBecomeDoctorRequest,
+                name: "Евгений",
+                email: "mail2@mail.com",
+            };
+
+            // Create admins using mongoose
+            const create1 = await BecomeDoctorRequest.create(request1);
+            const create2 = await BecomeDoctorRequest.create(request2);
+            const create3 = await BecomeDoctorRequest.create(request3);
+
+            // Update admin id
+            request1.id = String(create1._id);
+            request2.id = String(create2._id);
+            request3.id = String(create3._id);
+
+            // Generate expected answer
+            const answer = [request2];
+
+            //* Act
+            const responce = await request
+                .get("/api/admin/become-doctor-requests")
+                .set("auth", header)
+                .query({ from: 1, amount: 1 });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Access
+            expect(status).toEqual(200);
+            expect(data.requests).toEqual(answer);
+            expect(data.error).toBeUndefined();
+            expect(data.message).toBeUndefined();
+            expect(data.from).toEqual(1);
+            expect(data.to).toEqual(2);
+
+            done();
+        });
+
+        // ANCHOR: should return empty array
+        test("should return empty array", async (done) => {
+            //* Arrange
+            const header = await getAuthAdminHeader();
+
+            //* Act
+            const responce = await request
+                .get("/api/admin/become-doctor-requests")
+                .set("auth", header)
+                .query({ from: 1, amount: 1 });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Access
+            expect(status).toEqual(200);
+            expect(data.requests).toEqual([]);
+            expect(data.error).toBeUndefined();
+            expect(data.message).toBeUndefined();
+
+            done();
+        });
+
+        // ANCHOR: should return empty array on from = 123
+        test("should return empty array on from = 123", async (done) => {
+            //* Arrange
+            const header = await getAuthAdminHeader();
+
+            //* Act
+            const responce = await request
+                .get("/api/admin/become-doctor-requests")
+                .set("auth", header)
+                .query({ from: 123, amount: 100 });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+            //* Access
+            expect(status).toEqual(200);
+            expect(data.requests).toEqual([]);
+            expect(data.error).toBeUndefined();
+            expect(data.message).toBeUndefined();
+
+            done();
+        });
+
+        // ANCHOR: should be protected
+        test("should be protected", async (done) => {
+            //* Act
+            const responce = await request
+                .get("/api/admin/become-doctor-requests")
+                .query({ from: 123, amount: 100 });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(status).toEqual(401);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("not_authorize");
+
+            done();
+        });
+    });
     // /SECTION
 });

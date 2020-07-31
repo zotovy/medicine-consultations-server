@@ -63,7 +63,7 @@ Router.get(
             success: true,
             hasRequests: requests.length === 0,
             from,
-            amount,
+            to: from + amount,
             requests,
         });
     }

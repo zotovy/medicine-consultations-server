@@ -144,6 +144,7 @@ class TokenServices {
         }
 
         const founded = await AdminAccessToken.find({ value: token });
+        // console.info(token, await AdminAccessToken.find({}));
 
         // No token in DB
         if (founded.length === 0) {
@@ -166,7 +167,7 @@ class TokenServices {
                     logger.w(`invalid token were provide, token=${token}`);
                     return res.status(403).json({
                         success: false,
-                        error: "invalid_token",
+                        error: "not_authorize",
                         message: "Some token was passed but it's invalid token",
                     });
                 }
