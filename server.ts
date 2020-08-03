@@ -9,6 +9,7 @@ import rateLimit from "express-rate-limit";
 import { Server } from "http";
 
 import ApiRouter from "./routes/index";
+import FakeRouter from "./routes/fake_api_routes";
 
 // Config MODE to dev
 // process.env.MODE = "testing";
@@ -38,7 +39,6 @@ if (process.env.MODE === "testing") {
     }
 } else if (process.env.MODE === "fake") {
     console.log("server running in fake mode");
-
     // load fake config
     const result = dotenv.config({ path: "./configs/fake.env" });
     if (result.error) {
@@ -68,6 +68,11 @@ app.use("/static", express.static("static"));
 app.use(bodyParser.json());
 app.use("/api", ApiRouter);
 
+if (process.env.MODE === "fake") {
+    // load fake api
+    app.use("/fake", FakeRouter);
+}
+
 // for what??
 if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"));
@@ -77,6 +82,8 @@ let server: Server | undefined;
 
 const main = async () => {
     try {
+        console.log(process.env.mongodb_url);
+
         // connect to db
         await mongoose.connect(process.env.mongodb_url ?? "", {
             useNewUrlParser: true,

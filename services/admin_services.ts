@@ -17,7 +17,7 @@ import logger from "../logger";
 import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
 import admin from "../models/admin";
 import token_services from "../services/token_services";
-import { BecomeDoctorObj, IBecomeDoctor } from "../types/models";
+import { BecomeDoctorObj, IBecomeDoctor, AdminRole } from "../types/models";
 import { request } from "http";
 
 class AdminServices {
@@ -154,6 +154,27 @@ class AdminServices {
         }
     };
 
+    // ANCHOR: remove become doctor requests
+    removeBecomeDoctorRequest = async (id: string): Promise<boolean> => {
+        try {
+            let error;
+
+            await BecomeDoctorRequest.remove({ _id: id }, (e) => (error = e));
+
+            if (error) {
+                logger.e(`Error while remove become doctor requests ${error}`);
+                return false;
+            } else {
+                return true;
+            }
+        } catch (e) {
+            logger.e(
+                `Unxpected Error while remove become doctor requests, id=${id}. ${e}`
+            );
+            return false;
+        }
+    };
+
     // ANCHOR: check refresh token
     checkAccessToken = async (
         adminId: string,
@@ -174,7 +195,7 @@ class AdminServices {
             token,
             process.env.jwt_admin_access ?? "",
             (e) => {
-                if (e?.name === "TokenExpiredError") {
+                if (e) {
                     return true;
                 }
                 return false;

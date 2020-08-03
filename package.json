@@ -5,7 +5,7 @@
     "main": "server.ts",
     "scripts": {
         "start": "set MODE=production&&ts-node ./server.ts",
-        "dev": "ts-node-dev --respawn ./server.ts",
+        "dev": "set MODE=dev&&ts-node-dev --respawn ./server.ts",
         "build": "tsc",
         "test": "jest  --detectOpenHandles --forceExit",
         "fake": "set MODE=fake&&ts-node ./server.ts",

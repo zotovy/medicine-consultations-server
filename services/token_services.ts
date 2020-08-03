@@ -14,7 +14,7 @@ class TokenServices {
     generateToken = (id: string, key: string): string => {
         logger.i(`generate ${key} token for ${id}`);
 
-        let expiresIn: string = key.includes("access") ? "30m" : "1y";
+        let expiresIn: string = key.includes("access") ? "10m" : "1y";
 
         return jwt.sign(
             {
@@ -195,7 +195,7 @@ class TokenServices {
             token,
             process.env[key] ?? "",
             (e: any, data: any) => {
-                if (e?.name && e.name !== "TokenExpiredError") {
+                if (e?.name) {
                     return e;
                 }
                 return data;
@@ -211,6 +211,11 @@ class TokenServices {
             // @ts-ignore
             id = response?.id;
         }
+
+        // @ts-ignore
+        logger.i(response);
+
+        logger.i(key);
 
         if (!id) {
             return false;
@@ -234,6 +239,12 @@ class TokenServices {
         }
 
         // console.info(key, adminId === id, adminId.length !== 0, founded);
+
+        logger.i(`Is ${key} token ok?:
+                  adminId === id: ${adminId === id}
+                  adminId.length !== 0: ${adminId.length !== 0}
+                  founded.length === 1: ${founded.length === 1}
+                  `);
 
         // @ts-ignore
         return adminId === id && adminId.length !== 0 && founded.length === 1;

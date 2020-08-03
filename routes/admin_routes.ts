@@ -5,6 +5,8 @@ import tokenServices from "../services/token_services";
 import { IAdminToAdminObj } from "../services/types_services";
 import token_services from "../services/token_services";
 import { parse } from "path";
+import logger from "../logger";
+import { access } from "fs";
 
 // Used to process the http request
 const Router = express.Router();
@@ -61,7 +63,7 @@ Router.get(
         // Send requests
         return res.status(200).json({
             success: true,
-            hasRequests: requests.length === 0,
+            hasRequests: requests.length !== 0,
             from,
             to: from + amount,
             requests,
@@ -108,7 +110,7 @@ Router.get("/token/check-access", async (req, res) => {
 
     if (!token || !id) {
         return res.status(400).json({
-            expired: false,
+            isOk: false,
         });
     }
 
@@ -149,11 +151,18 @@ Router.post("/token/update-tokens", async (req, res) => {
     // get refresh token & id
     const { accessToken, refreshToken, adminId } = req.body;
 
+    console.log(accessToken, refreshToken, adminId);
+
     if (!refreshToken || !adminId || !accessToken) {
         return res.status(501).json({
             success: false,
         });
     }
+
+    console.log(
+        await adminServices.checkRefreshToken(adminId, refreshToken),
+        await adminServices.checkAccessToken(adminId, accessToken)
+    );
 
     // validate refresh token
     const isOk = await adminServices.checkRefreshToken(adminId, refreshToken);
