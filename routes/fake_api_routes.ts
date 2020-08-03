@@ -11,11 +11,19 @@
 
 import { Router as ExpressRouter } from "express";
 import User from "../models/user";
+import { AccessToken, RefreshToken } from "../models/tokens";
 
 const Router = ExpressRouter();
 
 Router.post("/remove-users", async (req, res) => {
     await User.remove({});
+    res.send(true);
+});
+
+Router.post("/remove-tokens", async (req, res) => {
+    console.log("remove!");
+    await AccessToken.remove({});
+    await RefreshToken.remove({});
     res.send(true);
 });
 
