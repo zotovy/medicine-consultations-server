@@ -608,7 +608,7 @@ describe("Test Doctor API", () => {
             );
 
             //* Act
-            const responce = await request.post(
+            const responce = await request.delete(
                 `/api/admin/become-doctor-request/remove/${String(_id)}`
             );
             const status = responce.status;
@@ -627,7 +627,7 @@ describe("Test Doctor API", () => {
             const id = "123";
 
             //* Act
-            const responce = await request.post(
+            const responce = await request.delete(
                 `/api/admin/become-doctor-request/remove/${id}`
             );
             const status = responce.status;
@@ -650,7 +650,7 @@ describe("Test Doctor API", () => {
             await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
 
             //* Act
-            const responce = await request.post(
+            const responce = await request.delete(
                 `/api/admin/become-doctor-request/remove/${String(_id)}`
             );
             const status = responce.status;
@@ -669,7 +669,7 @@ describe("Test Doctor API", () => {
             await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
 
             //* Act
-            const responce = await request.post(
+            const responce = await request.delete(
                 "/api/admin/become-doctor-request/remove"
             );
             const status = responce.status;

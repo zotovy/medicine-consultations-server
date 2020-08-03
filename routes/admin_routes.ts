@@ -104,7 +104,7 @@ Router.post(
 );
 
 // ANCHOR: POST /become-doctor-request/remove/:id
-Router.post("/become-doctor-request/remove/:id", async (req, res) => {
+Router.delete("/become-doctor-request/remove/:id", async (req, res) => {
     // Get id
     const { id } = req.params;
 
