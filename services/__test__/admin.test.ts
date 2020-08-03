@@ -19,6 +19,7 @@ import { DoctorObjToBecomeDoctorObj } from "../types_services";
 import { BecomeDoctorRequest } from "../../models/doctor";
 import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
 import { access } from "fs";
+import { request } from "http";
 
 /**
  *  ? This test module testing admin services
@@ -544,6 +545,58 @@ describe("Test Admin services", () => {
             //* Checking
 
             expect(result).toEqual(answer);
+        });
+    });
+    // /SECTION
+
+    // SECTION: removeBecomeDoctorRequest()
+    describe("removeBecomeDoctorRequest()", () => {
+        // ANCHOR: should remove sample request
+        test("should remove sample request", async () => {
+            //* Arrange
+            const { _id } = await BecomeDoctorRequest.create(sampleRequest);
+
+            //* Act
+            const ok = await adminServices.removeBecomeDoctorRequest(
+                String(_id)
+            );
+
+            //* Assert
+            expect(ok).toEqual(true);
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests).toEqual([]);
+        });
+
+        // ANCHOR: should return false on not existing id provide
+        test("should return false on not existing id provide", async () => {
+            //* Arrange
+            const id = "123";
+
+            //* Act
+            const ok = await adminServices.removeBecomeDoctorRequest(id);
+
+            //* Assert
+            expect(ok).toEqual(false);
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests).toEqual([]);
+        });
+
+        // ANCHOR: should remove only one request
+        test("should remove only one request", async () => {
+            //* Arrange
+            const { _id } = await BecomeDoctorRequest.create(sampleRequest);
+            await BecomeDoctorRequest.create(sampleRequest);
+            await BecomeDoctorRequest.create(sampleRequest);
+
+            //* Act
+            const ok = await adminServices.removeBecomeDoctorRequest(
+                String(_id)
+            );
+
+            //* Assert
+            expect(ok).toEqual(true);
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests.length).toEqual(2);
         });
     });
     // /SECTION

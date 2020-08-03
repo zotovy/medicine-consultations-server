@@ -597,4 +597,92 @@ describe("Test Doctor API", () => {
         });
     });
     // /SECTION
+
+    // SECTION: POST /become-doctor-request/remove/:id
+    describe("POST /become-doctor-request/remove/:id", () => {
+        // ANCHOR: should remove sample request
+        test("should remove sample request", async () => {
+            //* Arrange
+            const { _id } = await BecomeDoctorRequest.create(
+                sampleBecomeDoctorRequest
+            );
+
+            //* Act
+            const responce = await request.post(
+                `/api/admin/become-doctor-request/remove/${String(_id)}`
+            );
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(status).toEqual(202);
+            expect(data.success).toEqual(true);
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests).toEqual([]);
+        });
+
+        // ANCHOR: should return false on not existing id provide
+        test("should return false on not existing id provide", async () => {
+            //* Arrange
+            const id = "123";
+
+            //* Act
+            const responce = await request.post(
+                `/api/admin/become-doctor-request/remove/${id}`
+            );
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests).toEqual([]);
+        });
+
+        // ANCHOR: should remove only one request
+        test("should remove only one request", async () => {
+            //* Arrange
+            const { _id } = await BecomeDoctorRequest.create(
+                sampleBecomeDoctorRequest
+            );
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+
+            //* Act
+            const responce = await request.post(
+                `/api/admin/become-doctor-request/remove/${String(_id)}`
+            );
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(status).toEqual(202);
+            expect(data.success).toEqual(true);
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests.length).toEqual(2);
+        });
+
+        // ANCHOR: should 404 error on no id provide
+        test("should 404 error on no id provide", async () => {
+            //* Arrange
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+
+            //* Act
+            const responce = await request.post(
+                "/api/admin/become-doctor-request/remove"
+            );
+            const status = responce.status;
+            const data = responce.text;
+
+            //* Assert
+            expect(status).toEqual(404);
+            expect(data).toContain(
+                "Cannot POST /api/admin/become-doctor-request/remove"
+            );
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests.length).toEqual(1);
+        });
+    });
+    // /SECTION
 });

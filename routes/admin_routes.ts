@@ -103,6 +103,20 @@ Router.post(
     }
 );
 
+// ANCHOR: POST /become-doctor-request/remove/:id
+Router.post("/become-doctor-request/remove/:id", async (req, res) => {
+    // Get id
+    const { id } = req.params;
+
+    // Remove
+    const isOk = await adminServices.removeBecomeDoctorRequest(id);
+
+    // Return response
+    return res.status(isOk ? 202 : 400).json({
+        success: isOk,
+    });
+});
+
 // ANCHOR: POST /token/check-access
 Router.get("/token/check-access", async (req, res) => {
     // Get token & id
