@@ -73,11 +73,11 @@ Router.get(
 
 // ANCHOR: POST /become-doctor-request/submit
 Router.post(
-    "/become-doctor-request/submit",
+    "/become-doctor-request/submit/:id",
     tokenServices.authAdminToken,
     async (req, res) => {
         // Extract request id
-        const requestId = req.body.id;
+        const requestId = req.params.id;
 
         if (!requestId) {
             return res.status(400).json({
@@ -89,6 +89,8 @@ Router.post(
         const serviceResponse = await adminServices.submitBecomeDoctorRequests(
             requestId
         );
+
+        logger.w(serviceResponse.success);
 
         if (!serviceResponse.success) {
             return res.status(400).json({
@@ -104,18 +106,22 @@ Router.post(
 );
 
 // ANCHOR: POST /become-doctor-request/remove/:id
-Router.delete("/become-doctor-request/remove/:id", async (req, res) => {
-    // Get id
-    const { id } = req.params;
+Router.delete(
+    "/become-doctor-request/remove/:id",
+    tokenServices.authAdminToken,
+    async (req, res) => {
+        // Get id
+        const { id } = req.params;
 
-    // Remove
-    const isOk = await adminServices.removeBecomeDoctorRequest(id);
+        // Remove
+        const isOk = await adminServices.removeBecomeDoctorRequest(id);
 
-    // Return response
-    return res.status(isOk ? 202 : 400).json({
-        success: isOk,
-    });
-});
+        // Return response
+        return res.status(isOk ? 202 : 400).json({
+            success: isOk,
+        });
+    }
+);
 
 // ANCHOR: POST /token/check-access
 Router.get("/token/check-access", async (req, res) => {

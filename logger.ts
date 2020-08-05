@@ -54,7 +54,7 @@ class Logger {
         this.saveStack();
     };
 
-    warning = (message: string, trace: any = null): void => {
+    warning = (message: any, trace: any = null): void => {
         const time = new Date();
 
         console.log(`${" Warning: ".black.bgYellow} ${message}`);

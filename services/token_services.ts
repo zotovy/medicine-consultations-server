@@ -117,6 +117,8 @@ class TokenServices {
     authAdminToken = async (req: any, res: any, next: Function) => {
         const header: string | undefined = req.headers.auth;
 
+        console.log(header);
+
         if (!header) {
             logger.w(
                 "Admin must be authorize to go to this page but no token was found"
