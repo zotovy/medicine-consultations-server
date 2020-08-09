@@ -9,6 +9,7 @@ import {
     IBecomeDoctor,
     IAdmin,
     AdminObj,
+    EWorkPlan,
 } from "../types/models";
 
 /**
@@ -35,6 +36,7 @@ export function IUserToUserObj(e: IUser): UserObject {
         createdAt: e.createdAt,
         lastActiveAt: e.lastActiveAt,
         favourites: [...e.favourites],
+        age: e.age,
     };
 }
 
@@ -90,6 +92,11 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         passportSeries: e.passportSeries,
         workExperience: e.workExperience,
         workPlaces: e.workPlaces,
+        age: e.age,
+        isAdult: e.isAdult,
+        isChild: e.isChild,
+        workPlan:
+            e.workPlan === "single" ? EWorkPlan.Single : EWorkPlan.Multiple,
     };
 }
 /**
@@ -97,6 +104,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
  */
 export function DoctorObjToBecomeDoctorObj(e: DoctorObject): BecomeDoctorObj {
     return {
+        id: String(e.id),
         name: e.name,
         surname: e.surname,
         phone: e.phone.toString(),
@@ -122,7 +130,7 @@ export function IBecomeDoctorToBecomeDoctorObj(
     e: IBecomeDoctor
 ): BecomeDoctorObj {
     return {
-        id: e.id,
+        id: String(e.id),
         name: e.name,
         surname: e.surname,
         phone: e.phone,

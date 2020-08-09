@@ -7,7 +7,7 @@ import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 import doctorServices from "../doctor_services";
 
 // @types
-import { DoctorObject, BecomeDoctorObj } from "../../types/models";
+import { DoctorObject, BecomeDoctorObj, EWorkPlan } from "../../types/models";
 import {
     IDoctorToDoctorObj,
     DoctorObjToBecomeDoctorObj,
@@ -66,6 +66,10 @@ const sampleDoctor: DoctorObject = {
     passportSeries: "123123",
     workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
+    age: 35,
+    isAdult: true,
+    isChild: false,
+    workPlan: EWorkPlan.Multiple,
 };
 
 describe("Test Doctor services", () => {
@@ -356,6 +360,16 @@ describe("Test Doctor services", () => {
             expect(responce.success).toEqual(false);
             expect(responce.error).toEqual("no_doctor_found");
             expect(responce.message).toBeDefined();
+        });
+    });
+    // /SECTION
+
+    // SECTION: get all
+    describe(" get all", () => {
+        test("123", async () => {
+            await Doctor.create(sampleDoctor);
+
+            expect((await doctorServices.getAll()).length).toEqual(1);
         });
     });
     // /SECTION

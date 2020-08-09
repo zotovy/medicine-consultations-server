@@ -9,7 +9,7 @@ import app, { server } from "../../server";
 import doctorServices from "../../services/doctor_services";
 
 // @types
-import { DoctorObject, BecomeDoctorObj } from "../../types/models";
+import { DoctorObject, BecomeDoctorObj, EWorkPlan } from "../../types/models";
 import {
     IDoctorToDoctorObj,
     DoctorObjToBecomeDoctorObj,
@@ -72,6 +72,10 @@ const sampleDoctor: DoctorObject = {
     passportSeries: "123123",
     workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
+    age: 19,
+    isAdult: false,
+    isChild: true,
+    workPlan: EWorkPlan.Single,
 };
 
 const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(

@@ -14,6 +14,7 @@ export interface IUser extends Document {
     name: string;
     surname: string;
     patronymic: string;
+    age?: number;
     photoUrl: string;
     phone: number;
     email: string;
@@ -54,6 +55,12 @@ export interface UserObject {
     createdAt: IUser["createdAt"];
     lastActiveAt: IUser["lastActiveAt"];
     favourites: mongoose.Types.ObjectId[];
+    age?: IUser["age"];
+}
+
+export enum EWorkPlan {
+    Single = "single",
+    Multiple = "multiple",
 }
 
 /**
@@ -78,6 +85,9 @@ export interface IDoctor extends IUser {
     passportIssueDate: string;
     workExperience: string;
     workPlaces: string;
+    workPlan?: string;
+    isChild?: boolean;
+    isAdult?: boolean;
 }
 
 export interface DoctorObject extends UserObject {
@@ -99,6 +109,9 @@ export interface DoctorObject extends UserObject {
     passportIssueDate: IDoctor["passportIssueDate"];
     workExperience: IDoctor["workExperience"];
     workPlaces: IDoctor["workPlaces"];
+    workPlan?: EWorkPlan;
+    isChild?: boolean;
+    isAdult?: boolean;
 }
 
 /**

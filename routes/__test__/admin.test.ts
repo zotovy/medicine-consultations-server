@@ -220,16 +220,14 @@ describe("Test Doctor API", () => {
                 sampleAdmin.password
             );
 
-            const id = (
-                await BecomeDoctorRequest.create(sampleBecomeDoctorRequest)
-            ).id;
+            const { _id } = await BecomeDoctorRequest.create(
+                sampleBecomeDoctorRequest
+            );
 
             //* Act
             const response = await request
-                .post("/api/admin/become-doctor-request/submit")
-                .set("auth", "Bearer " + tokens?.access ?? "")
-                .type("json")
-                .send({ id });
+                .post(`/api/admin/become-doctor-request/submit/${_id}`)
+                .set("auth", "Bearer " + tokens?.access ?? "");
             const status = response.status;
             const data = JSON.parse(response.text);
 
@@ -256,10 +254,8 @@ describe("Test Doctor API", () => {
 
             //* Act
             const response = await request
-                .post("/api/admin/become-doctor-request/submit")
-                .set("auth", "Bearer " + tokens?.access ?? "")
-                .type("json")
-                .send({ id });
+                .post(`/api/admin/become-doctor-request/submit/${id}`)
+                .set("auth", "Bearer " + tokens?.access ?? "");
             const status = response.status;
             const data = JSON.parse(response.text);
 
@@ -603,14 +599,21 @@ describe("Test Doctor API", () => {
         // ANCHOR: should remove sample request
         test("should remove sample request", async () => {
             //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
             const { _id } = await BecomeDoctorRequest.create(
                 sampleBecomeDoctorRequest
             );
 
             //* Act
-            const responce = await request.delete(
-                `/api/admin/become-doctor-request/remove/${String(_id)}`
-            );
+            const responce = await request
+                .delete(
+                    `/api/admin/become-doctor-request/remove/${String(_id)}`
+                )
+                .set("auth", "Bearer " + tokens?.access ?? "");
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
@@ -624,12 +627,17 @@ describe("Test Doctor API", () => {
         // ANCHOR: should return false on not existing id provide
         test("should return false on not existing id provide", async () => {
             //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
             const id = "123";
 
             //* Act
-            const responce = await request.delete(
-                `/api/admin/become-doctor-request/remove/${id}`
-            );
+            const responce = await request
+                .delete(`/api/admin/become-doctor-request/remove/${id}`)
+                .set("auth", "Bearer " + tokens?.access ?? "");
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
@@ -643,6 +651,11 @@ describe("Test Doctor API", () => {
         // ANCHOR: should remove only one request
         test("should remove only one request", async () => {
             //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
             const { _id } = await BecomeDoctorRequest.create(
                 sampleBecomeDoctorRequest
             );
@@ -650,9 +663,11 @@ describe("Test Doctor API", () => {
             await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
 
             //* Act
-            const responce = await request.delete(
-                `/api/admin/become-doctor-request/remove/${String(_id)}`
-            );
+            const responce = await request
+                .delete(
+                    `/api/admin/become-doctor-request/remove/${String(_id)}`
+                )
+                .set("auth", "Bearer " + tokens?.access ?? "");
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
@@ -666,20 +681,50 @@ describe("Test Doctor API", () => {
         // ANCHOR: should 404 error on no id provide
         test("should 404 error on no id provide", async () => {
             //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
             await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
 
             //* Act
-            const responce = await request.delete(
-                "/api/admin/become-doctor-request/remove"
-            );
+            const responce = await request
+                .delete("/api/admin/become-doctor-request/remove")
+                .set("auth", "Bearer " + tokens?.access ?? "");
             const status = responce.status;
             const data = responce.text;
 
             //* Assert
             expect(status).toEqual(404);
             expect(data).toContain(
-                "Cannot POST /api/admin/become-doctor-request/remove"
+                "Cannot DELETE /api/admin/become-doctor-request/remove"
             );
+            const requests = await BecomeDoctorRequest.find({});
+            expect(requests.length).toEqual(1);
+        });
+
+        // ANCHOR: should be protected route
+        test("should 404 error on no id provide", async () => {
+            //* Arrange
+            await Admin.create(sampleAdmin);
+            const { tokens } = await adminServices.login(
+                sampleAdmin.username,
+                sampleAdmin.password
+            );
+            await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
+
+            //* Act
+            const responce = await request.delete(
+                "/api/admin/become-doctor-request/remove/123456789101"
+            );
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(data.error).toEqual("not_authorize");
+            expect(data.success).toEqual(false);
+            expect(status).toEqual(401);
             const requests = await BecomeDoctorRequest.find({});
             expect(requests.length).toEqual(1);
         });

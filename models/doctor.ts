@@ -88,6 +88,9 @@ const Doctor = extendedSchema(User.schema, {
             required: true,
         },
     ],
+    workPlan: String,
+    isChild: Boolean,
+    isAdult: Boolean,
 });
 
 export default model<IDoctor>("Doctor", Doctor);

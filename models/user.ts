@@ -1,6 +1,4 @@
 import mongoose, { Schema, model } from "mongoose";
-import Consultation from "./consultation";
-import Review from "./speciality";
 
 // @types
 import { IUser } from "../types/models";
@@ -29,21 +27,6 @@ const UserSchema = new Schema({
     phone: {
         required: false,
         type: Number,
-        validate: [
-            (val) => {
-                if (val == undefined || val == -1) return true;
-
-                // 79323327361 --> 7
-                // 7932332736  --> 0
-                // 1111111111  --> 1
-                const firstNumber = Math.floor(val / 10000000000);
-
-                if (firstNumber != 7) return false;
-
-                return true;
-            },
-            "phone_format_number",
-        ],
     },
     email: {
         type: String,
@@ -62,6 +45,7 @@ const UserSchema = new Schema({
         required: reqiredField,
         validate: [(value) => value.length >= 6, "length_error"],
     },
+    age: Number,
     sex: {
         type: Boolean,
         required: reqiredField,
