@@ -55,6 +55,7 @@ const Doctor = extendedSchema(User.schema, {
         required: true,
     },
     experience: Number, // in days
+    serviceExperience: Number, // in days
     rating: {
         type: Number, // from 0 to 5
         required: true,

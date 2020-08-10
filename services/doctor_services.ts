@@ -10,17 +10,25 @@ import {
     TValidateDoctor,
     TDoctorValidationErrors,
     TValidationErrorType,
-    TSpeciality,
+    ESpeciality,
     TCreateDoctor,
     TUpdateDoctor,
     TRemoveDoctor,
     TGetOneDoctor,
     TSaveBecomeDoctorRequest,
+    IGetDoctorsFilter,
+    EWorkExperience,
+    EGenders,
+    EWorkPlan,
 } from "../types/services";
 
 // Services
 import UserServices from "./user_services";
-import { IDoctorToDoctorObj } from "./types_services";
+import {
+    IDoctorToDoctorObj,
+    consistingOf,
+    validateByEnum,
+} from "./types_services";
 import logger from "../logger";
 
 class DoctorServices {
@@ -94,7 +102,7 @@ class DoctorServices {
             } else {
                 for (let i = 0; i < doctor.speciality.length; i++) {
                     if (
-                        !Object.keys(TSpeciality).includes(doctor.speciality[i])
+                        !Object.keys(ESpeciality).includes(doctor.speciality[i])
                     ) {
                         errors.speciality = ErrorType.TypeError;
                         break;
@@ -341,6 +349,11 @@ class DoctorServices {
         };
     };
 
+    // ANCHOR: get all
+    getAll = async () => {
+        return await Doctor.find();
+    };
+
     // ANCHOR: save become doctor request
     saveBecomeDoctorRequest = async (
         request: BecomeDoctorObj
@@ -382,6 +395,114 @@ class DoctorServices {
                 error: "invalid_error",
                 message: "Invalid error happened",
             };
+        }
+    };
+
+    private handleRawGetAllFilter = (filter: any): IGetDoctorsFilter => {
+        if (typeof filter !== "object" || !filter) {
+            // TYPE_ERROR or EMPTY_FILTER_RESPONSE
+            return {};
+        }
+
+        // This object will be our final filter config
+        let config: IGetDoctorsFilter = {};
+
+        //* Speciality?
+        if (filter.speciality) {
+            const field = validateByEnum<ESpeciality>(
+                filter.speciality,
+                ESpeciality
+            );
+
+            if (field) {
+                config.speciality = field;
+            }
+        }
+
+        //* Experience?
+        if (filter.experience) {
+            const field = validateByEnum<EWorkExperience>(
+                filter.experience,
+                EWorkExperience
+            );
+
+            if (field) {
+                config.experience = field;
+            }
+        }
+
+        //* ServiceExperience?
+        if (filter.serviceExperience) {
+            const field = validateByEnum<EWorkExperience>(
+                filter.serviceExperience,
+                EWorkExperience
+            );
+
+            if (field) {
+                config.serviceExperience = field;
+            }
+        }
+
+        //* Rating?
+        if (filter.rating) {
+            let submitted: number[] = [];
+            filter.rating.forEach((element: any) => {
+                if (
+                    typeof element === "number" &&
+                    element >= 0 &&
+                    element <= 5
+                ) {
+                    submitted.push(element);
+                }
+            });
+
+            if (submitted.length > 0) {
+                config.rating = submitted;
+            }
+        }
+
+        //* Sex?
+        if (filter.sex) {
+            const field = validateByEnum<EGenders>(filter.sex, EGenders);
+
+            if (field) {
+                config.sex = field;
+            }
+        }
+
+        //* City?
+        if (filter.city && consistingOf(filter.city, "string")) {
+            config.city = filter.city;
+        }
+
+        //* WorkPlan
+        if (filter.workPlan) {
+            const field = validateByEnum<EWorkPlan>(filter.workPlan, EWorkPlan);
+
+            if (field) {
+                config.workPlan = field;
+            }
+        }
+
+        //* isChild
+        if (filter.isChild && consistingOf(filter.isChild, "boolean")) {
+            config.isChild = filter.isChild;
+        }
+
+        //* isAdult
+        if (filter.isAdult && consistingOf(filter.isAdult, "boolean")) {
+            config.isAdult = filter.isAdult;
+        }
+
+        return config;
+    };
+
+    // ! This's using only for testing. DO NOT USE FOR PRODUCTION
+    testHandleRawGetAllFilter = (
+        filter: any
+    ): IGetDoctorsFilter | undefined => {
+        if (process.env.MODE === "testing") {
+            return this.handleRawGetAllFilter(filter);
         }
     };
 }

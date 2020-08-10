@@ -7,13 +7,19 @@ import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 import doctorServices from "../doctor_services";
 
 // @types
-import { DoctorObject, BecomeDoctorObj, EWorkPlan } from "../../types/models";
+import { DoctorObject, BecomeDoctorObj } from "../../types/models";
 import {
     IDoctorToDoctorObj,
     DoctorObjToBecomeDoctorObj,
     IBecomeDoctorToBecomeDoctorObj,
 } from "../types_services";
 import doctor_services from "../doctor_services";
+import {
+    EWorkPlan,
+    ESpeciality,
+    EWorkExperience,
+    EGenders,
+} from "../../types/services";
 
 /**
  *  ? This test module testing doctor services
@@ -70,6 +76,7 @@ const sampleDoctor: DoctorObject = {
     isAdult: true,
     isChild: false,
     workPlan: EWorkPlan.Multiple,
+    serviceExperience: 365,
 };
 
 describe("Test Doctor services", () => {
@@ -414,6 +421,250 @@ describe("Test Doctor services", () => {
             expect(response.message).toBeDefined();
             const raw = await BecomeDoctorRequest.find({});
             expect(raw.length).toEqual(3);
+        });
+    });
+    // /SECTION
+
+    // SECTION: handleRawGetAllFilter()
+    describe("handleRawGetAllFilter()", () => {
+        // ANCHOR: should pass speciality
+        test("should pass speciality", async () => {
+            //* Act
+            const filter = {
+                speciality: [ESpeciality.Dermatologist],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass speciality
+        test("shouldn't pass speciality", async () => {
+            //* Act
+            const filter = {
+                speciality: ["123"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass experience
+        test("should pass experience", async () => {
+            //* Act
+            const filter = {
+                experience: [EWorkExperience.LessYear],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass experience
+        test("shouldn't pass experience", async () => {
+            //* Act
+            const filter = {
+                experience: ["123"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass serviceExperience
+        test("should pass serviceExperience", async () => {
+            //* Act
+            const filter = {
+                serviceExperience: [EWorkExperience.LessYear],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass serviceExperience
+        test("shouldn't pass serviceExperience", async () => {
+            //* Act
+            const filter = {
+                serviceExperience: [123],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass rating
+        test("should pass rating", async () => {
+            //* Act
+            const filter = {
+                rating: [5],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass rating bigger than 5
+        test("shouldn't pass rating", async () => {
+            //* Act
+            const filter = {
+                rating: [123],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: shouldn't pass rating less than 0
+        test("shouldn't pass rating", async () => {
+            //* Act
+            const filter = {
+                rating: [-1],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: shouldn't pass rating with incorrect type
+        test("shouldn't pass rating", async () => {
+            //* Act
+            const filter = {
+                rating: [123],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass sex
+        test("should pass sex", async () => {
+            //* Act
+            const filter = {
+                sex: [EGenders.Female],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass sex
+        test("shouldn't pass sex", async () => {
+            //* Act
+            const filter = {
+                sex: ["cow"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass city
+        test("should pass city", async () => {
+            //* Act
+            const filter = {
+                city: ["Москва"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass city
+        test("shouldn't pass city", async () => {
+            //* Act
+            const filter = {
+                city: [123],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass workPlan
+        test("should pass workPlan", async () => {
+            //* Act
+            const filter = {
+                workPlan: [EWorkPlan.Single],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass workPlan
+        test("shouldn't pass workPlan", async () => {
+            //* Act
+            const filter = {
+                workPlan: ["123"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass isChild
+        test("should pass isChild", async () => {
+            //* Act
+            const filter = {
+                isChild: [false],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass isChild
+        test("shouldn't pass isChild", async () => {
+            //* Act
+            const filter = {
+                isChild: [123],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass isAdult
+        test("should pass isAdult", async () => {
+            //* Act
+            const filter = {
+                isAdult: [false],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass isAdult
+        test("shouldn't pass isAdult", async () => {
+            //* Act
+            const filter = {
+                isAdult: [123],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
         });
     });
     // /SECTION

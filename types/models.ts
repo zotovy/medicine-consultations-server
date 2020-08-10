@@ -1,4 +1,5 @@
 import mongoose, { Document, Types } from "mongoose";
+import { EWorkPlan } from "./services";
 
 /**
  *  Refresh Token model interface
@@ -58,11 +59,6 @@ export interface UserObject {
     age?: IUser["age"];
 }
 
-export enum EWorkPlan {
-    Single = "single",
-    Multiple = "multiple",
-}
-
 /**
  * Doctor interface model
  */
@@ -75,6 +71,7 @@ export interface IDoctor extends IUser {
     speciality: string[];
     beginDoctorDate: Date;
     experience: number;
+    serviceExperience: number;
     rating: number;
     whosFavourite: mongoose.Types.ObjectId[];
     clientsReviews: mongoose.Types.ObjectId[];
@@ -99,6 +96,7 @@ export interface DoctorObject extends UserObject {
     speciality: IDoctor["speciality"];
     beginDoctorDate: IDoctor["beginDoctorDate"];
     experience: IDoctor["experience"];
+    serviceExperience: IDoctor["serviceExperience"];
     rating: IDoctor["rating"];
     whosFavourite: IDoctor["whosFavourite"];
     clientsReviews: IDoctor["clientsReviews"];
@@ -110,8 +108,8 @@ export interface DoctorObject extends UserObject {
     workExperience: IDoctor["workExperience"];
     workPlaces: IDoctor["workPlaces"];
     workPlan?: EWorkPlan;
-    isChild?: boolean;
-    isAdult?: boolean;
+    isChild?: IDoctor["isChild"];
+    isAdult?: IDoctor["isAdult"];
 }
 
 /**

@@ -9,11 +9,12 @@ import app, { server } from "../../server";
 import doctorServices from "../../services/doctor_services";
 
 // @types
-import { DoctorObject, BecomeDoctorObj, EWorkPlan } from "../../types/models";
+import { DoctorObject, BecomeDoctorObj } from "../../types/models";
 import {
     IDoctorToDoctorObj,
     DoctorObjToBecomeDoctorObj,
 } from "../../services/types_services";
+import { EWorkPlan } from "../../types/services";
 
 /**
  *  ? This test module testing user services
@@ -75,7 +76,8 @@ const sampleDoctor: DoctorObject = {
     age: 19,
     isAdult: false,
     isChild: true,
-    workPlan: EWorkPlan.Single,
+    workPlan: EWorkPlan.Multiple,
+    serviceExperience: 365,
 };
 
 const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(

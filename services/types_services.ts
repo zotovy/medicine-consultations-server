@@ -9,8 +9,8 @@ import {
     IBecomeDoctor,
     IAdmin,
     AdminObj,
-    EWorkPlan,
 } from "../types/models";
+import { EWorkPlan } from "../types/services";
 
 /**
  * Convert IUser --> UserObject
@@ -97,6 +97,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         isChild: e.isChild,
         workPlan:
             e.workPlan === "single" ? EWorkPlan.Single : EWorkPlan.Multiple,
+        serviceExperience: e.serviceExperience,
     };
 }
 /**
@@ -165,4 +166,44 @@ export function IAdminToAdminObj(e: IAdmin): AdminObj {
         role: e.role,
         username: e.username,
     };
+}
+
+/**
+ * Check is All Array consist <type>
+ */
+export const consistingOf = (array: any, type: string) => {
+    if (!Array.isArray(array)) {
+        return false;
+    }
+
+    for (let i = 0; i < array.length; i++) {
+        if (typeof array[i] !== type) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+/**
+ * Check is All Array consist <EnumType>
+ */
+export function validateByEnum<E>(array: any, e: any): Array<E> | undefined {
+    if (!Array.isArray(array)) {
+        return undefined;
+    }
+
+    const values: string[] = Object.values(e);
+    let submitted: E[] = [];
+    array.forEach((element: any) => {
+        if (values.includes(element)) {
+            submitted.push(e[element]);
+        }
+    });
+
+    if (submitted.length > 0) {
+        return submitted;
+    }
+
+    return undefined;
 }

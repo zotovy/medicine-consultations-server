@@ -23,6 +23,7 @@ import {
 } from "../../services/types_services";
 import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
 import token_services from "../../services/token_services";
+import { EWorkPlan } from "../../types/services";
 
 /**
  *  ? This test module testing admin services
@@ -93,6 +94,11 @@ const sampleDoctor: DoctorObject = {
     passportSeries: "123123",
     workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
+    serviceExperience: 365,
+    age: 25,
+    isAdult: false,
+    isChild: true,
+    workPlan: EWorkPlan.Single,
 };
 
 const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
@@ -707,11 +713,6 @@ describe("Test Doctor API", () => {
         // ANCHOR: should be protected route
         test("should 404 error on no id provide", async () => {
             //* Arrange
-            await Admin.create(sampleAdmin);
-            const { tokens } = await adminServices.login(
-                sampleAdmin.username,
-                sampleAdmin.password
-            );
             await BecomeDoctorRequest.create(sampleBecomeDoctorRequest);
 
             //* Act

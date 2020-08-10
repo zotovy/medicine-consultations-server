@@ -1,5 +1,11 @@
 // @types
-import { UserObject, DoctorObject, AdminRole, AdminObj } from "./models";
+import {
+    UserObject,
+    DoctorObject,
+    AdminRole,
+    AdminObj,
+    SpecialityType,
+} from "./models";
 
 /**
  *  This type describe return object of UserServices.getUsers() function
@@ -199,15 +205,15 @@ export type TRemoveUser = {
 /**
  *  This type describe existing doctor's speciality
  */
-export enum TSpeciality {
-    "Педиатр",
-    "Терапевт",
-    "Дерматолог",
-    "Психолог",
-    "Дефектолог",
-    "Логопед",
-    "Диетолог",
-    "Аллерголог",
+export enum ESpeciality {
+    Pediatrician = "Pediatrician",
+    Therapist = "Therapist",
+    Dermatologist = "Dermatologist",
+    Psychologist = "Psychologist",
+    Defectologis = "Defectologis",
+    Logopedist = "Logopedist",
+    Nutritionist = "Nutritionist",
+    Allergist = "Allergist",
 }
 
 /**
@@ -303,7 +309,7 @@ export type TRemoveDoctor = {
 };
 
 /**
- * This type describe error object from UserServices.getUserById() function
+ * This type describe returned object from  DoctorServices.getOne() function
  */
 export type TGetOneDoctor = {
     // Is operation going success
@@ -318,6 +324,60 @@ export type TGetOneDoctor = {
     // Return doctor if success
     doctor?: UserObject;
 };
+
+/**
+ * This object a config area of work experience filter items
+ */
+export const AreaWorkExperience = {
+    LessYear: [0, 364],
+    OneYear: [365, 1094],
+    ThreeYears: [1095, 1824],
+    FiveYears: [1825, 2190],
+    MoreFiveYears: [2190, -1],
+};
+
+/**
+ * This enum describe work experience filter
+ */
+
+export enum EWorkExperience {
+    LessYear = "LessYear",
+    OneYear = "OneYear",
+    ThreeYears = "ThreeYears",
+    FiveYears = "FiveYears",
+    MoreFiveYears = "MoreFiveYears",
+}
+
+/**
+ * This enum describe work experience filter
+ */
+export enum EWorkPlan {
+    Single = "Single",
+    Multiple = "Multiple",
+}
+
+/**
+ * This enum describe existing genders
+ */
+export enum EGenders {
+    Male = "Male",
+    Female = "Female",
+}
+
+/**
+ * This interface describe filter which passed inside DoctorServices.getAll()
+ */
+export interface IGetDoctorsFilter {
+    speciality?: ESpeciality[];
+    experience?: EWorkExperience[];
+    serviceExperience?: EWorkExperience[];
+    rating?: number[];
+    sex?: EGenders[];
+    city?: string[];
+    workPlan?: EWorkPlan[];
+    isChild?: boolean;
+    isAdult?: boolean;
+}
 
 /**
  * This type describe error object from UserServices.saveBecomeDoctorRequest() function
