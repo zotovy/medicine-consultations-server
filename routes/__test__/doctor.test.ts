@@ -15,6 +15,7 @@ import {
     DoctorObjToBecomeDoctorObj,
 } from "../../services/types_services";
 import { EWorkPlan } from "../../types/services";
+import doctor from "../../models/doctor";
 
 /**
  *  ? This test module testing user services
@@ -132,7 +133,7 @@ describe("Test Doctor API", () => {
         await BecomeDoctorRequest.remove({});
     });
 
-    // SECTION
+    // SECTION: POST /doctor
     describe("POST /doctor", () => {
         // ANCHOR: should create sample doctor
         test("should create sample doctor", async (done) => {
@@ -303,6 +304,158 @@ describe("Test Doctor API", () => {
     });
     // /SECTION
 
+    // SECTION: GET /doctors
+    describe("GET /doctors", () => {
+        // ANCHOR: should get 3 doctors
+        test("should get 3 doctors", async (done) => {
+            //* Arrange
+            const doc1 = await Doctor.create(sampleDoctor);
+            const doc2 = await Doctor.create({
+                ...sampleDoctor,
+                email: "1@mail.com",
+                notificationEmail: "1@mail.com",
+            });
+            const doc3 = await Doctor.create({
+                ...sampleDoctor,
+                email: "2@mail.com",
+                notificationEmail: "2@mail.com",
+            });
+            const doctor1 = { ...sampleDoctor, id: String(doc1._id) };
+            const doctor2 = {
+                ...sampleDoctor,
+                id: String(doc2._id),
+                email: "1@mail.com",
+                notificationEmail: "1@mail.com",
+            };
+            const doctor3 = {
+                ...sampleDoctor,
+                id: String(doc3._id),
+                email: "2@mail.com",
+                notificationEmail: "2@mail.com",
+            };
+
+            //* Act
+            const response = await request.get(`/api/doctors`);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(
+                data.doctors.map((e: any) => convertDoctorFields(e))
+            ).toEqual([doctor1, doctor2, doctor3]);
+            expect(data.success).toEqual(true);
+
+            done();
+        });
+
+        // ANCHOR: should use filter
+        test("should use filter", async (done) => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            await Doctor.create({
+                ...sampleDoctor,
+                email: "2@mail.com",
+                notificationEmail: "2@mail.com",
+            });
+            const { _id } = await Doctor.create({
+                ...sampleDoctor,
+                email: "1@mail.com",
+                notificationEmail: "1@mail.com",
+                speciality: ["Logopedist"],
+                experience: 100,
+                serviceExperience: 400,
+                rating: 3.1,
+                city: "Новосибирск",
+                workPlan: EWorkPlan.Multiple,
+                isChild: true,
+                isAdult: false,
+            });
+
+            const doctor = {
+                ...sampleDoctor,
+                id: String(_id),
+                email: "1@mail.com",
+                notificationEmail: "1@mail.com",
+                speciality: ["Logopedist"],
+                experience: 100,
+                serviceExperience: 400,
+                rating: 3.1,
+                city: "Новосибирск",
+                workPlan: EWorkPlan.Multiple,
+                isChild: true,
+                isAdult: false,
+            };
+
+            const filter = {
+                speciality: ["Logopedist"],
+                experience: ["LessYear"],
+                serviceExperience: ["OneYear"],
+                rating: [3],
+                city: ["Новосибирск"],
+                workPlan: ["Multiple"],
+                isChild: true,
+                isAdult: false,
+            };
+
+            //* Act
+            const response = await request
+                .get(`/api/doctors`)
+                .type("json")
+                .send({
+                    filter,
+                });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(
+                data.doctors.map((e: any) => convertDoctorFields(e))
+            ).toEqual([doctor]);
+            expect(data.success).toEqual(true);
+
+            done();
+        });
+
+        // ANCHOR: should use from & amount queries
+        test("should use from & amount queries", async (done) => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const { _id } = await Doctor.create({
+                ...sampleDoctor,
+                email: "1@mail.com",
+                notificationEmail: "1@mail.com",
+            });
+            await Doctor.create({
+                ...sampleDoctor,
+                email: "2@mail.com",
+                notificationEmail: "2@mail.com",
+            });
+            const doctor = {
+                ...sampleDoctor,
+                id: String(_id),
+                email: "1@mail.com",
+                notificationEmail: "1@mail.com",
+            };
+
+            //* Act
+            const response = await request.get(`/api/doctors?from=1&amount=1`);
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(
+                data.doctors.map((e: any) => convertDoctorFields(e))
+            ).toEqual([doctor]);
+            expect(data.success).toEqual(true);
+
+            done();
+        });
+    });
+    // /SECTION
+
     // SECTION: GET /doctor/:id
     describe("GET /doctor/:id", () => {
         // ANCHOR: should get sample doctor
@@ -341,7 +494,7 @@ describe("Test Doctor API", () => {
     });
     // /SECTION
 
-    // SECTION
+    // SECTION: POST /doctor-request/send
     describe("POST /doctor-request/send", () => {
         // ANCHOR: should save sample request
         test("should save sample request", async (done) => {
