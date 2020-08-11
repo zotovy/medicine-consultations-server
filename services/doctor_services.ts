@@ -352,7 +352,11 @@ class DoctorServices {
     };
 
     // ANCHOR: get all
-    getAll = async (rawFilter?: any): Promise<DoctorObject[]> => {
+    getAll = async (
+        rawFilter?: any,
+        from: number = 0,
+        amount: number = 50
+    ): Promise<DoctorObject[]> => {
         // handle filter
         const filter: IGetDoctorsFilter = this.handleRawGetAllFilter(rawFilter);
 
@@ -445,7 +449,7 @@ class DoctorServices {
             queryFilter.isAdult = filter.isAdult;
         }
 
-        const raw = await Doctor.find(queryFilter);
+        const raw = await Doctor.find(queryFilter).skip(from).limit(amount);
         return raw.map((e) => IDoctorToDoctorObj(e));
     };
 
