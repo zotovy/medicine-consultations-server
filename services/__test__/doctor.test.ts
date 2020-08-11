@@ -14,12 +14,7 @@ import {
     IBecomeDoctorToBecomeDoctorObj,
 } from "../types_services";
 import doctor_services from "../doctor_services";
-import {
-    EWorkPlan,
-    ESpeciality,
-    EWorkExperience,
-    EGenders,
-} from "../../types/services";
+import { EWorkPlan, ESpeciality, EWorkExperience } from "../../types/services";
 
 /**
  *  ? This test module testing doctor services
@@ -61,11 +56,11 @@ const sampleDoctor: DoctorObject = {
     beginDoctorDate: new Date(),
     clientsConsultations: [], // will add later
     clientsReviews: [], // will add later
-    experience: 3 * 365,
+    experience: 364,
     favourites: [], // will add later
     rating: 4.6,
     sheldure: [], // will add later
-    speciality: [],
+    speciality: ["Pediatrician", "Nutritionist"],
     whosFavourite: [], // will add later
     passportIssueDate: "21.11.2015",
     passportIssuedByWhom: "МВД г. Москвы",
@@ -76,7 +71,7 @@ const sampleDoctor: DoctorObject = {
     isAdult: true,
     isChild: false,
     workPlan: EWorkPlan.Multiple,
-    serviceExperience: 365,
+    serviceExperience: 360,
 };
 
 describe("Test Doctor services", () => {
@@ -371,12 +366,370 @@ describe("Test Doctor services", () => {
     });
     // /SECTION
 
-    // SECTION: get all
-    describe(" get all", () => {
-        test("123", async () => {
-            await Doctor.create(sampleDoctor);
+    // SECTION: getAll()
+    describe("getAll()", () => {
+        // ANCHOR: should find with speciality filter
+        test("should find with speciality filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                speciality: ["Pediatrician"],
+            };
 
-            expect((await doctorServices.getAll()).length).toEqual(1);
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with speciality filter
+        test("shouldn't find with speciality filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                speciality: ["Therapist"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: shouldn't find with 1 valid & 1 invalid speciality filter
+        test("shouldn't find with 1 valid & 1 invalid speciality filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                speciality: ["Pediatrician", "Therapist"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with experience filter
+        test("should find with experience filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                experience: ["LessYear"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with multiple experience filter
+        test("should find with multiple experience filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                experience: [
+                    "LessYear",
+                    "OneYear",
+                    "ThreeYears",
+                    "FiveYears",
+                    "MoreFiveYears",
+                ],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with experience filter
+        test("shouldn't find with experience filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                experience: ["FiveYears"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with serviceExperience filter
+        test("should find with serviceExperience filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                serviceExperience: ["LessYear"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with service experience filter
+        test("shouldn't find with service experience filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                serviceExperience: ["FiveYears"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with rating filter
+        test("should find with rating filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                rating: [4],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with multiple rating filters
+        test("should find with multiple rating filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                rating: [1, 4, 5],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with rating filter
+        test("shouldn't find with rating filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                rating: [3, 5],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with sex filter
+        test("should find with sex filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                sex: true,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with sex filters
+        test("shouldn't find with sex filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                sex: false,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with city filter
+        test("should find with city filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                city: ["Москва"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with multiply city filter
+        test("should find with multiply city filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                city: ["Москва", "Новосибирск"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with city filters
+        test("shouldn't find with city filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                city: ["Новосибирск"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with work plan filter
+        test("should find with work plan filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                workPlan: ["Multiple"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with multiple work plan filter
+        test("should find with multiple work plan filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                workPlan: ["Multiple", "Single"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with work plan filter
+        test("shouldn't find with work plan filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                workPlan: ["Single"],
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with isChild filter
+        test("should find with isChild filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                isChild: false,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with isChild filter
+        test("shouldn't find with isChild filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                isChild: true,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
+        // ANCHOR: should find with isAdult filter
+        test("should find with isAdult filter", async () => {
+            //* Arrange
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                isAdult: true,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with isAdult filter
+        test("shouldn't find with isAdult filter", async () => {
+            //* Arrange
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                isAdult: false,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
         });
     });
     // /SECTION
@@ -431,7 +784,7 @@ describe("Test Doctor services", () => {
         test("should pass speciality", async () => {
             //* Act
             const filter = {
-                speciality: [ESpeciality.Dermatologist],
+                speciality: ["Pediatrician"],
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -551,7 +904,7 @@ describe("Test Doctor services", () => {
         test("should pass sex", async () => {
             //* Act
             const filter = {
-                sex: [EGenders.Female],
+                sex: false,
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -563,7 +916,7 @@ describe("Test Doctor services", () => {
         test("shouldn't pass sex", async () => {
             //* Act
             const filter = {
-                sex: ["cow"],
+                sex: "cow",
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -623,7 +976,7 @@ describe("Test Doctor services", () => {
         test("should pass isChild", async () => {
             //* Act
             const filter = {
-                isChild: [false],
+                isChild: false,
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -635,7 +988,7 @@ describe("Test Doctor services", () => {
         test("shouldn't pass isChild", async () => {
             //* Act
             const filter = {
-                isChild: [123],
+                isChild: 123,
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -647,7 +1000,7 @@ describe("Test Doctor services", () => {
         test("should pass isAdult", async () => {
             //* Act
             const filter = {
-                isAdult: [false],
+                isAdult: false,
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -659,7 +1012,7 @@ describe("Test Doctor services", () => {
         test("shouldn't pass isAdult", async () => {
             //* Act
             const filter = {
-                isAdult: [123],
+                isAdult: 123,
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 

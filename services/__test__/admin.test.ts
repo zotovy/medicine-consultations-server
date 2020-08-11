@@ -20,6 +20,7 @@ import { BecomeDoctorRequest } from "../../models/doctor";
 import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
 import { access } from "fs";
 import { request } from "http";
+import { EWorkPlan } from "../../types/services";
 
 /**
  *  ? This test module testing admin services
@@ -84,6 +85,11 @@ const sampleDoctor: DoctorObject = {
     passportSeries: "123123",
     workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
+    serviceExperience: 365,
+    age: 35,
+    isAdult: false,
+    isChild: true,
+    workPlan: EWorkPlan.Multiple,
 };
 
 const sampleRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(sampleDoctor);

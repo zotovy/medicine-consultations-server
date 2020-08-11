@@ -18,8 +18,9 @@ import {
     TSaveBecomeDoctorRequest,
     IGetDoctorsFilter,
     EWorkExperience,
-    EGenders,
     EWorkPlan,
+    IGetDoctorsFilterQuery,
+    MWorkExperience,
 } from "../types/services";
 
 // Services
@@ -30,6 +31,7 @@ import {
     validateByEnum,
 } from "./types_services";
 import logger from "../logger";
+import { query } from "express";
 
 class DoctorServices {
     // ANCHOR: validate doctor
@@ -350,8 +352,101 @@ class DoctorServices {
     };
 
     // ANCHOR: get all
-    getAll = async () => {
-        return await Doctor.find();
+    getAll = async (rawFilter?: any): Promise<DoctorObject[]> => {
+        // handle filter
+        const filter: IGetDoctorsFilter = this.handleRawGetAllFilter(rawFilter);
+
+        // convert filter --> mongoose query
+        const queryFilter: IGetDoctorsFilterQuery = {};
+
+        //* Speciality
+        if (filter.speciality) {
+            queryFilter.speciality = {
+                $all: filter.speciality,
+            };
+        }
+
+        //* Experience
+        if (filter.experience) {
+            const queries = filter.experience.map((e) => {
+                const area = MWorkExperience[e];
+                return {
+                    experience: { $gte: area[0], $lte: area[1] ?? undefined },
+                };
+            });
+
+            if (queryFilter.$or) {
+                queryFilter.$or = queryFilter.$or.concat(queries);
+            } else {
+                queryFilter.$or = queries;
+            }
+        }
+
+        //* ServiceExperience
+        if (filter.serviceExperience) {
+            const queries = filter.serviceExperience.map((e) => {
+                const area = MWorkExperience[e];
+                return {
+                    serviceExperience: {
+                        $gte: area[0],
+                        $lte: area[1] ?? undefined,
+                    },
+                };
+            });
+
+            if (queryFilter.$or) {
+                queryFilter.$or = queryFilter.$or.concat(queries);
+            } else {
+                queryFilter.$or = queries;
+            }
+        }
+
+        //* Rating
+        if (filter.rating) {
+            const queries = filter.rating.map((e) => {
+                return {
+                    rating: { $gte: e, $lt: e + 1 },
+                };
+            });
+
+            if (queryFilter.$or) {
+                queryFilter.$or = queryFilter.$or.concat(queries);
+            } else {
+                queryFilter.$or = queries;
+            }
+        }
+
+        //* Sex
+        if (typeof filter.sex === "boolean") {
+            queryFilter.sex = filter.sex;
+        }
+
+        //* City
+        if (filter.city) {
+            queryFilter.city = {
+                $in: filter.city,
+            };
+        }
+
+        //* WorkPlan
+        if (filter.workPlan) {
+            queryFilter.workPlan = {
+                $in: filter.workPlan,
+            };
+        }
+
+        //* IsChild
+        if (typeof filter.isChild === "boolean") {
+            queryFilter.isChild = filter.isChild;
+        }
+
+        //* IsAdult
+        if (typeof filter.isAdult === "boolean") {
+            queryFilter.isAdult = filter.isAdult;
+        }
+
+        const raw = await Doctor.find(queryFilter);
+        return raw.map((e) => IDoctorToDoctorObj(e));
     };
 
     // ANCHOR: save become doctor request
@@ -398,7 +493,7 @@ class DoctorServices {
         }
     };
 
-    private handleRawGetAllFilter = (filter: any): IGetDoctorsFilter => {
+    handleRawGetAllFilter = (filter: any): IGetDoctorsFilter => {
         if (typeof filter !== "object" || !filter) {
             // TYPE_ERROR or EMPTY_FILTER_RESPONSE
             return {};
@@ -462,12 +557,8 @@ class DoctorServices {
         }
 
         //* Sex?
-        if (filter.sex) {
-            const field = validateByEnum<EGenders>(filter.sex, EGenders);
-
-            if (field) {
-                config.sex = field;
-            }
+        if (typeof filter.sex === "boolean") {
+            config.sex = filter.sex;
         }
 
         //* City?
@@ -485,12 +576,12 @@ class DoctorServices {
         }
 
         //* isChild
-        if (filter.isChild && consistingOf(filter.isChild, "boolean")) {
+        if (typeof filter.isChild === "boolean") {
             config.isChild = filter.isChild;
         }
 
         //* isAdult
-        if (filter.isAdult && consistingOf(filter.isAdult, "boolean")) {
+        if (typeof filter.isAdult === "boolean") {
             config.isAdult = filter.isAdult;
         }
 

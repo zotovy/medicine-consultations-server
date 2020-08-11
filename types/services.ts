@@ -357,14 +357,6 @@ export enum EWorkPlan {
 }
 
 /**
- * This enum describe existing genders
- */
-export enum EGenders {
-    Male = "Male",
-    Female = "Female",
-}
-
-/**
  * This interface describe filter which passed inside DoctorServices.getAll()
  */
 export interface IGetDoctorsFilter {
@@ -372,12 +364,49 @@ export interface IGetDoctorsFilter {
     experience?: EWorkExperience[];
     serviceExperience?: EWorkExperience[];
     rating?: number[];
-    sex?: EGenders[];
+    sex?: boolean;
     city?: string[];
     workPlan?: EWorkPlan[];
     isChild?: boolean;
     isAdult?: boolean;
 }
+
+/**
+ * This interface describe filter query for mongoose
+ */
+export interface IGetDoctorsFilterQuery {
+    speciality?: {
+        $all: string[];
+    };
+    $or?: {
+        [key: string]: {
+            $gte?: number;
+            $lte?: number;
+        };
+    }[];
+    sex?: boolean;
+    city?: {
+        $in?: string[];
+    };
+    workPlan?: {
+        $in?: string[];
+    };
+    // serviceExperience?: EWorkExperience[];
+    // rating?: number[];
+    // sex?: EGenders[];
+    // city?: string[];
+    // workPlan?: EWorkPlan[];
+    isChild?: boolean;
+    isAdult?: boolean;
+}
+
+export const MWorkExperience = {
+    LessYear: [0, 364],
+    OneYear: [365, 1094],
+    ThreeYears: [1095, 1824],
+    FiveYears: [1825, 2190],
+    MoreFiveYears: [2190],
+};
 
 /**
  * This type describe error object from UserServices.saveBecomeDoctorRequest() function
