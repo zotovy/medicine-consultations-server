@@ -2,6 +2,8 @@ import express from "express";
 import rateLimitter from "express-rate-limit";
 import doctorServices from "../services/doctor_services";
 import { Types } from "mongoose";
+import logger from "../logger";
+import { parse } from "path";
 
 // Used to process the http request
 const Router = express.Router();
@@ -113,6 +115,31 @@ Router.get("/doctor/:id", async (req, res) => {
             success: false,
             error: response.error,
             message: response.message,
+        });
+    }
+});
+
+// ANCHOR: GET /doctors
+Router.get("/doctors", async (req, res) => {
+    const { filter } = req.body;
+
+    let [from, amount] = [
+        parseInt(String(req.query.from)),
+        parseInt(String(req.query.amount)),
+    ];
+
+    try {
+        const doctors = await doctorServices.getAll(filter, from, amount);
+
+        return res.status(200).json({
+            success: true,
+            doctors,
+        });
+    } catch (e) {
+        logger.e(e);
+        return res.status(500).json({
+            success: false,
+            error: "invalid_errors",
         });
     }
 });

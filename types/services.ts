@@ -391,11 +391,6 @@ export interface IGetDoctorsFilterQuery {
     workPlan?: {
         $in?: string[];
     };
-    // serviceExperience?: EWorkExperience[];
-    // rating?: number[];
-    // sex?: EGenders[];
-    // city?: string[];
-    // workPlan?: EWorkPlan[];
     isChild?: boolean;
     isAdult?: boolean;
 }
