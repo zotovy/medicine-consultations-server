@@ -3,7 +3,7 @@ import rateLimitter from "express-rate-limit";
 import doctorServices from "../services/doctor_services";
 import { Types } from "mongoose";
 import logger from "../logger";
-import { parse } from "path";
+import { ServerError } from "../types/errors";
 
 // Used to process the http request
 const Router = express.Router();
@@ -137,10 +137,7 @@ Router.get("/doctors", async (req, res) => {
         });
     } catch (e) {
         logger.e(e);
-        return res.status(500).json({
-            success: false,
-            error: "invalid_errors",
-        });
+        throw new ServerError(e);
     }
 });
 

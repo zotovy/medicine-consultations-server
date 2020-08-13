@@ -12,6 +12,7 @@ import { RefreshToken } from "../models/tokens";
 // @types
 import { UserObject } from "../types/models";
 import logger from "../logger";
+import { ServerError } from "../types/errors";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -304,11 +305,7 @@ Router.get("/users", getUsersLimitter, async (req, res) => {
             users: dbcode.users,
         });
     } catch (e) {
-        return res.status(500).json({
-            success: false,
-            error: "invalid_error",
-            message: e,
-        });
+        throw new ServerError(e);
     }
 });
 
@@ -354,11 +351,7 @@ Router.get("/user/:id", getUserLimitter, async (req, res, next) => {
         });
     } catch (e) {
         logger.e(e, e.stack);
-        return res.status(500).json({
-            success: false,
-            error: "invalid_error",
-            message: e,
-        });
+        throw new ServerError(e);
     }
 });
 
@@ -406,11 +399,7 @@ Router.post(
         } catch (e) {
             logger.e(e, e.stack);
 
-            return res.status(500).json({
-                success: false,
-                error: "invalid_error",
-                message: e,
-            });
+            throw new ServerError(e);
         }
     }
 );
@@ -475,11 +464,7 @@ Router.post("/user", async (req, res) => {
         });
     } catch (e) {
         logger.e(e, e.trace);
-        return res.status(500).json({
-            success: false,
-            error: "invalid_error",
-            message: e,
-        });
+        throw new ServerError(e);
     }
 });
 
@@ -545,11 +530,7 @@ Router.put("/user/:id", async (req, res, next) => {
         });
     } catch (e) {
         logger.e(e, e.trace);
-        return res.status(500).json({
-            success: false,
-            error: "invalid_error",
-            message: e,
-        });
+        throw new ServerError(e);
     }
 });
 
@@ -588,11 +569,7 @@ Router.delete("/user/:id", async (req, res, next) => {
         });
     } catch (e) {
         logger.e(e, e.trace);
-        return res.status(500).json({
-            success: false,
-            error: "invalid_error",
-            message: e,
-        });
+        throw new ServerError(e);
     }
 });
 

@@ -25,6 +25,7 @@
     },
     "homepage": "https://github.com/PandaDEVoper/medicine-consultations-server#readme",
     "dependencies": {
+        "@sentry/node": "^5.20.1",
         "colors": "^1.4.0",
         "connect": "^3.7.0",
         "cors": "^2.8.5",

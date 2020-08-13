@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -10,9 +11,6 @@ import { Server } from "http";
 
 import ApiRouter from "./routes/index";
 import FakeRouter from "./routes/fake_api_routes";
-
-// Config MODE to dev
-// process.env.MODE = "testing";
 
 // Config env
 if (process.env.MODE === "testing") {
@@ -56,6 +54,13 @@ const appLimitter = rateLimit({
 const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
 
+// Config sentry
+Sentry.init({
+    dsn:
+        "https://65f48faa380a4894a949c0819a27c068@o433163.ingest.sentry.io/5389090",
+});
+app.use(Sentry.Handlers.requestHandler());
+
 // Apply middlewares
 app.use(appLimitter);
 app.use(cors());
@@ -67,6 +72,7 @@ app.use(
 app.use("/static", express.static("static"));
 app.use(bodyParser.json());
 app.use("/api", ApiRouter);
+app.use(Sentry.Handlers.errorHandler());
 
 if (process.env.MODE === "fake") {
     // load fake api
