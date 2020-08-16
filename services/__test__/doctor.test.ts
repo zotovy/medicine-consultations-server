@@ -75,6 +75,21 @@ const sampleDoctor: DoctorObject = {
     qualification: "first",
 };
 
+const secondSampleUser = {
+    ...sampleDoctor,
+    email: "123@mail.com",
+    experience: 1000,
+    notificationEmail: "123@mail.com",
+    speciality: [],
+    whosFavourite: [], // will add later
+    qualification: undefined,
+    rating: 0,
+    city: undefined,
+    workPlan: undefined,
+    isChild: undefined,
+    isAdult: undefined,
+};
+
 describe("Test Doctor services", () => {
     let db: mongoose.Mongoose;
 
@@ -372,6 +387,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with speciality filter
         test("should find with speciality filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -388,6 +404,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with speciality filter
         test("shouldn't find with speciality filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 speciality: ["Therapist"],
@@ -403,6 +420,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with 1 valid & 1 invalid speciality filter
         test("shouldn't find with 1 valid & 1 invalid speciality filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 speciality: ["Pediatrician", "Therapist"],
@@ -418,6 +436,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with experience filter
         test("should find with experience filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -456,6 +475,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with experience filter
         test("shouldn't find with experience filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 experience: ["FiveYears"],
@@ -471,6 +491,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with qualification filter
         test("should find with qualification filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -487,6 +508,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with qualification filter
         test("shouldn't find with qualification filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 qualification: ["second"],
@@ -502,6 +524,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with rating filter
         test("should find with rating filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -518,6 +541,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with multiple rating filters
         test("should find with multiple rating filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -534,6 +558,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with rating filter
         test("shouldn't find with rating filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 rating: [3, 5],
@@ -549,6 +574,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with city filter
         test("should find with city filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -565,6 +591,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with multiply city filter
         test("should find with multiply city filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -581,6 +608,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with city filters
         test("shouldn't find with city filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 city: ["Новосибирск"],
@@ -596,6 +624,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with work plan filter
         test("should find with work plan filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -612,6 +641,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with multiple work plan filter
         test("should find with multiple work plan filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -628,6 +658,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with work plan filter
         test("shouldn't find with work plan filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 workPlan: ["Single"],
@@ -643,6 +674,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with isChild filter
         test("should find with isChild filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -659,6 +691,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with isChild filter
         test("shouldn't find with isChild filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 isChild: true,
@@ -674,6 +707,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should find with isAdult filter
         test("should find with isAdult filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
@@ -690,6 +724,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: shouldn't find with isAdult filter
         test("shouldn't find with isAdult filter", async () => {
             //* Arrange
+            await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
                 isAdult: false,
@@ -791,6 +826,30 @@ describe("Test Doctor services", () => {
             //* Act
             const filter = {
                 experience: ["123"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass qualification
+        test("shouldn't pass experience", async () => {
+            //* Act
+            const filter = {
+                qualification: ["first"],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: should pass qualification
+        test("shouldn't pass experience", async () => {
+            //* Act
+            const filter = {
+                qualification: ["123"],
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 

@@ -55,11 +55,13 @@ const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
 
 // Config sentry
-Sentry.init({
-    dsn:
-        "https://65f48faa380a4894a949c0819a27c068@o433163.ingest.sentry.io/5389090",
-});
-app.use(Sentry.Handlers.requestHandler());
+if (process.env.MODE !== "testing") {
+    Sentry.init({
+        dsn:
+            "https://65f48faa380a4894a949c0819a27c068@o433163.ingest.sentry.io/5389090",
+    });
+    app.use(Sentry.Handlers.requestHandler());
+}
 
 // Apply middlewares
 app.use(appLimitter);
@@ -72,7 +74,10 @@ app.use(
 app.use("/static", express.static("static"));
 app.use(bodyParser.json());
 app.use("/api", ApiRouter);
-app.use(Sentry.Handlers.errorHandler());
+
+if (process.env.MODE !== "testing") {
+    app.use(Sentry.Handlers.errorHandler());
+}
 
 if (process.env.MODE === "fake") {
     // load fake api

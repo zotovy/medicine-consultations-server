@@ -392,12 +392,15 @@ export interface IGetDoctorsFilterQuery {
     }[];
     qualification?: {
         $in?: string[];
+        // $nin: [null, undefined];
     };
     city?: {
         $in?: string[];
+        // $nin: [null, undefined];
     };
     workPlan?: {
         $in?: string[];
+        // $nin: [null, undefined];
     };
     isChild?: boolean;
     isAdult?: boolean;

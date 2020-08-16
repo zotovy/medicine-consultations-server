@@ -364,7 +364,6 @@ describe("Test Doctor API", () => {
                 notificationEmail: "1@mail.com",
                 speciality: ["Logopedist"],
                 experience: 100,
-                serviceExperience: 400,
                 rating: 3.1,
                 city: "Новосибирск",
                 workPlan: EWorkPlan.Multiple,
@@ -379,7 +378,6 @@ describe("Test Doctor API", () => {
                 notificationEmail: "1@mail.com",
                 speciality: ["Logopedist"],
                 experience: 100,
-                serviceExperience: 400,
                 rating: 3.1,
                 city: "Новосибирск",
                 workPlan: EWorkPlan.Multiple,
@@ -390,7 +388,6 @@ describe("Test Doctor API", () => {
             const filter = {
                 speciality: ["Logopedist"],
                 experience: ["LessYear"],
-                serviceExperience: ["OneYear"],
                 rating: [3],
                 city: ["Новосибирск"],
                 workPlan: ["Multiple"],

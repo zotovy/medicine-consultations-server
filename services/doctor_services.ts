@@ -391,6 +391,7 @@ class DoctorServices {
 
         //* Qualification?
         if (filter.qualification) {
+            console.log(123);
             queryFilter.qualification = {
                 $in: filter.qualification,
             };
@@ -528,6 +529,9 @@ class DoctorServices {
                 config.qualification.push("first");
             else if (filter.qualification.includes("highest"))
                 config.qualification.push("highest");
+
+            if (config.qualification.length === 0)
+                config.qualification = undefined;
         }
 
         //* Rating?
