@@ -82,6 +82,7 @@ export interface IDoctor extends IUser {
     passportIssueDate: string;
     workExperience: string;
     workPlaces: string;
+    qualification?: string;
     workPlan?: string;
     isChild?: boolean;
     isAdult?: boolean;
@@ -107,6 +108,7 @@ export interface DoctorObject extends UserObject {
     passportIssueDate: IDoctor["passportIssueDate"];
     workExperience: IDoctor["workExperience"];
     workPlaces: IDoctor["workPlaces"];
+    qualification?: IDoctor["qualification"];
     workPlan?: EWorkPlan;
     isChild?: IDoctor["isChild"];
     isAdult?: IDoctor["isAdult"];

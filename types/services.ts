@@ -349,6 +349,11 @@ export enum EWorkExperience {
 }
 
 /**
+ * This type describe doctor qualification
+ */
+export type TQualification = "second" | "first" | "highest";
+
+/**
  * This enum describe work experience filter
  */
 export enum EWorkPlan {
@@ -360,11 +365,11 @@ export enum EWorkPlan {
  * This interface describe filter which passed inside DoctorServices.getAll()
  */
 export interface IGetDoctorsFilter {
+    symptoms?: any; // todo
     speciality?: ESpeciality[];
     experience?: EWorkExperience[];
-    serviceExperience?: EWorkExperience[];
+    qualification?: string[];
     rating?: number[];
-    sex?: boolean;
     city?: string[];
     workPlan?: EWorkPlan[];
     isChild?: boolean;
@@ -375,6 +380,7 @@ export interface IGetDoctorsFilter {
  * This interface describe filter query for mongoose
  */
 export interface IGetDoctorsFilterQuery {
+    symptoms?: any; //todo
     speciality?: {
         $all: string[];
     };
@@ -384,7 +390,9 @@ export interface IGetDoctorsFilterQuery {
             $lte?: number;
         };
     }[];
-    sex?: boolean;
+    qualification?: {
+        $in?: string[];
+    };
     city?: {
         $in?: string[];
     };

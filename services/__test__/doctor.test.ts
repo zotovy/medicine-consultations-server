@@ -72,6 +72,7 @@ const sampleDoctor: DoctorObject = {
     isChild: false,
     workPlan: EWorkPlan.Multiple,
     serviceExperience: 360,
+    qualification: "first",
 };
 
 describe("Test Doctor services", () => {
@@ -467,13 +468,13 @@ describe("Test Doctor services", () => {
             expect(doctors).toEqual([]);
         });
 
-        // ANCHOR: should find with serviceExperience filter
-        test("should find with serviceExperience filter", async () => {
+        // ANCHOR: should find with qualification filter
+        test("should find with qualification filter", async () => {
             //* Arrange
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
-                serviceExperience: ["LessYear"],
+                qualification: ["first"],
             };
 
             //* Act
@@ -483,12 +484,12 @@ describe("Test Doctor services", () => {
             expect(doctors).toEqual([doctor]);
         });
 
-        // ANCHOR: shouldn't find with service experience filter
-        test("shouldn't find with service experience filter", async () => {
+        // ANCHOR: shouldn't find with qualification filter
+        test("shouldn't find with qualification filter", async () => {
             //* Arrange
             await Doctor.create(sampleDoctor);
             const filter = {
-                serviceExperience: ["FiveYears"],
+                qualification: ["second"],
             };
 
             //* Act
@@ -536,37 +537,6 @@ describe("Test Doctor services", () => {
             await Doctor.create(sampleDoctor);
             const filter = {
                 rating: [3, 5],
-            };
-
-            //* Act
-            const doctors = await doctorServices.getAll(filter);
-
-            //* Assert
-            expect(doctors).toEqual([]);
-        });
-
-        // ANCHOR: should find with sex filter
-        test("should find with sex filter", async () => {
-            //* Arrange
-            const { _id } = await Doctor.create(sampleDoctor);
-            const doctor = { ...sampleDoctor, id: String(_id) };
-            const filter = {
-                sex: true,
-            };
-
-            //* Act
-            const doctors = await doctorServices.getAll(filter);
-
-            //* Assert
-            expect(doctors).toEqual([doctor]);
-        });
-
-        // ANCHOR: shouldn't find with sex filters
-        test("shouldn't find with sex filter", async () => {
-            //* Arrange
-            await Doctor.create(sampleDoctor);
-            const filter = {
-                sex: false,
             };
 
             //* Act
@@ -828,30 +798,6 @@ describe("Test Doctor services", () => {
             expect(cfg).toEqual({});
         });
 
-        // ANCHOR: should pass serviceExperience
-        test("should pass serviceExperience", async () => {
-            //* Act
-            const filter = {
-                serviceExperience: [EWorkExperience.LessYear],
-            };
-            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
-
-            //* Arrange
-            expect(cfg).toEqual(filter);
-        });
-
-        // ANCHOR: shouldn't pass serviceExperience
-        test("shouldn't pass serviceExperience", async () => {
-            //* Act
-            const filter = {
-                serviceExperience: [123],
-            };
-            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
-
-            //* Arrange
-            expect(cfg).toEqual({});
-        });
-
         // ANCHOR: should pass rating
         test("should pass rating", async () => {
             //* Act
@@ -893,30 +839,6 @@ describe("Test Doctor services", () => {
             //* Act
             const filter = {
                 rating: [123],
-            };
-            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
-
-            //* Arrange
-            expect(cfg).toEqual({});
-        });
-
-        // ANCHOR: should pass sex
-        test("should pass sex", async () => {
-            //* Act
-            const filter = {
-                sex: false,
-            };
-            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
-
-            //* Arrange
-            expect(cfg).toEqual(filter);
-        });
-
-        // ANCHOR: shouldn't pass sex
-        test("shouldn't pass sex", async () => {
-            //* Act
-            const filter = {
-                sex: "cow",
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 

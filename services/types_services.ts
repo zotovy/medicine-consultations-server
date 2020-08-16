@@ -98,6 +98,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         workPlan:
             e.workPlan === "single" ? EWorkPlan.Single : EWorkPlan.Multiple,
         serviceExperience: e.serviceExperience,
+        qualification: e.qualification,
     };
 }
 /**

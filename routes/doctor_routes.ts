@@ -4,6 +4,7 @@ import doctorServices from "../services/doctor_services";
 import { Types } from "mongoose";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
+import doctor from "../models/doctor";
 
 // Used to process the http request
 const Router = express.Router();
@@ -129,7 +130,7 @@ Router.get("/doctors", async (req, res) => {
     ];
 
     try {
-        const doctors = await doctorServices.getAll(filter, from, amount);
+        let doctors = await doctorServices.getAll(filter, from, amount);
 
         return res.status(200).json({
             success: true,

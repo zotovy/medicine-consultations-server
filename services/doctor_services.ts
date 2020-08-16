@@ -363,6 +363,9 @@ class DoctorServices {
         // convert filter --> mongoose query
         const queryFilter: IGetDoctorsFilterQuery = {};
 
+        //* Symptoms
+        // todo
+
         //* Speciality
         if (filter.speciality) {
             queryFilter.speciality = {
@@ -386,23 +389,11 @@ class DoctorServices {
             }
         }
 
-        //* ServiceExperience
-        if (filter.serviceExperience) {
-            const queries = filter.serviceExperience.map((e) => {
-                const area = MWorkExperience[e];
-                return {
-                    serviceExperience: {
-                        $gte: area[0],
-                        $lte: area[1] ?? undefined,
-                    },
-                };
-            });
-
-            if (queryFilter.$or) {
-                queryFilter.$or = queryFilter.$or.concat(queries);
-            } else {
-                queryFilter.$or = queries;
-            }
+        //* Qualification?
+        if (filter.qualification) {
+            queryFilter.qualification = {
+                $in: filter.qualification,
+            };
         }
 
         //* Rating
@@ -418,11 +409,6 @@ class DoctorServices {
             } else {
                 queryFilter.$or = queries;
             }
-        }
-
-        //* Sex
-        if (typeof filter.sex === "boolean") {
-            queryFilter.sex = filter.sex;
         }
 
         //* City
@@ -506,6 +492,9 @@ class DoctorServices {
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};
 
+        //* Symptoms
+        // todo
+
         //* Speciality?
         if (filter.speciality) {
             const field = validateByEnum<ESpeciality>(
@@ -530,16 +519,15 @@ class DoctorServices {
             }
         }
 
-        //* ServiceExperience?
-        if (filter.serviceExperience) {
-            const field = validateByEnum<EWorkExperience>(
-                filter.serviceExperience,
-                EWorkExperience
-            );
-
-            if (field) {
-                config.serviceExperience = field;
-            }
+        //* Qualification?
+        if (Array.isArray(filter.qualification)) {
+            config.qualification = [];
+            if (filter.qualification.includes("second"))
+                config.qualification.push("second");
+            else if (filter.qualification.includes("first"))
+                config.qualification.push("first");
+            else if (filter.qualification.includes("highest"))
+                config.qualification.push("highest");
         }
 
         //* Rating?
@@ -558,11 +546,6 @@ class DoctorServices {
             if (submitted.length > 0) {
                 config.rating = submitted;
             }
-        }
-
-        //* Sex?
-        if (typeof filter.sex === "boolean") {
-            config.sex = filter.sex;
         }
 
         //* City?
