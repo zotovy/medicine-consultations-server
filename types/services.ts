@@ -365,7 +365,6 @@ export enum EWorkPlan {
  * This interface describe filter which passed inside DoctorServices.getAll()
  */
 export interface IGetDoctorsFilter {
-    symptoms?: any; // todo
     speciality?: ESpeciality[];
     experience?: EWorkExperience[];
     qualification?: string[];
@@ -380,7 +379,6 @@ export interface IGetDoctorsFilter {
  * This interface describe filter query for mongoose
  */
 export interface IGetDoctorsFilterQuery {
-    symptoms?: any; //todo
     speciality?: {
         $all: string[];
     };

@@ -493,9 +493,6 @@ class DoctorServices {
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};
 
-        //* Symptoms
-        // todo
-
         //* Speciality?
         if (filter.speciality) {
             const field = validateByEnum<ESpeciality>(
