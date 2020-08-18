@@ -527,6 +527,72 @@ describe("Test Doctor services", () => {
             expect(doctors).toEqual([]);
         });
 
+        // ANCHOR: should use isDownward=true filter
+        test("should use isDownward=true filter", async () => {
+            //* Arrange
+            const thirdDoctor = {
+                ...secondSampleUser,
+                email: "hey@mail.com",
+                notificationEmail: "hey@mail.com",
+                rating: 2,
+            };
+            const res1 = await Doctor.create(sampleDoctor);
+            const res2 = await Doctor.create(secondSampleUser);
+            const res3 = await Doctor.create(thirdDoctor);
+
+            const doctor = { ...sampleDoctor, id: String(res1._id) };
+            const secondDoctor = {
+                ...secondSampleUser,
+                id: String(res2._id),
+            };
+            thirdDoctor.id = String(res3._id);
+
+            const filter = {
+                isDownward: true,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors[0]).toEqual(doctor);
+            expect(doctors[1]).toEqual(thirdDoctor);
+            expect(doctors[2]).toEqual(secondDoctor);
+        });
+
+        // ANCHOR: should use isDownward=false filter
+        test("should use isDownward=false filter", async () => {
+            //* Arrange
+            const thirdDoctor = {
+                ...secondSampleUser,
+                email: "hey@mail.com",
+                notificationEmail: "hey@mail.com",
+                rating: 2,
+            };
+            const res1 = await Doctor.create(sampleDoctor);
+            const res2 = await Doctor.create(secondSampleUser);
+            const res3 = await Doctor.create(thirdDoctor);
+
+            const doctor = { ...sampleDoctor, id: String(res1._id) };
+            const secondDoctor = {
+                ...secondSampleUser,
+                id: String(res2._id),
+            };
+            thirdDoctor.id = String(res3._id);
+
+            const filter = {
+                isDownward: false,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors[0]).toEqual(secondDoctor);
+            expect(doctors[1]).toEqual(thirdDoctor);
+            expect(doctors[2]).toEqual(doctor);
+        });
+
         // ANCHOR: should find with speciality filter
         test("should find with speciality filter", async () => {
             //* Arrange
@@ -945,6 +1011,30 @@ describe("Test Doctor services", () => {
             //* Act
             const filter = {
                 fullName: [true],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
+        // ANCHOR: should pass downward filter
+        test("should pass fullName filter", () => {
+            //* Act
+            const filter = {
+                isDownward: true,
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass isDownward filter
+        test("shouldn't pass isDownward filter", () => {
+            //* Act
+            const filter = {
+                isDownward: ["123"],
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 

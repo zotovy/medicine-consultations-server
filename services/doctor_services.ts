@@ -455,7 +455,12 @@ class DoctorServices {
             queryFilter.isAdult = filter.isAdult;
         }
 
-        const raw = await Doctor.find(queryFilter).skip(from).limit(amount);
+        const raw = await Doctor.find(queryFilter)
+            .sort({
+                rating: filter.isDownward ? -1 : 1,
+            })
+            .skip(from)
+            .limit(amount);
         return raw.map((e) => IDoctorToDoctorObj(e));
     };
 
@@ -518,8 +523,8 @@ class DoctorServices {
         }
 
         //* IsDownward?
-        if (typeof filter.IsDownward === "boolean") {
-            config.IsDownward = filter.IsDownward;
+        if (typeof filter.isDownward === "boolean") {
+            config.isDownward = filter.isDownward;
         }
 
         //* Speciality?

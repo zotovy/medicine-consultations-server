@@ -95,8 +95,11 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         age: e.age,
         isAdult: e.isAdult,
         isChild: e.isChild,
-        workPlan:
-            e.workPlan === "single" ? EWorkPlan.Single : EWorkPlan.Multiple,
+        workPlan: e.workPlan
+            ? e.workPlan === "single"
+                ? EWorkPlan.Single
+                : EWorkPlan.Multiple
+            : undefined,
         serviceExperience: e.serviceExperience,
         qualification: e.qualification,
     };

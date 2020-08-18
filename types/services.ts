@@ -366,7 +366,7 @@ export enum EWorkPlan {
  */
 export interface IGetDoctorsFilter {
     fullName?: string;
-    IsDownward?: boolean;
+    isDownward?: boolean;
     speciality?: ESpeciality[];
     experience?: EWorkExperience[];
     qualification?: string[];
