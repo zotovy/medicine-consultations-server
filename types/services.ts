@@ -365,6 +365,8 @@ export enum EWorkPlan {
  * This interface describe filter which passed inside DoctorServices.getAll()
  */
 export interface IGetDoctorsFilter {
+    fullName?: string;
+    IsDownward?: boolean;
     speciality?: ESpeciality[];
     experience?: EWorkExperience[];
     qualification?: string[];
@@ -386,6 +388,7 @@ export interface IGetDoctorsFilterQuery {
         [key: string]: {
             $gte?: number;
             $lte?: number;
+            $in?: string[];
         };
     }[];
     qualification?: {

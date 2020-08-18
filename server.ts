@@ -11,6 +11,7 @@ import { Server } from "http";
 
 import ApiRouter from "./routes/index";
 import FakeRouter from "./routes/fake_api_routes";
+import user from "./models/user";
 
 // Config env
 if (process.env.MODE === "testing") {

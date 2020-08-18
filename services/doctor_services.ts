@@ -363,8 +363,27 @@ class DoctorServices {
         // convert filter --> mongoose query
         const queryFilter: IGetDoctorsFilterQuery = {};
 
-        //* Symptoms
-        // todo
+        //* FullName
+        if (filter.fullName) {
+            const splitted = filter.fullName.split(" ");
+            queryFilter.$or = [
+                {
+                    name: {
+                        $in: splitted,
+                    },
+                },
+                {
+                    surname: {
+                        $in: splitted,
+                    },
+                },
+                {
+                    patronymic: {
+                        $in: splitted,
+                    },
+                },
+            ];
+        }
 
         //* Speciality
         if (filter.speciality) {
@@ -492,6 +511,16 @@ class DoctorServices {
 
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};
+
+        //* FullName?
+        if (typeof filter.fullName === "string") {
+            config.fullName = filter.fullName;
+        }
+
+        //* IsDownward?
+        if (typeof filter.IsDownward === "boolean") {
+            config.IsDownward = filter.IsDownward;
+        }
 
         //* Speciality?
         if (filter.speciality) {

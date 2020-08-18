@@ -77,6 +77,9 @@ const sampleDoctor: DoctorObject = {
 
 const secondSampleUser = {
     ...sampleDoctor,
+    name: "Егор",
+    surname: "Егоров",
+    patronymic: "Егорович",
     email: "123@mail.com",
     experience: 1000,
     notificationEmail: "123@mail.com",
@@ -384,6 +387,146 @@ describe("Test Doctor services", () => {
 
     // SECTION: getAll()
     describe("getAll()", () => {
+        // ANCHOR: should find with name filter
+        test("should find with name filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName: sampleDoctor.name,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with surname filter
+        test("should find with surname filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName: sampleDoctor.surname,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with patronymic filter
+        test("should find with patronymic filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName: sampleDoctor.patronymic,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with name & surname filter
+        test("should find with name & surname filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName: sampleDoctor.name + " " + sampleDoctor.surname,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with name & patronymic filter
+        test("should find with name & patronymic filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName: sampleDoctor.name + " " + sampleDoctor.patronymic,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with surname & patronymic filter
+        test("should find with surname & patronymic filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName: sampleDoctor.surname + " " + sampleDoctor.patronymic,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: should find with name, surname & patronymic filter
+        test("should find with name, surname & patronymic filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            const { _id } = await Doctor.create(sampleDoctor);
+            const doctor = { ...sampleDoctor, id: String(_id) };
+            const filter = {
+                fullName:
+                    sampleDoctor.surname +
+                    " " +
+                    sampleDoctor.patronymic +
+                    " " +
+                    sampleDoctor.name,
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([doctor]);
+        });
+
+        // ANCHOR: shouldn't find with name filter
+        test("shouldn't find with name filter", async () => {
+            //* Arrange
+            await Doctor.create(secondSampleUser);
+            await Doctor.create(sampleDoctor);
+            const filter = {
+                fullName: "123 123 123",
+            };
+
+            //* Act
+            const doctors = await doctorServices.getAll(filter);
+
+            //* Assert
+            expect(doctors).toEqual([]);
+        });
+
         // ANCHOR: should find with speciality filter
         test("should find with speciality filter", async () => {
             //* Arrange
@@ -785,6 +928,30 @@ describe("Test Doctor services", () => {
 
     // SECTION: handleRawGetAllFilter()
     describe("handleRawGetAllFilter()", () => {
+        // ANCHOR: should pass fullName filter
+        test("should pass fullName filter", () => {
+            //* Act
+            const filter = {
+                fullName: "Hey",
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual(filter);
+        });
+
+        // ANCHOR: shouldn't pass fullName filter
+        test("shouldn't pass fullName filter", () => {
+            //* Act
+            const filter = {
+                fullName: [true],
+            };
+            const cfg = doctorServices.testHandleRawGetAllFilter(filter);
+
+            //* Arrange
+            expect(cfg).toEqual({});
+        });
+
         // ANCHOR: should pass speciality
         test("should pass speciality", async () => {
             //* Act
