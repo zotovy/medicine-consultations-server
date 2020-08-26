@@ -31,7 +31,6 @@ import {
     validateByEnum,
 } from "./types_services";
 import logger from "../logger";
-import { query } from "express";
 
 class DoctorServices {
     // ANCHOR: validate doctor
@@ -410,7 +409,6 @@ class DoctorServices {
 
         //* Qualification?
         if (filter.qualification) {
-            console.log(123);
             queryFilter.qualification = {
                 $in: filter.qualification,
             };

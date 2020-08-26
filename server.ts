@@ -56,7 +56,7 @@ const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
 
 // Config sentry
-if (process.env.MODE !== "testing") {
+if (process.env.MODE === "production") {
     Sentry.init({
         dsn:
             "https://65f48faa380a4894a949c0819a27c068@o433163.ingest.sentry.io/5389090",
@@ -76,7 +76,7 @@ app.use("/static", express.static("static"));
 app.use(bodyParser.json());
 app.use("/api", ApiRouter);
 
-if (process.env.MODE !== "testing") {
+if (process.env.MODE === "production") {
     app.use(Sentry.Handlers.errorHandler());
 }
 
