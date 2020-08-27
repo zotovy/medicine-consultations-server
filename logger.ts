@@ -36,7 +36,7 @@ class Logger {
         this.stack.push(log);
     };
 
-    error = (message: string, trace: any = null): void => {
+    error = (message: any, trace: any = null): void => {
         const time = new Date();
 
         console.log(`${colors.bgRed.white(" Error: ")} ${message}`);
@@ -45,7 +45,7 @@ class Logger {
 
         const log: Log = {
             type: LogType.Error,
-            message: message,
+            message: message.toString(),
             timestamp: time,
             trace,
         };

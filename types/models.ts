@@ -272,10 +272,50 @@ export interface IAdminHistory extends Document {
     timestamp: Date;
 }
 
-export interface AdminHistoryProject {
+export interface AdminHistoryObject {
     id: IAdminHistory["id"];
     adminId: IAdminHistory["adminId"];
     whatDid: IAdminHistory["whatDid"];
     payload: Object;
     timestamp: IAdminHistory["timestamp"];
+}
+
+//========================================================================================
+/*                                                                                      *
+ *                                         MAILS                                        *
+ *                                                                                      */
+//========================================================================================
+
+/**
+ * This interface describe mongoose MailBlocks model
+ */
+export interface IMailBlocks extends Document {
+    // email which services cant send mails
+    email: string;
+}
+
+/**
+ * This interface describe MailBlocks model
+ */
+export interface MailBlocksObject {
+    email: IMailBlocks["email"];
+}
+
+/**
+ * This interface describe mongoose ResetPasswordRequest model
+ */
+export interface IResetPasswordRequest extends Document {
+    // id of sended user
+    userId: String;
+
+    // date of request creation
+    timestamp: Date;
+}
+
+/**
+ * This interface describe MailBlocks model
+ */
+export interface ResetPasswordRequestObject {
+    userId: IResetPasswordRequest["userId"];
+    timestamp: IResetPasswordRequest["timestamp"];
 }

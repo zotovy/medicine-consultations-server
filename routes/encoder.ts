@@ -8,8 +8,6 @@ class Encoder {
         keys.forEach((key) => {
             try {
                 if (query[key]) {
-                    console.log(JSON.parse(query[key]));
-
                     final[key] = JSON.parse(query[key]);
                 }
             } catch (e) {

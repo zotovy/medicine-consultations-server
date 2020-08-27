@@ -141,27 +141,12 @@ Router.get("/doctors", async (req, res) => {
 
     const data = encoder.query(req.query, qKeys);
 
-    console.log("data  ", data);
-
     if (typeof data.from !== "number") {
         data.from = undefined;
     }
     if (typeof data.amount !== "number") {
         data.amount = undefined;
     }
-
-    // const filter = {
-    //     fullName: data.fullName,
-    //     isDownward: data.isDownward,
-    //     speciality: data.speciality,
-    //     isChild: data.isChild,
-    //     isAdult: data.isAdult,
-    //     experience: data.experience,
-    //     qualification: data.qualification,
-    //     city: data.city,
-    //     workPlan: data.workPlan,
-    //     rating: data.rating,
-    // };
 
     try {
         let doctors = await doctorServices.getAll(data, data.from, data.amount);

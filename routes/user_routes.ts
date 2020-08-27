@@ -13,6 +13,7 @@ import { RefreshToken } from "../models/tokens";
 import { UserObject } from "../types/models";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
+import mail_services from "../services/mail_services";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -215,17 +216,17 @@ const resetPasswordEmailLimitter = rateLimitter({
 /**
  * This function send reset email with reset password link
  */
-Router.post(
-    "/send-reset-password-email",
-    resetPasswordEmailLimitter,
-    async (req, res) => {
-        const email = req.body.email;
+// Router.post(
+//     "/send-reset-password-email",
+//     resetPasswordEmailLimitter,
+//     async (req, res) => {
+//         const email = req.body.email;
 
-        await userServices.sendResetPasswordMail(email);
+//         await userServices.sendResetPasswordMail(email);
 
-        res.status(200).json({ success: true });
-    }
-);
+//         res.status(200).json({ success: true });
+//     }
+// );
 
 // ANCHOR: Refresh token
 // Limit request
@@ -456,6 +457,8 @@ Router.post("/user", async (req, res) => {
         const tokens = await userServices.generateNewTokens(
             dbcode.user?.id ?? ""
         );
+
+        await mail_services.sendResetPasswordMail(dbcode.user?.id ?? "");
 
         return res.status(201).json({
             success: true,

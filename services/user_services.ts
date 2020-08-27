@@ -120,18 +120,18 @@ class UserServices {
      * and set reset password mail
      */
     // todo: mailing
-    async sendResetPasswordMail(email: string) {
-        // Errors
-        const EMAIL_FORMAT_ERROR = "email_format_error";
+    // async sendResetPasswordMail(email: string) {
+    //     // Errors
+    //     const EMAIL_FORMAT_ERROR = "email_format_error";
 
-        // Check given email
-        const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-        if (!re.test(email)) {
-            return EMAIL_FORMAT_ERROR;
-        }
+    //     // Check given email
+    //     const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    //     if (!re.test(email)) {
+    //         return EMAIL_FORMAT_ERROR;
+    //     }
 
-        emailServices.sendResetPasswordEmail(email);
-    }
+    //     emailServices.sendResetPasswordEmail(email);
+    // }
 
     // ANCHOR: validateUser
     /**

@@ -1,17 +1,4 @@
-import express from "express";
-import * as Sentry from "@sentry/node";
-import mongoose from "mongoose";
-import bodyParser from "body-parser";
-import cors from "cors";
 import dotenv from "dotenv";
-import rateLimit from "express-rate-limit";
-
-// @types
-import { Server } from "http";
-
-import ApiRouter from "./routes/index";
-import FakeRouter from "./routes/fake_api_routes";
-import user from "./models/user";
 
 // Config env
 if (process.env.MODE === "testing") {
@@ -45,6 +32,19 @@ if (process.env.MODE === "testing") {
     }
 }
 
+import express from "express";
+import * as Sentry from "@sentry/node";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+
+// @types
+import { Server } from "http";
+
+import ApiRouter from "./routes/index";
+import FakeRouter from "./routes/fake_api_routes";
+
 // Limit request from one IP per hour
 const appLimitter = rateLimit({
     windowMs: 1000,
@@ -75,6 +75,13 @@ app.use(
 app.use("/static", express.static("static"));
 app.use(bodyParser.json());
 app.use("/api", ApiRouter);
+
+app.get("/reset-password/:id", (req, res) => {
+    return res.send(`<h1>your id is ${req.params.id}</h1>`);
+});
+app.get("/unsubscribe-from-password/:id", (req, res) => {
+    return res.send(`<h1>your id is ${req.params.id}</h1>`);
+});
 
 if (process.env.MODE === "production") {
     app.use(Sentry.Handlers.errorHandler());
