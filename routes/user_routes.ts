@@ -7,13 +7,13 @@ import path from "path";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import userServices from "../services/user_services";
-import { RefreshToken } from "../models/tokens";
+import mail_services from "../services/mail_services";
+import tokenServices from "../services/token_services";
+import logger from "../logger";
 
 // @types
 import { UserObject } from "../types/models";
-import logger from "../logger";
 import { ServerError } from "../types/errors";
-import mail_services from "../services/mail_services";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -595,5 +595,24 @@ Router.post("/reset-password", async (req, res) => {
 
     return res.status(response.success ? 201 : 400).json(response);
 });
+
+Router.post(
+    "/send-reset-password-email",
+    tokenServices.authenticateToken,
+    async (req, res) => {
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: "required_error",
+            });
+        }
+
+        const response = await mail_services.sendResetPasswordMail(userId);
+
+        return res.status(response.success ? 200 : 400).json(response);
+    }
+);
 
 export default Router;

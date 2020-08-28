@@ -12,6 +12,7 @@ import { UserObject } from "../../types/models";
 import { IUserToUserObj } from "../../services/types_services";
 import user_services from "../../services/user_services";
 import { ResetPasswordRequest } from "../../models/mails";
+import token_services from "../../services/token_services";
 
 /**
  *  ? This test module testing user routes
@@ -35,6 +36,9 @@ process.env.useFindAndModify = "false";
 process.env.useUnifiedTopology = "true";
 process.env.jwt_access = "test-access-string";
 process.env.jwt_refresh = "test-refresh-string";
+process.env.mail = "healty-mountain-testing@mail.ru";
+process.env.mailPassword = "321dsa321";
+process.env.mailService = "Mail.ru";
 
 // Fix @types
 declare function done(): any;
@@ -127,7 +131,7 @@ describe("Test user routes", () => {
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
-            //* Access
+            //* Assert
             expect(status).toEqual(200);
             expect(data).toBeDefined();
             expect(data.success).toBe(true);
@@ -858,4 +862,71 @@ describe("Test user routes", () => {
         expect((await ResetPasswordRequest.find({})).length).toEqual(0);
         expect((await User.find({}))[0].password).toEqual("heyItsMe123");
     });
+
+    // SECTION: reset password email
+    describe("reset password email", () => {
+        // ANCHOR: should send reset password
+        test("should send reset password", async () => {
+            //* Arrange
+            const { _id } = await User.create({
+                ...sampleUser,
+                email: "the1ime@yandex.ru",
+            });
+            const { access } = await user_services.generateNewTokens(
+                String(_id)
+            );
+            const req = await ResetPasswordRequest.create({
+                userId: String(_id),
+                timestamp: new Date(),
+            });
+
+            //* Act
+            const responce = await request
+                .post(`/api/send-reset-password-email`)
+                .type("json")
+                .send({
+                    requestId: String(req._id),
+                    userId: String(_id),
+                    password: "heyItsMe123",
+                })
+                .set("auth", `Bearer ${access}`);
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+        });
+
+        // ANCHOR: should be protected
+        test("should be protected", async () => {
+            //* Arrange
+            const { _id } = await User.create({
+                ...sampleUser,
+                email: "the1ime@yandex.ru",
+            });
+            const req = await ResetPasswordRequest.create({
+                userId: String(_id),
+                timestamp: new Date(),
+            });
+
+            //* Act
+            const responce = await request
+                .post(`/api/send-reset-password-email`)
+                .type("json")
+                .send({
+                    requestId: String(req._id),
+                    userId: String(_id),
+                    password: "heyItsMe123",
+                });
+            const status = responce.status;
+            const data = JSON.parse(responce.text);
+
+            //* Assert
+            expect(status).toEqual(401);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("not_authorize");
+        });
+    });
+    // /SECTION
 });
