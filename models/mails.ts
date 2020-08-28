@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
 const MailBlocksSchema = new Schema({
     email: String,
@@ -10,7 +10,12 @@ const ResetPasswordRequestSchema = new Schema({
 });
 
 export const MailBlocks = model("MailBlocks", MailBlocksSchema);
-export const ResetPasswordRequest = model(
+export const ResetPasswordRequest = model<IResetPasswordRequest>(
     "ResetPasswordRequest",
     ResetPasswordRequestSchema
 );
+
+export interface IResetPasswordRequest extends Document {
+    userId: string;
+    timestamp: Date;
+}

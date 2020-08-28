@@ -44,20 +44,22 @@ export type TCheckUserEmailAndPassword = {
 
 /**
  *  This type describe return object of
- *  UserServices.checkUserEmailAndPassword(email: string, password : string) function
+ *  UserServices.resetPassword(email: string, password : string) function
  */
-export type TSendResetPasswordMail = {
+export type TResetPassword = {
     // Is operation going success
     success: true | false;
 
     // Show error if failed
-    error?: "invalid_error" | "invalid_password" | "invalid_email";
+    error?:
+        | "invalid_error"
+        | "no_request_found"
+        | "no_user_found"
+        | "expired_error"
+        | "invalid_password";
 
     // Show error message if failed
     message?: string;
-
-    // Return operation results if success
-    id?: string;
 };
 
 /**

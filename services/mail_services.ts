@@ -91,6 +91,7 @@ class EmailServices {
         // Create request
         const request = await ResetPasswordRequest.create({
             userId,
+            timestamp: new Date(),
         });
 
         // Setting

@@ -38,12 +38,15 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+// import userServices from "./services/user_services";
 
 // @types
 import { Server } from "http";
 
 import ApiRouter from "./routes/index";
 import FakeRouter from "./routes/fake_api_routes";
+
+// userServices.resetPassword("123456789101", "213");
 
 // Limit request from one IP per hour
 const appLimitter = rateLimit({

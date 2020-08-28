@@ -8,8 +8,8 @@ import userServices from "../user_services";
 
 // @types
 import { UserObject } from "../../types/models";
-import { IUserToUserObj } from "../types_services";
 import { AccessToken, RefreshToken } from "../../models/tokens";
+import { ResetPasswordRequest } from "../../models/mails";
 
 /**
  *  ? This test module testing user services
@@ -90,6 +90,7 @@ describe("Test UserServices", () => {
         await User.remove({});
         await AccessToken.remove({});
         await RefreshToken.remove({});
+        await ResetPasswordRequest.deleteMany({});
     });
 
     // SECTION: getUsers()
@@ -797,6 +798,94 @@ describe("Test UserServices", () => {
 
             //* Assert
             expect(isOk).toEqual(false);
+        });
+    });
+    // /SECTION
+
+    // SECTION: resetPassword
+    describe("resetPassword", () => {
+        // ANCHOR: should reset password
+        test("should reset password", async () => {
+            //* Arrange
+            const { _id } = await User.create(sampleUser);
+            await ResetPasswordRequest.create({
+                userId: String(_id),
+                timestamp: new Date(),
+            });
+
+            //* Act
+            const { success, error } = await userServices.resetPassword(
+                String(_id),
+                "heyItsMe123"
+            );
+
+            //* Assert
+            expect(success).toEqual(true);
+            expect(error).toBeUndefined();
+            expect((await ResetPasswordRequest.find({})).length).toEqual(0);
+            expect((await User.find({}))[0].password).toEqual("heyItsMe123");
+        });
+
+        // ANCHOR: shouldn't reset incorrect password
+        test("shouldn't reset incorrect password", async () => {
+            //* Arrange
+            const { _id } = await User.create(sampleUser);
+            await ResetPasswordRequest.create({
+                userId: String(_id),
+                timestamp: new Date(),
+            });
+
+            //* Act
+            const { success, error } = await userServices.resetPassword(
+                String(_id),
+                "12345678"
+            );
+
+            //* Assert
+            expect(success).toEqual(false);
+            expect(error).toEqual("invalid_password");
+            expect((await ResetPasswordRequest.find({})).length).toEqual(1);
+            expect((await User.find({}))[0].password).toEqual(
+                sampleUser.password
+            );
+        });
+
+        // ANCHOR: shouldn't reset without request
+        test("shouldn't reset without request", async () => {
+            //* Arrange
+            const { _id } = await User.create(sampleUser);
+
+            //* Act
+            const { success, error } = await userServices.resetPassword(
+                String(_id),
+                "heyItsMe123"
+            );
+
+            //* Assert
+            expect(success).toEqual(false);
+            expect(error).toEqual("no_request_found");
+            expect((await User.find({}))[0].password).toEqual(
+                sampleUser.password
+            );
+        });
+
+        // ANCHOR: should return no_user_found
+        test("should return no_user_found", async () => {
+            //* Arrange
+            await ResetPasswordRequest.create({
+                userId: "123456789101",
+                timestamp: new Date(),
+            });
+
+            //* Act
+            const { success, error } = await userServices.resetPassword(
+                "123456789101",
+                "heyItsMe123"
+            );
+
+            //* Assert
+            expect(success).toEqual(false);
+            expect(error).toEqual("no_user_found");
         });
     });
     // /SECTION

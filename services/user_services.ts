@@ -19,12 +19,13 @@ import {
     TValidateUser,
     TUserValidationErrors,
     TValidationErrorType,
+    TResetPassword,
 } from "../types/services";
 import { IUser, UserObject } from "../types/models";
-import { error, info } from "console";
 import { AccessToken, RefreshToken } from "../models/tokens";
 import token_services from "./token_services";
 import logger from "../logger";
+import { ResetPasswordRequest } from "../models/mails";
 
 class UserServices {
     /**
@@ -114,24 +115,71 @@ class UserServices {
         };
     }
 
-    // ANCHOR: sendResetPasswordMail
-    /**
-     * This function get user email, check email
-     * and set reset password mail
-     */
-    // todo: mailing
-    // async sendResetPasswordMail(email: string) {
-    //     // Errors
-    //     const EMAIL_FORMAT_ERROR = "email_format_error";
+    // ANCHOR: Reset password
+    resetPassword = async (
+        userId: string,
+        password: string
+    ): Promise<TResetPassword> => {
+        // Check password
+        const isOk = password.match(/^(?=.*\d)(?=.*[a-zA-Z])(?!.*\s).{8,128}$/);
+        if (!isOk) {
+            return {
+                success: false,
+                error: "invalid_password",
+            };
+        }
 
-    //     // Check given email
-    //     const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    //     if (!re.test(email)) {
-    //         return EMAIL_FORMAT_ERROR;
-    //     }
+        // Check existing request on this user
+        const request = await ResetPasswordRequest.findOne({ userId });
 
-    //     emailServices.sendResetPasswordEmail(email);
-    // }
+        if (!request) {
+            return {
+                success: false,
+                error: "no_request_found",
+            };
+        }
+
+        // delete request
+        await ResetPasswordRequest.findOneAndDelete({ userId });
+
+        // Check work time of request (24 hours)
+        const msDiff = new Date().getTime() - request.timestamp.getTime();
+        const hourDiff = Math.floor(msDiff / 3600000);
+
+        if (hourDiff >= 24) {
+            return {
+                success: false,
+                error: "expired_error",
+            };
+        }
+
+        // Set new password
+        try {
+            const user = await User.findOneAndUpdate(
+                { _id: userId },
+                { password }
+            ).catch((e) => null);
+
+            if (!user) {
+                return {
+                    success: false,
+                    error: "no_user_found",
+                };
+            }
+
+            return {
+                success: true,
+            };
+        } catch (e) {
+            logger.e(
+                `userServices.resetPassword(): error while updating user with id=${userId}. \n${e}`
+            );
+            return {
+                success: false,
+                error: "invalid_error",
+            };
+        }
+    };
 
     // ANCHOR: validateUser
     /**
