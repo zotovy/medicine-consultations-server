@@ -11,6 +11,7 @@ import app, { server } from "../../server";
 import { UserObject } from "../../types/models";
 import { IUserToUserObj } from "../../services/types_services";
 import user_services from "../../services/user_services";
+import { ResetPasswordRequest } from "../../models/mails";
 
 /**
  *  ? This test module testing user routes
@@ -100,6 +101,7 @@ describe("Test user routes", () => {
     // Remove all date from mongodb after each test case
     afterEach(async () => {
         await User.remove({});
+        await ResetPasswordRequest.deleteMany({});
     });
 
     // SECTION: /generate-token
@@ -826,4 +828,34 @@ describe("Test user routes", () => {
         });
     });
     // /SECTION
+
+    // ANCHOR: should reset password
+    test("should reset password", async () => {
+        //* Arrange
+        const { _id } = await User.create(sampleUser);
+        const req = await ResetPasswordRequest.create({
+            userId: String(_id),
+            timestamp: new Date(),
+        });
+
+        //* Act
+
+        const responce = await request
+            .post(`/api/reset-password`)
+            .type("json")
+            .send({
+                requestId: String(req._id),
+                userId: String(_id),
+                password: "heyItsMe123",
+            });
+        const status = responce.status;
+        const data = JSON.parse(responce.text);
+
+        //* Assert
+        expect(status).toEqual(201);
+        expect(data.success).toEqual(true);
+        expect(data.error).toBeUndefined();
+        expect((await ResetPasswordRequest.find({})).length).toEqual(0);
+        expect((await User.find({}))[0].password).toEqual("heyItsMe123");
+    });
 });

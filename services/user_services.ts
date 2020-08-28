@@ -21,7 +21,7 @@ import {
     TValidationErrorType,
     TResetPassword,
 } from "../types/services";
-import { IUser, UserObject } from "../types/models";
+import { IUser, UserObject, IResetPasswordRequest } from "../types/models";
 import { AccessToken, RefreshToken } from "../models/tokens";
 import token_services from "./token_services";
 import logger from "../logger";
@@ -117,6 +117,7 @@ class UserServices {
 
     // ANCHOR: Reset password
     resetPassword = async (
+        requestId: string,
         userId: string,
         password: string
     ): Promise<TResetPassword> => {
@@ -130,7 +131,12 @@ class UserServices {
         }
 
         // Check existing request on this user
-        const request = await ResetPasswordRequest.findOne({ userId });
+        const request: IResetPasswordRequest | null = await ResetPasswordRequest.findOne(
+            {
+                _id: requestId,
+                userId,
+            }
+        ).catch((e) => null);
 
         if (!request) {
             return {
@@ -143,7 +149,8 @@ class UserServices {
         await ResetPasswordRequest.findOneAndDelete({ userId });
 
         // Check work time of request (24 hours)
-        const msDiff = new Date().getTime() - request.timestamp.getTime();
+        //@ts-ignore
+        const msDiff = new Date().getTime() - request?.timestamp.getTime();
         const hourDiff = Math.floor(msDiff / 3600000);
 
         if (hourDiff >= 24) {

@@ -808,13 +808,14 @@ describe("Test UserServices", () => {
         test("should reset password", async () => {
             //* Arrange
             const { _id } = await User.create(sampleUser);
-            await ResetPasswordRequest.create({
+            const req = await ResetPasswordRequest.create({
                 userId: String(_id),
                 timestamp: new Date(),
             });
 
             //* Act
             const { success, error } = await userServices.resetPassword(
+                String(req._id),
                 String(_id),
                 "heyItsMe123"
             );
@@ -830,13 +831,14 @@ describe("Test UserServices", () => {
         test("shouldn't reset incorrect password", async () => {
             //* Arrange
             const { _id } = await User.create(sampleUser);
-            await ResetPasswordRequest.create({
+            const req = await ResetPasswordRequest.create({
                 userId: String(_id),
                 timestamp: new Date(),
             });
 
             //* Act
             const { success, error } = await userServices.resetPassword(
+                String(req._id),
                 String(_id),
                 "12345678"
             );
@@ -857,6 +859,7 @@ describe("Test UserServices", () => {
 
             //* Act
             const { success, error } = await userServices.resetPassword(
+                "123",
                 String(_id),
                 "heyItsMe123"
             );
@@ -872,13 +875,14 @@ describe("Test UserServices", () => {
         // ANCHOR: should return no_user_found
         test("should return no_user_found", async () => {
             //* Arrange
-            await ResetPasswordRequest.create({
+            const req = await ResetPasswordRequest.create({
                 userId: "123456789101",
                 timestamp: new Date(),
             });
 
             //* Act
             const { success, error } = await userServices.resetPassword(
+                String(req._id),
                 "123456789101",
                 "heyItsMe123"
             );
