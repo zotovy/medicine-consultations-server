@@ -816,7 +816,6 @@ describe("Test UserServices", () => {
             //* Act
             const { success, error } = await userServices.resetPassword(
                 String(req._id),
-                String(_id),
                 "heyItsMe123"
             );
 
@@ -839,7 +838,6 @@ describe("Test UserServices", () => {
             //* Act
             const { success, error } = await userServices.resetPassword(
                 String(req._id),
-                String(_id),
                 "12345678"
             );
 
@@ -855,12 +853,11 @@ describe("Test UserServices", () => {
         // ANCHOR: shouldn't reset without request
         test("shouldn't reset without request", async () => {
             //* Arrange
-            const { _id } = await User.create(sampleUser);
+            await User.create(sampleUser);
 
             //* Act
             const { success, error } = await userServices.resetPassword(
                 "123",
-                String(_id),
                 "heyItsMe123"
             );
 
@@ -883,7 +880,6 @@ describe("Test UserServices", () => {
             //* Act
             const { success, error } = await userServices.resetPassword(
                 String(req._id),
-                "123456789101",
                 "heyItsMe123"
             );
 

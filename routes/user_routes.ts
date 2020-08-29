@@ -578,41 +578,33 @@ Router.delete("/user/:id", async (req, res, next) => {
 
 // ANCHOR: resetPassword
 Router.post("/reset-password", async (req, res) => {
-    const { userId, requestId, password } = req.body;
+    const { requestId, password } = req.body;
 
-    if (!userId || !requestId || !password) {
+    if (!requestId || !password) {
         return res.status(400).json({
             success: false,
             error: "required_error",
         });
     }
 
-    const response = await userServices.resetPassword(
-        requestId,
-        userId,
-        password
-    );
+    const response = await userServices.resetPassword(requestId, password);
 
     return res.status(response.success ? 201 : 400).json(response);
 });
 
-Router.post(
-    "/send-reset-password-email",
-    tokenServices.authenticateToken,
-    async (req, res) => {
-        const { userId } = req.body;
+Router.post("/send-reset-password-email", async (req, res) => {
+    const { email } = req.body;
 
-        if (!userId) {
-            return res.status(400).json({
-                success: false,
-                error: "required_error",
-            });
-        }
-
-        const response = await mail_services.sendResetPasswordMail(userId);
-
-        return res.status(response.success ? 200 : 400).json(response);
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            error: "required_error",
+        });
     }
-);
+
+    const response = await mail_services.sendResetPasswordMail(email);
+
+    return res.status(response.success ? 200 : 400).json(response);
+});
 
 export default Router;

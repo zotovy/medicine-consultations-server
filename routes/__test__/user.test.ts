@@ -849,7 +849,6 @@ describe("Test user routes", () => {
             .type("json")
             .send({
                 requestId: String(req._id),
-                userId: String(_id),
                 password: "heyItsMe123",
             });
         const status = responce.status;
@@ -885,47 +884,14 @@ describe("Test user routes", () => {
                 .post(`/api/send-reset-password-email`)
                 .type("json")
                 .send({
-                    requestId: String(req._id),
-                    userId: String(_id),
-                    password: "heyItsMe123",
-                })
-                .set("auth", `Bearer ${access}`);
+                    email: "the1ime@yandex.ru",
+                });
             const status = responce.status;
             const data = JSON.parse(responce.text);
 
             //* Assert
             expect(status).toEqual(200);
             expect(data.success).toEqual(true);
-        });
-
-        // ANCHOR: should be protected
-        test("should be protected", async () => {
-            //* Arrange
-            const { _id } = await User.create({
-                ...sampleUser,
-                email: "the1ime@yandex.ru",
-            });
-            const req = await ResetPasswordRequest.create({
-                userId: String(_id),
-                timestamp: new Date(),
-            });
-
-            //* Act
-            const responce = await request
-                .post(`/api/send-reset-password-email`)
-                .type("json")
-                .send({
-                    requestId: String(req._id),
-                    userId: String(_id),
-                    password: "heyItsMe123",
-                });
-            const status = responce.status;
-            const data = JSON.parse(responce.text);
-
-            //* Assert
-            expect(status).toEqual(401);
-            expect(data.success).toEqual(false);
-            expect(data.error).toEqual("not_authorize");
         });
     });
     // /SECTION

@@ -118,7 +118,6 @@ class UserServices {
     // ANCHOR: Reset password
     resetPassword = async (
         requestId: string,
-        userId: string,
         password: string
     ): Promise<TResetPassword> => {
         // Check password
@@ -131,12 +130,10 @@ class UserServices {
         }
 
         // Check existing request on this user
-        const request: IResetPasswordRequest | null = await ResetPasswordRequest.findOne(
-            {
-                _id: requestId,
-                userId,
-            }
-        ).catch((e) => null);
+        //@ts-ignore
+        const request: IResetPasswordRequest = await ResetPasswordRequest.findById(
+            requestId
+        ).catch((e) => undefined);
 
         if (!request) {
             return {
@@ -146,10 +143,9 @@ class UserServices {
         }
 
         // delete request
-        await ResetPasswordRequest.findOneAndDelete({ userId });
+        await ResetPasswordRequest.findOneAndDelete({ _id: requestId });
 
         // Check work time of request (24 hours)
-        //@ts-ignore
         const msDiff = new Date().getTime() - request?.timestamp.getTime();
         const hourDiff = Math.floor(msDiff / 3600000);
 
@@ -163,7 +159,7 @@ class UserServices {
         // Set new password
         try {
             const user = await User.findOneAndUpdate(
-                { _id: userId },
+                { _id: request.userId },
                 { password }
             ).catch((e) => null);
 
@@ -179,7 +175,7 @@ class UserServices {
             };
         } catch (e) {
             logger.e(
-                `userServices.resetPassword(): error while updating user with id=${userId}. \n${e}`
+                `userServices.resetPassword(): error while updating user with id=${request.userId}. \n${e}`
             );
             return {
                 success: false,
