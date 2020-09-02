@@ -12,6 +12,7 @@ export interface IRefreshToken extends Document {
  *  User model interface with mongoose functions
  */
 export interface IUser extends Document {
+    fullName: string;
     name: string;
     surname: string;
     patronymic: string;
@@ -38,6 +39,7 @@ export interface IUser extends Document {
  */
 export interface UserObject {
     id: IUser["_id"];
+    fullName: IUser["fullName"];
     name: IUser["name"];
     surname: IUser["surname"];
     patronymic: IUser["patronymic"];

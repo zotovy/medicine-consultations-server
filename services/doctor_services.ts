@@ -1,6 +1,6 @@
 /// <reference path="../declaration/mongoose-extended-schema.d.ts" />
 
-import { Types } from "mongoose";
+import { Types, QueryCursor } from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 
 // types
@@ -31,6 +31,7 @@ import {
     validateByEnum,
 } from "./types_services";
 import logger from "../logger";
+import { query } from "express";
 
 class DoctorServices {
     // ANCHOR: validate doctor
@@ -364,24 +365,7 @@ class DoctorServices {
 
         //* FullName
         if (filter.fullName) {
-            const splitted = filter.fullName.split(" ");
-            queryFilter.$or = [
-                {
-                    name: {
-                        $in: splitted,
-                    },
-                },
-                {
-                    surname: {
-                        $in: splitted,
-                    },
-                },
-                {
-                    patronymic: {
-                        $in: splitted,
-                    },
-                },
-            ];
+            queryFilter.fullName = { $regex: new RegExp(filter.fullName) };
         }
 
         //* Speciality
@@ -459,6 +443,7 @@ class DoctorServices {
             })
             .skip(from)
             .limit(amount);
+
         return raw.map((e) => IDoctorToDoctorObj(e));
     };
 
@@ -506,6 +491,7 @@ class DoctorServices {
         }
     };
 
+    // ANCHOR: handle кaw get all filter
     handleRawGetAllFilter = (filter: any): IGetDoctorsFilter => {
         if (typeof filter !== "object" || !filter) {
             // TYPE_ERROR or EMPTY_FILTER_RESPONSE
@@ -607,6 +593,8 @@ class DoctorServices {
 
         return config;
     };
+
+    // ANCHOR: get by symptoms
 
     // ! This's using only for testing. DO NOT USE FOR PRODUCTION
     testHandleRawGetAllFilter = (

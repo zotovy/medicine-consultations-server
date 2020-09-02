@@ -18,7 +18,6 @@ import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
 import admin from "../models/admin";
 import token_services from "../services/token_services";
 import { BecomeDoctorObj, IBecomeDoctor, AdminRole } from "../types/models";
-import { request } from "http";
 
 class AdminServices {
     // constructor() {

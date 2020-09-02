@@ -383,6 +383,9 @@ export interface IGetDoctorsFilter {
  * This interface describe filter query for mongoose
  */
 export interface IGetDoctorsFilterQuery {
+    fullName?: {
+        $regex: RegExp;
+    };
     speciality?: {
         $all: string[];
     };

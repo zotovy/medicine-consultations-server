@@ -18,6 +18,7 @@ import { EWorkPlan } from "../types/services";
 export function IUserToUserObj(e: IUser): UserObject {
     return {
         id: String(e._id),
+        fullName: e.fullName,
         name: e.name,
         surname: e.surname,
         patronymic: e.patronymic,
@@ -56,6 +57,7 @@ export function IReviewToReviewObject(e: IReview): ReviewObject {
 export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
     return {
         id: String(e._id),
+        fullName: e.fullName,
         name: e.name,
         surname: e.surname,
         patronymic: e.patronymic,

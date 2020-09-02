@@ -21,6 +21,10 @@ const UserSchema = new Schema({
     patronymic: {
         type: String,
     },
+    fullName: {
+        type: String,
+        text: true,
+    },
     photoUrl: {
         type: String,
     },
