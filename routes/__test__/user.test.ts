@@ -64,6 +64,7 @@ const sampleUser: UserObject = {
     createdAt: new Date(),
     lastActiveAt: new Date(),
     favourites: [],
+    fullName: "Иванов Иван Иванович",
 };
 
 // Used to simulate http requests

@@ -99,6 +99,7 @@ const sampleDoctor: DoctorObject = {
     isAdult: false,
     isChild: true,
     workPlan: EWorkPlan.Single,
+    fullName: "Иванов Иван Иванович",
 };
 
 const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
