@@ -73,10 +73,12 @@ const sampleDoctor: DoctorObject = {
     workPlan: EWorkPlan.Multiple,
     serviceExperience: 360,
     qualification: "first",
+    fullName: "Иванов Иван Иванович",
 };
 
 const secondSampleUser = {
     ...sampleDoctor,
+    fullName: "Егор Егоров Егорович",
     name: "Егор",
     surname: "Егоров",
     patronymic: "Егорович",
@@ -479,7 +481,7 @@ describe("Test Doctor services", () => {
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
-                fullName: sampleDoctor.surname + " " + sampleDoctor.patronymic,
+                fullName: `${sampleDoctor.surname} ${sampleDoctor.patronymic}`,
             };
 
             //* Act

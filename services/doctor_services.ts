@@ -365,7 +365,14 @@ class DoctorServices {
 
         //* FullName
         if (filter.fullName) {
-            queryFilter.fullName = { $regex: new RegExp(filter.fullName) };
+            queryFilter.fullName = {
+                $regex: new RegExp(
+                    filter.fullName
+                        .split(" ")
+                        .map((e) => `(?=.*${e})`)
+                        .join("")
+                ),
+            };
         }
 
         //* Speciality

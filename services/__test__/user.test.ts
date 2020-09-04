@@ -56,6 +56,7 @@ const sampleUser: UserObject = {
     createdAt: new Date(),
     lastActiveAt: new Date(),
     favourites: [], // will add later
+    fullName: "Иванов Иван Иванович",
 };
 
 describe("Test UserServices", () => {
@@ -570,6 +571,7 @@ describe("Test UserServices", () => {
                 createdAt: new Date(),
                 lastActiveAt: new Date(),
                 favourites: [], // will add later
+                fullName: "Баскова Вера Сергеевна",
             };
             const { _id } = await User.create(sampleUser);
             updated.id = String(_id);
