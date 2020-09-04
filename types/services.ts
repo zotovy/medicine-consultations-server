@@ -222,10 +222,11 @@ export enum ESpeciality {
     Venereologist = "Venereologist",
     Andrologist = "Andrologist",
     Cardiologist = "Cardiologist",
-    Pulmonologis = "Pulmonologis",
+    Pulmonologist = "Pulmonologist",
     Otolaryngologist = "Otolaryngologist",
     Orthopedist = "Orthopedist",
     Dentist = "Dentist",
+    Gastroenterologist = "Gastroenterologist",
 }
 
 /**

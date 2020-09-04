@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
 import encoder from "./encoder";
-import symptoms from "../types/sympthoms";
+import symptoms, { BodyParts } from "../types/sympthoms";
 
 // Used to process the http request
 const Router = express.Router();
@@ -136,6 +136,7 @@ Router.get("/doctors", async (req, res) => {
         "experience",
         "workPlan",
         "rating",
+        "bodyParts",
     ];
 
     const data = encoder.query(req.query, qKeys);
@@ -192,7 +193,7 @@ Router.get("/symptoms", async (req, res) => {
     const { bodyPart } = req.query;
 
     try {
-        if (Object.keys(symptoms).includes(bodyPart as string)) {
+        if (BodyParts.includes(bodyPart as string)) {
             return res.status(200).json({
                 success: true,
                 // @ts-ignore

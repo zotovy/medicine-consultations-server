@@ -1,3 +1,5 @@
+import { ESpeciality } from "./services";
+
 export const Belmo_na_glazu = {
     name: "Бельмо на глазу",
     description:
@@ -798,7 +800,7 @@ export const Astma = { name: "Астма" };
 export const Rak = { name: "Рак" };
 export const Tuberkulez = { name: "Туберкулез" };
 
-export default {
+const symptoms = {
     Глаза: [
         Belmo_na_glazu,
         Bol_v_veke,
@@ -948,7 +950,54 @@ export default {
         Shum_v_sertse_u_rebenka,
         Ekstrasistoliya,
     ],
-    "Мочеполовая система": [
+    "Мужская мочеполовая система": [
+        Bol_abdominalnaya,
+        Bol_analnaya,
+        Bol_v_verhnej_chasti_zhivota,
+        Bol_v_zheludke,
+        Bol_v_zheludke_posle_edy,
+        Bol_v_zheludke_u_detej,
+        Bol_v_zhivote,
+        Bol_v_zadnem_prohode,
+        Bol_v_kopchike,
+        Bol_v_levoj_chasti_zhivota,
+        Bol_v_oblasti_zheludka,
+        Bol_v_oblasti_zhivota,
+        Bol_v_pishhevode,
+        Bol_v_pupke,
+        Bol_v_yagoditsah,
+        Bol_vnizu_zhivota,
+        Bol_vnizu_zhivota_pri_beremennosti,
+        Bol_vnizu_zhivota_u_detej,
+        Bol_vyshe_pupka,
+        Vzvesi_v_okoloplodnyh_vodah,
+        Vzdutie_zhivota,
+        Golod,
+        Dispepsiya,
+        Zhazhda_polidipsiya,
+        Zapor,
+        Izzhoga,
+        Ikota,
+        Kamni_v_pochkah,
+        Kashel_s_krovyu,
+        Kashel_s_mokrotoj,
+        Kolika,
+        Krovotechenie_pri_defekatsii,
+        Krov_v_stule,
+        Malovodie,
+        Meteorizm_gazy,
+        Mnogovodie,
+        Narushenie_mezenterialnogo_krovoobrashheniya,
+        Narushenie_pishhevareniya,
+        Narushenie_platsentarnoe,
+        Ostrye_boli_v_zhivote,
+        Ponos_diareya,
+        Rasstrojstvo_zheludka,
+        Skoplenie_zhidkosti_v_bryushnoj_polosti,
+        Tyazhest_tyazhest_v_zheludke,
+        Urchit_v_zhivote_urchanie_v_zhivote,
+    ],
+    "Женская мочеполовая система": [
         Bol_abdominalnaya,
         Bol_analnaya,
         Bol_v_verhnej_chasti_zhivota,
@@ -1011,7 +1060,42 @@ export default {
         Snizhenie_sluha,
         Shum_v_ushah,
     ],
-    "Рот и горло": {
+    Рот: {
+        Bolit_zub,
+        Bol_v_desne,
+        Bol_v_yazyke,
+        Bol_vo_rtu,
+        Bruksizm,
+        Vospalenie_desen,
+        Geograficheskij_yazyk,
+        Gorech_vo_rtu,
+        Disgevziya_narushenie_vkusovogo_vospriyatiya,
+        Zaedy_treshhiny_v_ugolkah_rta,
+        Zapah_atsetona,
+        Zapah_izo_rta,
+        Kashel,
+        Krovotochivost_desen,
+        Lejkoplakiya_volosatyj_yazyk,
+        Nalet_na_yazyke,
+        Narushenie_zvukoproiznosheniya,
+        Narushenie_rechevogo_razvitiya,
+        Narushenie_rechi_fonetiko_fonematicheskoe,
+        Nepravilnyj_prikus,
+        Otryzhka,
+        Penistaya_mokrota,
+        Privkus_vo_rtu,
+        Pyatna_na_yazyke,
+        Rvota,
+        Rvota_s_krovyu_gematemezis,
+        Svishh,
+        Skrezhet_zubami,
+        Suhoj_kashel,
+        Suhost_vo_rtu,
+        Toshnota,
+        Hrap,
+        Chuvstvitelnost_zubov,
+    },
+    Горло: {
         Bolit_zub,
         Bol_v_desne,
         Bol_v_yazyke,
@@ -1218,4 +1302,40 @@ export default {
         Bol_v_grudnoy_kletle,
         Odushka_vo_vremya_vdoha,
     },
+};
+
+export default symptoms;
+
+export const BodyParts = Object.keys(symptoms);
+export enum EBodyParts {
+    "Глаза" = "Глаза",
+    "Голова" = "Голова",
+    "Мжуская мочеполовая система" = "Мужская мочеполовая система",
+    "Женская мочеполовая система" = "Женская мочеполовая система",
+    "Ухо" = "Ухо",
+    "Рот" = "Рот",
+    "Горло" = "Горло",
+    "Пищеварительная система" = "Пищеварительная система",
+    "Нога" = "Нога",
+    "Позвоночник" = "Позвоночник",
+    "Сердце" = "Сердце",
+    "Легкие" = "Легкие",
+}
+
+export const BodyPartsToSpecialities = {
+    Глаза: [ESpeciality.Ophthalmologist],
+    Голова: [ESpeciality.Neurologist],
+    "Мужская мочеполовая система": [
+        ESpeciality.Venereologist,
+        ESpeciality.Andrologist,
+    ],
+    "Женская мочеполовая система": [ESpeciality.Gynecologis],
+    Ухо: [ESpeciality.Otolaryngologist],
+    Рот: [ESpeciality.Dentist],
+    Горло: [ESpeciality.Pediatrician],
+    "Пищеварительная система": [ESpeciality.Gastroenterologist],
+    Нога: [ESpeciality.Orthopedist],
+    Позвоночник: [ESpeciality.Orthopedist],
+    Сердце: [ESpeciality.Cardiologist],
+    Легкие: [ESpeciality.Pulmonologist],
 };

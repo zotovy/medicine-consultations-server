@@ -32,6 +32,7 @@ import {
 } from "./types_services";
 import logger from "../logger";
 import { query } from "express";
+import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
 
 class DoctorServices {
     // ANCHOR: validate doctor
@@ -507,6 +508,25 @@ class DoctorServices {
 
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};
+
+        //* BodyParts
+        if (filter.bodyParts) {
+            const field = validateByEnum<EBodyParts>(
+                filter.bodyParts,
+                EBodyParts
+            );
+
+            if (field) {
+                config.speciality = [];
+                field.forEach(
+                    (e) =>
+                        // @ts-ignore
+                        (config.speciality = config.speciality?.concat(
+                            BodyPartsToSpecialities[e]
+                        ))
+                );
+            }
+        }
 
         //* FullName?
         if (typeof filter.fullName === "string") {
