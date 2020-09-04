@@ -4,9 +4,8 @@ import doctorServices from "../services/doctor_services";
 import { Types } from "mongoose";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
-import doctor from "../models/doctor";
-import { EDESTADDRREQ } from "constants";
 import encoder from "./encoder";
+import symptoms from "../types/sympthoms";
 
 // Used to process the http request
 const Router = express.Router();
@@ -184,6 +183,31 @@ Router.post("/doctor-request/send", async (req, res) => {
             success: false,
             error: response.error,
             message: response.message,
+        });
+    }
+});
+
+// ANCHOR: GET /symptoms
+Router.get("/symptoms", async (req, res) => {
+    const { bodyPart } = req.query;
+
+    try {
+        if (Object.keys(symptoms).includes(bodyPart as string)) {
+            return res.status(200).json({
+                success: true,
+                // @ts-ignore
+                symptoms: symptoms[bodyPart],
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                error: "invalid_body_part",
+            });
+        }
+    } catch (e) {
+        return res.status(500).json({
+            success: false,
+            error: "invalid_error",
         });
     }
 });

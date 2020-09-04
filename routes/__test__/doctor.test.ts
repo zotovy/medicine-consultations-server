@@ -470,4 +470,216 @@ describe("Test Doctor API", () => {
         });
     });
     // /SECTION
+
+    // SECTION: GET /symptoms
+    describe("POST /symptoms", () => {
+        // ANCHOR: should get all eye data
+        test("should get all eye data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Глаза",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all head data
+        test("should get all head data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Голова",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all skin data
+        test("should get all skin data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Кожа",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all Urogenital system data
+        test("should get all Urogenital system data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Мочеполовая система",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all ears data
+        test("should get all ears data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Ухо",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all mouth and throat data
+        test("should get all mouth and throat data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Рот и горло",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all Digestive system data
+        test("should get all Digestive system data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Пищеварительная система",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all leg data
+        test("should get all leg data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Нога",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all nose data
+        test("should get all nose data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Нос",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all Spine data
+        test("should get all Spine data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Позвоночник",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all heart data
+        test("should get all heart data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Сердце",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all Lungs data
+        test("should get all Lungs data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Легкие",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get data
+        test("should get data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "123",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.symptoms).toBeUndefined();
+            done();
+        });
+    });
+    // /SECTION
 });

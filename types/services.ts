@@ -216,6 +216,16 @@ export enum ESpeciality {
     Logopedist = "Logopedist",
     Nutritionist = "Nutritionist",
     Allergist = "Allergist",
+    Ophthalmologist = "Ophthalmologist",
+    Neurologist = "Neurologist",
+    Gynecologis = "Gynecologis",
+    Venereologist = "Venereologist",
+    Andrologist = "Andrologist",
+    Cardiologist = "Cardiologist",
+    Pulmonologis = "Pulmonologis",
+    Otolaryngologist = "Otolaryngologist",
+    Orthopedist = "Orthopedist",
+    Dentist = "Dentist",
 }
 
 /**
