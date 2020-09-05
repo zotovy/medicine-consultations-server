@@ -164,6 +164,7 @@ Router.get("/doctors", async (req, res) => {
                 speciality: e.speciality,
                 surname: e.surname,
                 age: e.age,
+                id: e.id,
             }));
         }
 
