@@ -521,11 +521,27 @@ describe("Test Doctor API", () => {
             done();
         });
 
-        // ANCHOR: should get all Urogenital system data
+        // ANCHOR: should get all Man urogenital system data
         test("should get all Urogenital system data", async (done) => {
             //* Act
             const response = await request.get(`/api/symptoms`).query({
-                bodyPart: "Мочеполовая система",
+                bodyPart: "Мужская мочеполовая система",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all Woman urogenital system data
+        test("should get all Urogenital system data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Женская мочеполовая система",
             });
             const status = response.status;
             const data = JSON.parse(response.text);
@@ -553,11 +569,27 @@ describe("Test Doctor API", () => {
             done();
         });
 
-        // ANCHOR: should get all mouth and throat data
+        // ANCHOR: should get all mouth data
         test("should get all mouth and throat data", async (done) => {
             //* Act
             const response = await request.get(`/api/symptoms`).query({
-                bodyPart: "Рот и горло",
+                bodyPart: "Рот",
+            });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(200);
+            expect(data.success).toEqual(true);
+            expect(typeof data.symptoms).toEqual("object");
+            done();
+        });
+
+        // ANCHOR: should get all throat data
+        test("should get all mouth and throat data", async (done) => {
+            //* Act
+            const response = await request.get(`/api/symptoms`).query({
+                bodyPart: "Горло",
             });
             const status = response.status;
             const data = JSON.parse(response.text);

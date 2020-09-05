@@ -117,6 +117,18 @@ export interface DoctorObject extends UserObject {
 }
 
 /**
+ * Doctor tile interface model
+ */
+export interface DoctorTile {
+    name: string;
+    surname: string;
+    speciality: string[];
+    age?: number;
+    photoUrl: string;
+    rating: number;
+}
+
+/**
  *  Consultation model interface
  */
 export interface IConsultation extends Document {

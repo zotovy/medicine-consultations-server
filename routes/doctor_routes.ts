@@ -6,6 +6,7 @@ import logger from "../logger";
 import { ServerError } from "../types/errors";
 import encoder from "./encoder";
 import symptoms, { BodyParts } from "../types/sympthoms";
+import { DoctorObject, DoctorTile } from "../types/models";
 
 // Used to process the http request
 const Router = express.Router();
@@ -149,7 +150,22 @@ Router.get("/doctors", async (req, res) => {
     }
 
     try {
-        let doctors = await doctorServices.getAll(data, data.from, data.amount);
+        let doctors: any = await doctorServices.getAll(
+            data,
+            data.from,
+            data.amount
+        );
+
+        if (req.query.type === "tile") {
+            doctors = doctors.map((e: DoctorObject) => ({
+                name: e.name,
+                photoUrl: e.photoUrl,
+                rating: e.rating,
+                speciality: e.speciality,
+                surname: e.surname,
+                age: e.age,
+            }));
+        }
 
         return res.status(200).json({
             success: true,
