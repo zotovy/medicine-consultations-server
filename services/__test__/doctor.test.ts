@@ -14,6 +14,7 @@ import {
     IBecomeDoctorToBecomeDoctorObj,
 } from "../types_services";
 import doctor_services from "../doctor_services";
+import setupModels from "../../models";
 import { EWorkPlan, ESpeciality, EWorkExperience } from "../../types/services";
 
 /**
@@ -94,6 +95,8 @@ const secondSampleUser = {
     isChild: undefined,
     isAdult: undefined,
 };
+
+setupModels();
 
 describe("Test Doctor services", () => {
     let db: mongoose.Mongoose;
