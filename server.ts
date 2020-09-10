@@ -32,13 +32,13 @@ if (process.env.MODE === "testing") {
     }
 }
 
+import setupModels from "./models";
 import express from "express";
 import * as Sentry from "@sentry/node";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import email_services from "./services/mail_services";
 
 // @types
 import { Server } from "http";
@@ -79,6 +79,7 @@ app.use("/static", express.static("static"));
 app.use(bodyParser.json());
 app.use("/api", ApiRouter);
 
+// todo
 app.get("/reset-password/:id", (req, res) => {
     return res.send(`<h1>your id is ${req.params.id}</h1>`);
 });
@@ -99,6 +100,8 @@ if (process.env.MODE === "fake") {
 if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"));
 }
+
+setupModels();
 
 let server: Server | undefined;
 

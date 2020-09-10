@@ -157,7 +157,7 @@ export interface ConsultationObject {
  * Review model interface
  */
 export interface IReview extends Document {
-    patiendId: string;
+    patientId: string;
     doctorId: string;
     content: string;
     point: number;
@@ -165,7 +165,7 @@ export interface IReview extends Document {
 }
 
 export interface ReviewObject {
-    patientId: IReview["patiendId"];
+    patientId: IReview["patientId"];
     doctorId: IReview["doctorId"];
     content: IReview["content"];
     point: IReview["point"];

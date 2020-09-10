@@ -1,6 +1,8 @@
 /// <reference path="../declaration/mongoose-extended-schema.d.ts" />
 
-import { Types, QueryCursor } from "mongoose";
+import { Types } from "mongoose";
+import User from "../models/user";
+import Review from "../models/review";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 
 // types
@@ -31,10 +33,19 @@ import {
     validateByEnum,
 } from "./types_services";
 import logger from "../logger";
-import { query } from "express";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
 
 class DoctorServices {
+    // constructor() {
+    //     Review.create({
+    //         patientId: "123456789101",
+    //         doctorId: "5f44c05f2c5c2939e09994a3",
+    //         content: "This is my contexst",
+    //         point: 3,
+    //         timestamp: new Date(),
+    //     });
+    // }
+
     // ANCHOR: validate doctor
     validate = async (
         doctor: any,
@@ -334,7 +345,17 @@ class DoctorServices {
             };
         }
 
-        const doctor: IDoctor | null = await Doctor.findById(id);
+        const doctor: IDoctor | null = await Doctor.findById(id).populate({
+            path: "clientsReviews",
+            populate: {
+                path: "patientId",
+                select: {
+                    name: 1,
+                    surname: 1,
+                    photoUrl: 1,
+                },
+            },
+        });
 
         if (!doctor) {
             logger.w(`No doctor found, id=${id}`);

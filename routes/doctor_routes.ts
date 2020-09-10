@@ -140,6 +140,8 @@ Router.get("/doctors", async (req, res) => {
         "bodyParts",
     ];
 
+    JSON.stringify({});
+
     const data = encoder.query(req.query, qKeys);
 
     if (typeof data.from !== "number") {

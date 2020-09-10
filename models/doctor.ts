@@ -72,9 +72,9 @@ const Doctor = extendedSchema(User.schema, {
         {
             type: mongoose.Types.ObjectId,
             ref: "Review",
-            required: true,
         },
     ],
+
     clientsConsultations: [
         {
             type: mongoose.Types.ObjectId,

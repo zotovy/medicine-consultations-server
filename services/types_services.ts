@@ -45,7 +45,7 @@ export function IReviewToReviewObject(e: IReview): ReviewObject {
     return {
         content: e.content,
         doctorId: e.doctorId,
-        patientId: e.patiendId,
+        patientId: e.patientId,
         point: e.point,
         timestamp: e.timestamp,
     };

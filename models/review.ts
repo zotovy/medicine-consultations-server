@@ -1,13 +1,15 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { IReview } from "../types/models";
 
 const Review = new Schema({
     patientId: {
-        type: String,
+        type: Types.ObjectId,
+        ref: "User",
         required: true,
     },
     doctorId: {
-        type: String,
+        type: Types.ObjectId,
+        ref: "Doctor",
         required: true,
     },
     content: {
