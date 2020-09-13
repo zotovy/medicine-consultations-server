@@ -7,7 +7,7 @@
         "start": "set MODE=production&&ts-node ./server.ts",
         "dev": "set MODE=dev&&ts-node-dev --respawn ./server.ts",
         "build": "tsc",
-        "test": "set MODE=testing&jest --detectOpenHandles --forceExit",
+        "test": "set MODE=testing&jest --detectOpenHandles --forceExit --coverage && coveralls < coverage/lcov.info",
         "fake": "set MODE=fake&&ts-node ./server.ts",
         "isolate": "ts-node-dev --respawn test.ts"
     },
@@ -55,6 +55,7 @@
         "@types/node": "^14.0.26",
         "@types/nodemailer": "^6.4.0",
         "@types/supertest": "^2.0.10",
+        "coveralls": "^3.1.0",
         "jest": "^26.1.0",
         "nodemon": "^2.0.4",
         "supertest": "^4.0.2",
