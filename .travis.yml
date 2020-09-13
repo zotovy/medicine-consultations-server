@@ -1,20 +1,16 @@
 language: node_js
 node_js:
-    - "stable"
-
+    - stable
 env:
     - MODE=testing
-
 services:
     - mongodb
-
 install: npm install
 script: npm test
-
 deploy:
     provider: heroku
     api_key:
-        secure: NQi6BBsnVoktGClw06dsyLP+btIZ+3iicS+El179qlKekvu/Z6hhWso68m6/bbs6Bk/ADcKllEFyMPkKIyod62MIApTz48sWk2poGFAixFSoz7cOnemzgRVDxyjnk2oLhsApbjwaYT4mlkPuHFEdGQjR7ajxzU1+n/hjCJGyY1VZ5fTMi190MWcCR7h6anhDnhrb8KwCBsr0Wx6NzhimqwrhCA+C21+dUFEP2qH0HLsBxscjlUVjyqrSvAN0a5JINW24J9BvxZSM9/sxq2/paNLnhQt2epCmvXDVT5eF74e/ajHIdCj9GMXF4n0VTIF3VSfT/qUMaaFfebPPdn5pR+MVoPC9DbpvthigDEBu11n87dxsgx4b3iyorM7ZM4nNnjZiCKXsFbdOvBbpCrfLSMFHSk2I9Kru0QaCSt87OY7cAyZbq0geOUbxjYqlF+Nyg0zUG5ZjEP/5/FDpYvCOWY8I9VjmF3eB4BauE6tRy58Ku6XpzO+L9PRTYiSZBu26d66hE2bzBU0Abq5bJZ3sXUxg5EPeVsVkN1MWoBY4aPSJ+095clzYDWO+pT4Y8Intam3VK72iAhBZOEKSy/iMQQi+CLfGcz0f7MuDvJIdhr5Y9ywe3jWw60o8jGMOE/m2IeMAMk7FUHyPflIQpTo/gDsFrLBD5tULmQOYieGANAo=
+        secure: bkn7g5DuyJiFX3Y5A28H1lA+jBaLVSpiK0IDmFGbrBnUvB8apO/tAlxL33PEq5XeEC04medhVxLTi6G2v2ZvPFEHmuEtgy9g3eKHLfvikwhPe4IicjHExwqX0z9YwxeTow1g58jA82TwzzjFImaUSvOLZh0NRkhsJMkttU+zXZM+9UglCJi2snDQIbA0wr/SZ/wo54aOICuUuOURhJ3H+CgnPZbl3C0/buzs5I3K++Mv9w2PFTjD0AWVUPGhrfmTOrXFk+bck1p+Ysc/GIBregjIGiYeJsuUrL2+O0ZHyICUAmlBuxp+cLhGczxC8zjUzbqQziVts5AbNwzvChy1gJQNtUbP9y1l1C1T2zK8fLdj7Z9qRRLLMim0toBEMkQiKoNmRL+BmAmg8pi7SYTKJ93dkuZAgXaCcxhvPoaJ0GwWItJmZ0o8h4fGbih6k8rmQKJyGEx+3M1Y/uXQ66MqX8nicNWLXn8MblddW+fodhVfFhClP1RJxcppRHO2QbjTGtDawJbfRP5z9FGFzM0yQ2nj0DJjTGq1Sw/osLJCgYG5mP+rfyyR58Q7ypx77YyIfzz+shxO7lHi673s9Lzy69AV5vCBqAq1A6edcxG3YDrA3hUmwQ5YSq5j23E2zi2DqAZSqda86Vf5XLQ8BRk6Do7hZEICmQhvzyn+0D8FLgA=
     app: medicine-consultation-server
     on:
         only:
