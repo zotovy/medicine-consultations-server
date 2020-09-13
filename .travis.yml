@@ -16,5 +16,7 @@ deploy:
     api_key:
         secure: NQi6BBsnVoktGClw06dsyLP+btIZ+3iicS+El179qlKekvu/Z6hhWso68m6/bbs6Bk/ADcKllEFyMPkKIyod62MIApTz48sWk2poGFAixFSoz7cOnemzgRVDxyjnk2oLhsApbjwaYT4mlkPuHFEdGQjR7ajxzU1+n/hjCJGyY1VZ5fTMi190MWcCR7h6anhDnhrb8KwCBsr0Wx6NzhimqwrhCA+C21+dUFEP2qH0HLsBxscjlUVjyqrSvAN0a5JINW24J9BvxZSM9/sxq2/paNLnhQt2epCmvXDVT5eF74e/ajHIdCj9GMXF4n0VTIF3VSfT/qUMaaFfebPPdn5pR+MVoPC9DbpvthigDEBu11n87dxsgx4b3iyorM7ZM4nNnjZiCKXsFbdOvBbpCrfLSMFHSk2I9Kru0QaCSt87OY7cAyZbq0geOUbxjYqlF+Nyg0zUG5ZjEP/5/FDpYvCOWY8I9VjmF3eB4BauE6tRy58Ku6XpzO+L9PRTYiSZBu26d66hE2bzBU0Abq5bJZ3sXUxg5EPeVsVkN1MWoBY4aPSJ+095clzYDWO+pT4Y8Intam3VK72iAhBZOEKSy/iMQQi+CLfGcz0f7MuDvJIdhr5Y9ywe3jWw60o8jGMOE/m2IeMAMk7FUHyPflIQpTo/gDsFrLBD5tULmQOYieGANAo=
     app: medicine-consultation-server
-    only:
-        branch: master
+    on:
+        only:
+            branch:
+                - master
