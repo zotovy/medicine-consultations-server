@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import User from "../../models/user";
 import { RefreshToken } from "../../models/tokens";
 import app, { server } from "../../server";
-import setupModels from "../../models";
 
 // @types
 import { UserObject } from "../../types/models";
@@ -40,8 +39,6 @@ process.env.jwt_refresh = "test-refresh-string";
 process.env.mail = "healty-mountain-testing@mail.ru";
 process.env.mailPassword = "321dsa321";
 process.env.mailService = "Mail.ru";
-
-setupModels();
 
 // Fix @types
 declare function done(): any;

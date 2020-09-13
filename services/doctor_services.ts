@@ -354,6 +354,10 @@ class DoctorServices {
                     surname: 1,
                     photoUrl: 1,
                 },
+                options: {
+                    limit: 4, // todo
+                    sort: { created: -1 },
+                },
             },
         });
 
