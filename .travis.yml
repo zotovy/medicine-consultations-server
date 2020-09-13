@@ -11,4 +11,7 @@ install: npm install
 services:
     - mongodb
 
+env:
+    - MODE=testing
+
 script: npm test

@@ -524,7 +524,7 @@ class DoctorServices {
         }
     };
 
-    // ANCHOR: handle кaw get all filter
+    // ANCHOR: handle raw get all filter
     handleRawGetAllFilter = (filter: any): IGetDoctorsFilter => {
         if (typeof filter !== "object" || !filter) {
             // TYPE_ERROR or EMPTY_FILTER_RESPONSE
