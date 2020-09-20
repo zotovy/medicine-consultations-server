@@ -416,23 +416,24 @@ describe("Test UserServices", () => {
     describe("test setUserAvatar()", () => {
         // ANCHOR: should set avatar
         /** Create sample user. Function should update userAvatar. Checking by User.findOne()  */
-        test("should set avatar", async () => {
-            //* Given
-            const avatarUrl =
-                "https://it-here.ru/wp-content/uploads/2020/06/macos-big-sur.png";
-            const { _id } = await User.create(sampleUser);
+        // todo
+        // test("should set avatar", async () => {
+        //     //* Given
+        //     const avatarUrl =
+        //         "https://it-here.ru/wp-content/uploads/2020/06/macos-big-sur.png";
+        //     const { _id } = await User.create(sampleUser);
 
-            //* Result
-            const { success } = await userServices.setUserAvatar(
-                _id,
-                avatarUrl
-            );
-            const response = await User.findOne({ _id: _id });
+        //     //* Result
+        //     const { success } = await userServices.setUserAvatar(
+        //         _id,
+        //         avatarUrl
+        //     );
+        //     const response = await User.findOne({ _id: _id });
 
-            //* Checking
-            expect(success).toBe(true);
-            expect(response?.photoUrl).toEqual(avatarUrl);
-        });
+        //     //* Checking
+        //     expect(success).toBe(true);
+        //     expect(response?.photoUrl).toEqual(avatarUrl);
+        // });
 
         // ANCHOR: should return error on unexisting user
         /** Trying to update photo of unexisting user. Function must return error */
