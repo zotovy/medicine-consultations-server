@@ -646,7 +646,8 @@ class DoctorServices {
         return config;
     };
 
-    // ANCHOR: get by symptoms
+    // ANCHOR: offer consultation
+    
 
     // ! This's using only for testing. DO NOT USE FOR PRODUCTION
     testHandleRawGetAllFilter = (

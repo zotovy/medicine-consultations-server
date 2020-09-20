@@ -28,10 +28,7 @@ const UserSchema = new Schema({
     photoUrl: {
         type: String,
     },
-    phone: {
-        required: false,
-        type: Number,
-    },
+    phone: Number,
     email: {
         type: String,
         required: reqiredField,

@@ -106,6 +106,8 @@ setupModels();
 let server: Server | undefined;
 
 const main = async () => {
+    if (process.env.MODE === "testing") return;
+
     try {
         console.log(process.env.mongodb_url);
 

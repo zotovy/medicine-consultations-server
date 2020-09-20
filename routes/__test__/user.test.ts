@@ -4,7 +4,6 @@ import supertest from "supertest";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import User from "../../models/user";
-import { RefreshToken } from "../../models/tokens";
 import app, { server } from "../../server";
 
 // @types
@@ -98,7 +97,7 @@ describe("Test user routes", () => {
     // Close MongodDB connection after all test cases have done
     afterAll(async (done) => {
         // await User.remove({});
-        db.connection.dropDatabase();
+        // db.connection.dropDatabase();
         server?.close();
         done();
     });

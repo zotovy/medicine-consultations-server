@@ -333,3 +333,35 @@ export interface ResetPasswordRequestObject {
     userId: IResetPasswordRequest["userId"];
     timestamp: IResetPasswordRequest["timestamp"];
 }
+
+//========================================================================================
+/*                                                                                      *
+ *                                        PAYMENT                                       *
+ *                                                                                      */
+//========================================================================================
+
+export interface IConsPayment extends Document {
+    status: string;
+    consultationId?: Types.ObjectId;
+    paymentId: string;
+    doctorId: Types.ObjectId;
+    userId: Types.ObjectId;
+    amount: number;
+    info: string;
+    createdAt: Date;
+    payAt?: Date;
+    canceledAt?: Date;
+}
+
+export interface ConsPaymentObj {
+    status: "waiting" | "success" | "canceled";
+    consultationId?: IConsPayment["consultationId"];
+    paymentId: IConsPayment["paymentId"];
+    doctorId: IConsPayment["doctorId"];
+    userId: IConsPayment["userId"];
+    amount: IConsPayment["amount"];
+    info: IConsPayment["info"];
+    createdAt: IConsPayment["createdAt"];
+    payAt?: IConsPayment["payAt"];
+    canceledAt?: IConsPayment["canceledAt"];
+}

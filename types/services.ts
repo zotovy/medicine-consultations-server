@@ -1,3 +1,4 @@
+import ajv from "ajv";
 // @types
 import {
     UserObject,
@@ -479,3 +480,35 @@ export type TSubmitBecomeDoctorRequests = {
 export type TCheckAccessToken = boolean;
 
 export type TCheckRefreshToken = boolean;
+
+//========================================================================================
+/*                                                                                      *
+ *                                        PAYMENT                                       *
+ *                                                                                      */
+//========================================================================================
+
+export const PayRequestValidationSchema = {
+    required: ["doctorId", "userId", "amount"],
+    properties: {
+        doctorId: {
+            type: "string",
+            minLength: 12,
+            maxLength: 24,
+        },
+        userId: {
+            type: "string",
+            minLength: 12,
+            maxLength: 24,
+        },
+        amount: {
+            type: "integer",
+            minimum: 500,
+        },
+    },
+};
+
+export type TPayReq = {
+    success: boolean;
+    error?: string;
+    url?: string;
+};

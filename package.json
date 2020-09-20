@@ -26,6 +26,7 @@
     "homepage": "https://github.com/PandaDEVoper/medicine-consultations-server#readme",
     "dependencies": {
         "@sentry/node": "^5.20.1",
+        "ajv": "^6.12.5",
         "colors": "^1.4.0",
         "connect": "^3.7.0",
         "cors": "^2.8.5",
@@ -44,6 +45,7 @@
         "react-protected-route-component": "^0.1.1"
     },
     "devDependencies": {
+        "@types/ajv": "^1.0.0",
         "@types/cors": "^2.8.6",
         "@types/express": "^4.17.7",
         "@types/express-rate-limit": "^5.0.0",
