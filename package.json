@@ -9,7 +9,8 @@
         "build": "tsc",
         "test": "set MODE=testing&jest --detectOpenHandles --forceExit --coverage && coveralls < coverage/lcov.info",
         "fake": "set MODE=fake&&ts-node ./server.ts",
-        "isolate": "ts-node-dev --respawn test.ts"
+        "isolate": "ts-node-dev --respawn test.ts",
+        "heroku-postbuild": "npm i -G ts-node"
     },
     "repository": {
         "type": "git",
