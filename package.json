@@ -4,13 +4,13 @@
     "description": "web server for medecine consulation app",
     "main": "server.ts",
     "scripts": {
-        "start": "set MODE=production&&ts-node ./server.ts",
+        "start": "set MODE=production&&node ./build/server.js",
         "dev": "set MODE=dev&&ts-node-dev --respawn ./server.ts",
         "build": "tsc",
         "test": "set MODE=testing&jest --detectOpenHandles --forceExit --coverage && coveralls < coverage/lcov.info",
         "fake": "set MODE=fake&&ts-node ./server.ts",
         "isolate": "ts-node-dev --respawn test.ts",
-        "heroku-postbuild": "npm i -G ts-node"
+        "postinstall": "npm run build"
     },
     "repository": {
         "type": "git",
