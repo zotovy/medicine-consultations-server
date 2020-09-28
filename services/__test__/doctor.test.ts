@@ -15,7 +15,7 @@ import {
 } from "../types_services";
 import doctor_services from "../doctor_services";
 import setupModels from "../../models";
-import { EWorkPlan, ESpeciality, EWorkExperience } from "../../types/services";
+import { EWorkPlan, EWorkExperience } from "../../types/services";
 
 /**
  *  ? This test module testing doctor services
@@ -105,7 +105,7 @@ describe("Test Doctor services", () => {
     // By using mongoose.connect
     beforeAll(async () => {
         db = await mongoose.connect(
-            "mongodb://localhost/db",
+            "mongodb://localhost/test-db",
             {
                 useNewUrlParser: true,
                 useCreateIndex: true,

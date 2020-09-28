@@ -512,3 +512,32 @@ export type TPayReq = {
     error?: string;
     url?: string;
 };
+
+//========================================================================================
+/*                                                                                      *
+ *                                     CONSULTATION                                     *
+ *                                                                                      */
+//========================================================================================
+
+export const ConsultationValidationSchema = {
+    required: ["patientId", "doctorId", "date"],
+    properties: {
+        patientId: {
+            type: "string",
+            pattern: "^[a-f\\d]{24}$",
+        },
+        doctorId: {
+            type: "string",
+            pattern: "^[a-f\\d]{24}$",
+        },
+        date: {
+            type: "string",
+            maxLength: 128,
+            format: "date-time",
+        },
+        note: {
+            type: "string",
+            maxLength: 2056,
+        },
+    },
+};

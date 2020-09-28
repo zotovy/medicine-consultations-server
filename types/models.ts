@@ -133,23 +133,15 @@ export interface DoctorTile {
  */
 export interface IConsultation extends Document {
     patientId: string;
-    patientName: string;
     doctorId: string;
-    doctorName: string;
-    doctorPhotoUrl: string;
-    doctorSpecialty: string;
     date: string;
     note?: string;
 }
 
 export interface ConsultationObject {
     patientId: IConsultation["patientId"];
-    patientName: IConsultation["patientName"];
     doctorId: IConsultation["doctorId"];
-    doctorName: IConsultation["doctorName"];
-    doctorPhotoUrl: IConsultation["doctorPhotoUrl"];
-    doctorSpecialty: IConsultation["doctorSpecialty"];
-    date: IConsultation["date"];
+    date: Date;
     note?: IConsultation["note"];
 }
 

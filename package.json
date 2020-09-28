@@ -10,7 +10,8 @@
         "test": "set MODE=testing&jest --detectOpenHandles --forceExit --coverage && coveralls < coverage/lcov.info",
         "fake": "set MODE=fake&&ts-node ./server.ts",
         "isolate": "ts-node-dev --respawn test.ts",
-        "postinstall": "npm run build"
+        "postinstall": "npm run build",
+        "sandbox": "set MODE=dev&&ts-node-dev --respawn ./sandbox.ts"
     },
     "repository": {
         "type": "git",

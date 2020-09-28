@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { IConsultation } from "../types/models";
 
 const requiredField = [true, "required_error"];
 
@@ -12,11 +13,6 @@ const Consultation = new Schema({
         type: String,
         required: requiredField,
     },
-
-    doctorSpecialty: {
-        type: String,
-        required: requiredField,
-    },
     date: {
         type: Date,
         required: requiredField,
@@ -26,4 +22,4 @@ const Consultation = new Schema({
     },
 });
 
-export default model("Consultation", Consultation);
+export default model<IConsultation>("Consultation", Consultation);
