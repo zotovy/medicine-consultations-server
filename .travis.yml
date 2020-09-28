@@ -7,12 +7,3 @@ services:
     - mongodb
 install: npm install
 script: npm test
-deploy:
-    provider: heroku
-    api_key:
-        secure: bkn7g5DuyJiFX3Y5A28H1lA+jBaLVSpiK0IDmFGbrBnUvB8apO/tAlxL33PEq5XeEC04medhVxLTi6G2v2ZvPFEHmuEtgy9g3eKHLfvikwhPe4IicjHExwqX0z9YwxeTow1g58jA82TwzzjFImaUSvOLZh0NRkhsJMkttU+zXZM+9UglCJi2snDQIbA0wr/SZ/wo54aOICuUuOURhJ3H+CgnPZbl3C0/buzs5I3K++Mv9w2PFTjD0AWVUPGhrfmTOrXFk+bck1p+Ysc/GIBregjIGiYeJsuUrL2+O0ZHyICUAmlBuxp+cLhGczxC8zjUzbqQziVts5AbNwzvChy1gJQNtUbP9y1l1C1T2zK8fLdj7Z9qRRLLMim0toBEMkQiKoNmRL+BmAmg8pi7SYTKJ93dkuZAgXaCcxhvPoaJ0GwWItJmZ0o8h4fGbih6k8rmQKJyGEx+3M1Y/uXQ66MqX8nicNWLXn8MblddW+fodhVfFhClP1RJxcppRHO2QbjTGtDawJbfRP5z9FGFzM0yQ2nj0DJjTGq1Sw/osLJCgYG5mP+rfyyR58Q7ypx77YyIfzz+shxO7lHi673s9Lzy69AV5vCBqAq1A6edcxG3YDrA3hUmwQ5YSq5j23E2zi2DqAZSqda86Vf5XLQ8BRk6Do7hZEICmQhvzyn+0D8FLgA=
-    app: medicine-consultation-server
-    on:
-        only:
-            branch:
-                - master

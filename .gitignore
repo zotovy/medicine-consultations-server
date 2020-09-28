@@ -4,3 +4,4 @@ node_modules
 logs
 /build/
 sandbox.ts
+coverage
