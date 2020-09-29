@@ -575,7 +575,7 @@ class UserServices {
     /**
      * Update received  user with the same id
      */
-    async updateUser(newUser: UserObject): Promise<TUpdateUser> {
+    async updateUser(newUser: any): Promise<TUpdateUser> {
         // Check received user
         const responce = await this.validateUser(newUser, false);
 

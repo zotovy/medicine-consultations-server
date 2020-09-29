@@ -9,6 +9,8 @@ import {
     IBecomeDoctor,
     IAdmin,
     AdminObj,
+    IConsultation,
+    ConsultationObject,
 } from "../types/models";
 import { EWorkPlan } from "../types/services";
 
@@ -38,6 +40,7 @@ export function IUserToUserObj(e: IUser): UserObject {
         lastActiveAt: e.lastActiveAt,
         favourites: [...e.favourites],
         age: e.age,
+        activeConsultation: [...e.activeConsultation],
     };
 }
 
@@ -104,6 +107,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
             : undefined,
         serviceExperience: e.serviceExperience,
         qualification: e.qualification,
+        activeConsultation: [...e.activeConsultation],
     };
 }
 /**
@@ -213,3 +217,14 @@ export function validateByEnum<E>(array: any, e: any): Array<E> | undefined {
 
     return undefined;
 }
+
+export const IConsultationToConsultationObj = (
+    e: IConsultation
+): ConsultationObject => {
+    return {
+        date: e.date,
+        doctorId: e.doctorId,
+        patientId: e.patientId,
+        note: e.note,
+    };
+};

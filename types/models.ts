@@ -60,7 +60,7 @@ export interface UserObject {
     lastActiveAt: IUser["lastActiveAt"];
     favourites: mongoose.Types.ObjectId[];
     age?: IUser["age"];
-    activeConsultation: mongoose.Types.ObjectId[] | ConsultationObject[];
+    activeConsultation: mongoose.Types.ObjectId[];
 }
 
 /**
@@ -136,14 +136,14 @@ export interface DoctorTile {
 export interface IConsultation extends Document {
     patientId: string;
     doctorId: string;
-    date: string;
+    date: Date;
     note?: string;
 }
 
 export interface ConsultationObject {
     patientId: IConsultation["patientId"];
     doctorId: IConsultation["doctorId"];
-    date: Date;
+    date: IConsultation["date"];
     note?: IConsultation["note"];
 }
 

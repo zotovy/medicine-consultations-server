@@ -1,3 +1,5 @@
+/// <reference path="../declaration/mongoose-extended-schema.d.ts" />
+
 import mongoose, { model, Schema } from "mongoose";
 import extendedSchema from "mongoose-extend-schema";
 

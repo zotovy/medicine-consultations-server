@@ -39,6 +39,9 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import socketio from "socket.io";
+import http from "http";
+import SocketServices from "./services/socket_services";
 
 // @types
 import { Server } from "http";
@@ -57,6 +60,7 @@ const appLimitter = rateLimit({
 // Create app
 const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
+const io = socketio(http.createServer(app));
 
 // Config sentry
 if (process.env.MODE === "production") {
@@ -120,6 +124,8 @@ const main = async () => {
         const db = mongoose.connection;
         console.log("successfully connect to db");
 
+        new SocketServices();
+
         // catch error
         db.on("error", (error: Error) => console.log(error));
 
@@ -137,4 +143,4 @@ const main = async () => {
 main();
 
 export default app;
-export { server };
+export { server, io };
