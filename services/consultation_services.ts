@@ -27,6 +27,11 @@ class ConsultationServices {
         const { _id } = await Consultation.create(raw).catch(throwInvalidError);
         return String(_id);
     };
+
+    connect = async (
+        consultationId: string,
+        userId: string
+    ): Promise<boolean> => {};
 }
 
 export default new ConsultationServices();

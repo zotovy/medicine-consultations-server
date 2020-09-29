@@ -102,6 +102,12 @@ const UserSchema = new Schema({
             ref: "Doctor",
         },
     ],
+    activeConsultations: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Consultation",
+        },
+    ],
 });
 
 export default model<IUser>("User", UserSchema);
