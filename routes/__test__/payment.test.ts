@@ -60,6 +60,7 @@ const sampleUser: UserObject = {
     lastActiveAt: new Date(),
     favourites: [],
     fullName: "Иванов Иван Иванович",
+    activeConsultations: [],
 };
 
 const sampleRequest = {
