@@ -80,6 +80,7 @@ const sampleDoctor: DoctorObject = {
     workPlan: EWorkPlan.Multiple,
     serviceExperience: 365,
     fullName: "Иванов Иван Иванович",
+    activeConsultations: [],
 };
 
 const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(

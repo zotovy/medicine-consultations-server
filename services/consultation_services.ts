@@ -1,5 +1,6 @@
 import Ajv from "ajv";
 import User from "../models/user";
+import { Socket } from "socket.io";
 import Doctor from "../models/doctor";
 import Consultation from "../models/consultation";
 import { ConsultationObject, IConsultation } from "../types/models";
@@ -8,6 +9,7 @@ import { IConsultationToConsultationObj } from "./types_services";
 import user_services from "./user_services";
 import { Types } from "mongoose";
 import consultation from "../models/consultation";
+import token_services from "./token_services";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -34,11 +36,21 @@ class ConsultationServices {
         return String(_id);
     };
 
-    connect = async (
-        consultationId: string,
-        userId: string,
-        isUser: boolean
-    ): Promise<boolean> => {
+    connect = async (socket: SocketIO.Socket): Promise<boolean> => {
+        const {
+            consultationId,
+            userId,
+            isUser,
+            accessToken,
+        } = socket.handshake.query;
+
+        const ok = await token_services.checkToken(
+            "jwt_access",
+            userId,
+            accessToken
+        );
+        if (!ok) throw "invalid_token";
+
         // Check is consultationId correct
         const consultation = await Consultation.findById(consultationId)
             .select("date -_id")
@@ -47,10 +59,11 @@ class ConsultationServices {
         // Throw error if no Consultation was found
         if (!consultation) throw "no_consultation_found_error";
 
-        const delta =
-            consultation.date.getUTCSeconds() - new Date().getUTCSeconds();
+        const delta = consultation.date.getTime() - new Date().getTime();
 
-        if (delta > 0 || delta > 10800) throw "time_error";
+        console.log("delta", delta);
+
+        if (delta > 0 || delta < -1.08e7) throw "time_error";
 
         if (isUser) {
             // Add ref to this consultation to user
@@ -58,11 +71,11 @@ class ConsultationServices {
                 { _id: userId },
                 {
                     $addToSet: {
-                        activeConsultations: [Types.ObjectId(userId)],
+                        activeConsultations: Types.ObjectId(userId),
                     },
                 },
                 (_, raw) => {
-                    if ((raw.nModified ?? 0) == 0) {
+                    if ((raw.n ?? 0) == 0) {
                         throw "no_user_found_error";
                     }
                 }
@@ -73,11 +86,11 @@ class ConsultationServices {
                 { _id: userId },
                 {
                     $addToSet: {
-                        activeConsultations: [Types.ObjectId(userId)],
+                        activeConsultations: Types.ObjectId(userId),
                     },
                 },
                 (_, raw) => {
-                    if ((raw.nModified ?? 0) === 0) {
+                    if ((raw.n ?? 0) === 0) {
                         throw "no_user_found_error";
                     }
                 }

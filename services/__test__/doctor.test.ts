@@ -75,6 +75,7 @@ const sampleDoctor: DoctorObject = {
     serviceExperience: 360,
     qualification: "first",
     fullName: "Иванов Иван Иванович",
+    activeConsultations: [],
 };
 
 const secondSampleUser = {

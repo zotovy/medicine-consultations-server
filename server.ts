@@ -60,7 +60,9 @@ const appLimitter = rateLimit({
 // Create app
 const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
-const io = socketio(http.createServer(app));
+const io = socketio(http.createServer(app), {
+    origins: "http://localhost:3000",
+});
 
 // Config sentry
 if (process.env.MODE === "production") {
@@ -134,6 +136,8 @@ const main = async () => {
             console.log(`server listening on localhost:${PORT}`);
             console.log(process.env.jwt_access);
         });
+
+        io.listen(server);
     } catch (e) {
         console.log(e);
     }

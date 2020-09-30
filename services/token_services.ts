@@ -214,10 +214,7 @@ class TokenServices {
             id = response?.id;
         }
 
-        // @ts-ignore
-        logger.i(response);
-
-        logger.i(key);
+        console.log("token ", token);
 
         if (!id) {
             return false;
@@ -242,7 +239,9 @@ class TokenServices {
 
         // console.info(key, adminId === id, adminId.length !== 0, founded);
 
-        logger.i(`Is ${key} token ok?:
+        logger.i(`Is ${key} token ok? ${
+            adminId === id && adminId.length !== 0 && founded.length === 1
+        }:
                   adminId === id: ${adminId === id}
                   adminId.length !== 0: ${adminId.length !== 0}
                   founded.length === 1: ${founded.length === 1}

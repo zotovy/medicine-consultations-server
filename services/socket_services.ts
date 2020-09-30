@@ -1,9 +1,15 @@
 import { io } from "../server";
+import consultation_services from "./consultation_services";
 
 class SocketServices {
     constructor() {
-        io.on("connection", (socket) => {
-            console.log(socket);
+        io.on("connection", async (socket) => {
+            await consultation_services
+                .connect(socket)
+                .then(() => io.to(socket.id).emit("success"))
+                .catch((e) => {
+                    io.to(socket.id).emit("error", e);
+                });
         });
     }
 }

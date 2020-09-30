@@ -40,7 +40,7 @@ export function IUserToUserObj(e: IUser): UserObject {
         lastActiveAt: e.lastActiveAt,
         favourites: [...e.favourites],
         age: e.age,
-        activeConsultation: [...e.activeConsultation],
+        activeConsultations: [...e.activeConsultations],
     };
 }
 
@@ -107,7 +107,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
             : undefined,
         serviceExperience: e.serviceExperience,
         qualification: e.qualification,
-        activeConsultation: [...e.activeConsultation],
+        activeConsultations: [...e.activeConsultations],
     };
 }
 /**

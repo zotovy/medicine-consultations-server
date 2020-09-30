@@ -1,5 +1,6 @@
 import { Router as Express } from "express";
 import consultation_services from "../services/consultation_services";
+import token_services from "../services/token_services";
 
 const Router = Express();
 

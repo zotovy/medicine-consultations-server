@@ -234,10 +234,11 @@ const tokenLimitter = rateLimitter({
     windowMs: 10 * 60 * 1000,
     max: 5, // 5 per 10 min
 });
+
 /**
  * This function generate new access & refresh token by receiver refresh token
  */
-Router.post("/token", tokenLimitter, async (req, res) => {
+Router.post("/token", async (req, res) => {
     const accessToken = req.body?.accessToken;
     const refreshToken = req.body?.refreshToken;
     const userId = req.body?.userId;
@@ -250,9 +251,11 @@ Router.post("/token", tokenLimitter, async (req, res) => {
         });
     }
 
-    const isOk =
-        (await userServices.checkRefreshToken(userId, refreshToken)) &&
-        (await userServices.checkAccessToken(userId, accessToken));
+    // const isOk =
+    //     (await userServices.checkRefreshToken(userId, refreshToken)) &&
+    //     (await userServices.checkAccessToken(userId, accessToken));
+
+    const isOk = await userServices.checkRefreshToken(userId, refreshToken);
 
     if (!isOk) {
         return res.status(400).json({
