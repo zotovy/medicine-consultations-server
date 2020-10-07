@@ -10,6 +10,7 @@ import user_services from "./user_services";
 import { Types } from "mongoose";
 import consultation from "../models/consultation";
 import token_services from "./token_services";
+import SocketServices from "./socket_services";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -49,55 +50,86 @@ class ConsultationServices {
             userId,
             accessToken
         );
+
         if (!ok) throw "invalid_token";
 
         // Check is consultationId correct
         const consultation = await Consultation.findById(consultationId)
             .select("date -_id")
             .exec();
+        ``;
 
         // Throw error if no Consultation was found
         if (!consultation) throw "no_consultation_found_error";
 
         const delta = consultation.date.getTime() - new Date().getTime();
 
-        console.log("delta", delta);
-
         if (delta > 0 || delta < -1.08e7) throw "time_error";
 
-        if (isUser) {
-            // Add ref to this consultation to user
-            await User.updateOne(
-                { _id: userId },
+        // Throw error if its not this user
+        if (isUser == "true") {
+            // Add ref to this consultation to doctor
+            await User.findByIdAndUpdate(
+                userId,
                 {
                     $addToSet: {
-                        activeConsultations: Types.ObjectId(userId),
+                        activeConsultations: Types.ObjectId(consultation._id),
                     },
                 },
                 (_, raw) => {
-                    if ((raw.n ?? 0) == 0) {
+                    if (!raw) {
                         throw "no_user_found_error";
                     }
                 }
             );
         } else {
             // Add ref to this consultation to doctor
-            await Doctor.updateOne(
-                { _id: userId },
+            await Doctor.findByIdAndUpdate(
+                userId,
                 {
                     $addToSet: {
-                        activeConsultations: Types.ObjectId(userId),
+                        activeConsultations: Types.ObjectId(consultation._id),
                     },
                 },
                 (_, raw) => {
-                    if ((raw.n ?? 0) === 0) {
+                    if (!raw) {
                         throw "no_user_found_error";
                     }
                 }
             );
         }
 
+        socket.join(`consultation-${consultationId}`);
+
+        socket.on("new_message", (message: string, userId: string) => {
+            Consultation.updateOne(
+                { _id: consultationId },
+                {
+                    $push: {
+                        messages: {
+                            user: userId,
+                            message: message,
+                        },
+                    },
+                },
+                (err: any, data: any) => {
+                    console.log(err, data);
+                }
+            );
+            this._onNewMessage(socket, message, consultationId);
+        });
+
         return true;
+    };
+
+    private _onNewMessage = (
+        socket: SocketIO.Socket,
+        message: string,
+        consultationId: string
+    ): void => {
+        socket
+            .to(`consultation-${consultationId}`)
+            .emit("new_message", message);
     };
 }
 

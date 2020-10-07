@@ -214,8 +214,6 @@ class TokenServices {
             id = response?.id;
         }
 
-        console.log("token ", token);
-
         if (!id) {
             return false;
         }
@@ -237,18 +235,16 @@ class TokenServices {
                 break;
         }
 
-        // console.info(key, adminId === id, adminId.length !== 0, founded);
-
-        logger.i(`Is ${key} token ok? ${
-            adminId === id && adminId.length !== 0 && founded.length === 1
-        }:
-                  adminId === id: ${adminId === id}
-                  adminId.length !== 0: ${adminId.length !== 0}
-                  founded.length === 1: ${founded.length === 1}
-                  `);
+        // logger.i(`Is ${key} token ok? ${
+        //     adminId === id && adminId.length !== 0 && founded.length === 1
+        // }:
+        //           adminId === id: ${adminId === id}
+        //           adminId.length !== 0: ${adminId.length !== 0}
+        //           founded.length === 1: ${founded.length >= 1}
+        //           `);
 
         // @ts-ignore
-        return adminId === id && adminId.length !== 0 && founded.length === 1;
+        return adminId === id && adminId.length !== 0 && founded.length >= 1;
     };
 }
 

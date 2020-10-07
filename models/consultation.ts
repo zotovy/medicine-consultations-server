@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { IConsultation } from "../types/models";
 
 const requiredField = [true, "required_error"];
@@ -20,6 +20,16 @@ const Consultation = new Schema({
     note: {
         type: String,
     },
+    messages: {
+        type: [{}],
+        default: [],
+    },
+    connected: [
+        {
+            type: Types.ObjectId,
+            ref: "User",
+        },
+    ],
 });
 
 export default model<IConsultation>("Consultation", Consultation);

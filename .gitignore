@@ -5,3 +5,4 @@ logs
 /build/
 sandbox.ts
 coverage
+/security/

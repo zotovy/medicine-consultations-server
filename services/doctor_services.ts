@@ -335,7 +335,10 @@ class DoctorServices {
     };
 
     // ANCHOR: get one
-    getOne = async (id: string | Types.ObjectId): Promise<TGetOneDoctor> => {
+    getOne = async (
+        id: string | Types.ObjectId,
+        populated = ""
+    ): Promise<TGetOneDoctor> => {
         if (!Types.ObjectId.isValid(id)) {
             logger.w(`Invalid Id were provide, id=${id}`);
             return {
@@ -347,18 +350,18 @@ class DoctorServices {
 
         const doctor: IDoctor | null = await Doctor.findById(id).populate({
             path: "clientsReviews",
-            populate: {
-                path: "patientId",
-                select: {
-                    name: 1,
-                    surname: 1,
-                    photoUrl: 1,
-                },
-                options: {
-                    limit: 4, // todo
-                    sort: { created: -1 },
-                },
-            },
+            // populate: {
+            //     path: "patientId",
+            //     select: {
+            //         name: 1,
+            //         surname: 1,
+            //         photoUrl: 1,
+            //     },
+            //     options: {
+            //         limit: 4, // todo
+            //         sort: { created: -1 },
+            //     },
+            // },
         });
 
         if (!doctor) {
@@ -647,7 +650,6 @@ class DoctorServices {
     };
 
     // ANCHOR: offer consultation
-    
 
     // ! This's using only for testing. DO NOT USE FOR PRODUCTION
     testHandleRawGetAllFilter = (

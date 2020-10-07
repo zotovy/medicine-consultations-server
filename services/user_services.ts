@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 // Modules
 import User from "../models/user";
+import Doctor from "../models/doctor";
 
 // Services
 import emailServices from "./mail_services";
@@ -21,7 +22,12 @@ import {
     TValidationErrorType,
     TResetPassword,
 } from "../types/services";
-import { IUser, UserObject, IResetPasswordRequest } from "../types/models";
+import {
+    IUser,
+    UserObject,
+    IResetPasswordRequest,
+    IDoctor,
+} from "../types/models";
 import { AccessToken, RefreshToken } from "../models/tokens";
 import token_services from "./token_services";
 import logger from "../logger";
@@ -88,7 +94,11 @@ class UserServices {
         email: string,
         password: string
     ): Promise<TCheckUserEmailAndPassword> {
-        const user: IUser | null = await User.findOne({ email });
+        let user: IUser | IDoctor | null = await User.findOne({ email });
+
+        if (!user) {
+            user = await Doctor.findOne({ email });
+        }
 
         // invalid email
         if (!user) {
@@ -253,6 +263,21 @@ class UserServices {
                         }
                     }
 
+                    const doctors = await Doctor.find({
+                        email: user.email,
+                    }).select("id");
+
+                    console.log(doctors);
+
+                    if (doctors.length != 0) {
+                        if (needUnique) {
+                            errors.email = ErrorType.UniqueError;
+                        } else {
+                            if (doctors[0].id !== user.id) {
+                                errors.email = ErrorType.UniqueError;
+                            }
+                        }
+                    }
                     // if (
                     //     (users.length != 0 && needUnique) ||
                     //     (users.length != 0 && users[0].id != user.id)

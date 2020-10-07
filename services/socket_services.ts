@@ -6,7 +6,9 @@ class SocketServices {
         io.on("connection", async (socket) => {
             await consultation_services
                 .connect(socket)
-                .then(() => io.to(socket.id).emit("success"))
+                .then(() => {
+                    io.to(socket.id).emit("success");
+                })
                 .catch((e) => {
                     io.to(socket.id).emit("error", e);
                 });

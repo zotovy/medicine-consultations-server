@@ -55,7 +55,7 @@ describe("Test Consultation services", () => {
 
     // Remove all date from mongodb after each test case
     afterEach(async () => {
-        await Consultation.deleteMany({});
+        await Consultation.remove({});
     });
 
     describe("create()", () => {

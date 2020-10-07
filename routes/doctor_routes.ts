@@ -96,7 +96,7 @@ Router.delete("/doctor/:id", async (req, res) => {
 
 // ANCHOR: GET /doctor/:id
 Router.get("/doctor/:id", async (req, res) => {
-    const id = req.params.id;
+    let { id } = req.params;
 
     if (!id || !Types.ObjectId.isValid(id)) {
         return res.status(400).json({

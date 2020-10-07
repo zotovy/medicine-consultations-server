@@ -33,18 +33,16 @@ if (process.env.MODE === "testing") {
 }
 
 import setupModels from "./models";
+import fs from "fs";
 import express from "express";
-import * as Sentry from "@sentry/node";
 import mongoose from "mongoose";
+import * as Sentry from "@sentry/node";
 import bodyParser from "body-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import socketio from "socket.io";
-import http from "http";
+import socketio, { listen } from "socket.io";
+import https from "https";
 import SocketServices from "./services/socket_services";
-
-// @types
-import { Server } from "http";
 
 import ApiRouter from "./routes/index";
 import FakeRouter from "./routes/fake_api_routes";
@@ -57,12 +55,15 @@ const appLimitter = rateLimit({
     max: 100, // Not more than 100 request in 10 seconds
 });
 
+// HTTPS optiosn
+const httpsOptions = {
+    key: fs.readFileSync("./security/cert.key"),
+    cert: fs.readFileSync("./security/cert.pem"),
+};
+
 // Create app
 const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
 const app = express();
-const io = socketio(http.createServer(app), {
-    origins: "http://localhost:3000",
-});
 
 // Config sentry
 if (process.env.MODE === "production") {
@@ -109,8 +110,6 @@ if (process.env.NODE_ENV === "production") {
 
 setupModels();
 
-let server: Server | undefined;
-
 const main = async () => {
     if (process.env.MODE === "testing") return;
 
@@ -126,18 +125,10 @@ const main = async () => {
         const db = mongoose.connection;
         console.log("successfully connect to db");
 
-        new SocketServices();
-
         // catch error
         db.on("error", (error: Error) => console.log(error));
 
-        // setup server listen
-        server = app.listen(PORT, "localhost", () => {
-            console.log(`server listening on localhost:${PORT}`);
-            console.log(process.env.jwt_access);
-        });
-
-        io.listen(server);
+        // io.listen(server);
     } catch (e) {
         console.log(e);
     }
@@ -146,5 +137,17 @@ const main = async () => {
 // run server
 main();
 
+// Listen server & setup socket.io
+const server = https
+    .createServer(httpsOptions, app)
+    .listen(PORT, () =>
+        console.log(`server listening on https://localhost:${PORT}`)
+    );
+const io = socketio(server, {
+    transports: ["websocket"],
+});
+
 export default app;
 export { server, io };
+
+new SocketServices();
