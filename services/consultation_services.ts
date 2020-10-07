@@ -11,6 +11,7 @@ import { Types } from "mongoose";
 import consultation from "../models/consultation";
 import token_services from "./token_services";
 import SocketServices from "./socket_services";
+import { io } from "../server";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -101,6 +102,11 @@ class ConsultationServices {
 
         socket.join(`consultation-${consultationId}`);
 
+        socket.on("user-connected", (id) => {
+            console.log("new user connected");
+            socket.broadcast.emit("user-connected", id);
+        });
+
         socket.on("new_message", (message: string, userId: string) => {
             Consultation.updateOne(
                 { _id: consultationId },
@@ -117,6 +123,16 @@ class ConsultationServices {
                 }
             );
             this._onNewMessage(socket, message, consultationId);
+        });
+
+        socket.on("call", (data) => {
+            console.log(`call user`, data.from);
+            console.log(Object.keys(io.sockets.sockets));
+
+            io.to(data.userToCall).emit("call", {
+                signal: data.signalData,
+                from: data.from,
+            });
         });
 
         return true;

@@ -40,7 +40,8 @@ import * as Sentry from "@sentry/node";
 import bodyParser from "body-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import socketio, { listen } from "socket.io";
+import socketio from "socket.io";
+import { PeerServer } from "peer";
 import https from "https";
 import SocketServices from "./services/socket_services";
 
@@ -57,8 +58,8 @@ const appLimitter = rateLimit({
 
 // HTTPS optiosn
 const httpsOptions = {
-    key: fs.readFileSync("./security/cert.key"),
-    cert: fs.readFileSync("./security/cert.pem"),
+    key: fs.readFileSync("./security/cert.key").toString(),
+    cert: fs.readFileSync("./security/cert.pem").toString(),
 };
 
 // Create app
@@ -140,7 +141,7 @@ main();
 // Listen server & setup socket.io
 const server = https
     .createServer(httpsOptions, app)
-    .listen(PORT, () =>
+    .listen(PORT, "0.0.0.0", () =>
         console.log(`server listening on https://localhost:${PORT}`)
     );
 const io = socketio(server, {
