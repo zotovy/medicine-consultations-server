@@ -58,8 +58,8 @@ const appLimitter = rateLimit({
 
 // HTTPS optiosn
 const httpsOptions = {
-    key: fs.readFileSync("./security/cert.key").toString(),
-    cert: fs.readFileSync("./security/cert.pem").toString(),
+    key: fs.readFileSync(process.env.ssl_key_path ?? "").toString(),
+    cert: fs.readFileSync(process.env.ssl_cert_path ?? "").toString(),
 };
 
 // Create app
@@ -141,8 +141,8 @@ main();
 // Listen server & setup socket.io
 const server = https
     .createServer(httpsOptions, app)
-    .listen(PORT, "0.0.0.0", () =>
-        console.log(`server listening on https://localhost:${PORT}`)
+    .listen(PORT, process.env.url ?? "", () =>
+        console.log(`server listening on https://${process.env.url}:${PORT}`)
     );
 const io = socketio(server, {
     transports: ["websocket"],
