@@ -914,6 +914,20 @@ const symptoms = {
         Shum_v_sertse_u_rebenka,
         Ekstrasistoliya,
     ],
+    "Молочные железы": [
+        { name: "Диффузная мастопатия" },
+        { name: "Узловая мастопатия" },
+        { name: "Киста молочной железы" },
+        { name: "Галактоцеле" },
+        { name: "Галакторея" },
+        { name: "Фиброаденома" },
+        { name: "Липома" },
+        { name: "Внутрипротоковая папиллома" },
+        { name: "Гинекомастия" },
+        { name: "Рак молочной железы" },
+        { name: "Рак педжета" },
+        { name: "Рак педжета" },
+    ],
     Кожа: [
         Boli_v_molochnoj_zheleze,
         Boli_v_oblasti_serdtsa,
@@ -1257,21 +1271,49 @@ const symptoms = {
         { name: "Кифосколиоз" },
         { name: "Нарушение осанки" },
     ],
-    Сердце: {
+    Сердце: [
         Shjimaushaya_bol,
         odshka,
         Snijenaya_fizicheskaya_vinoslivost,
         Opushhenie_nishnie_konechnosti,
         ecstracictoliya,
         poterya_soznaniya,
-    },
-    Легкие: {
+    ],
+    Легкие: [
         Sipliy_golos,
         hronischeskiy_suhol_kashel,
         Svistyashiy_zvuk_vo_vremya_dyhanya,
         Bol_v_grudnoy_kletle,
         Odushka_vo_vremya_vdoha,
-    },
+    ],
+    Рука: [
+        { name: "Альгодисменорея" },
+        { name: "Анемия" },
+        { name: "Аутоиммунное воспаление" },
+        { name: "Альгодисменорея" },
+        { name: "Боль в костях" },
+        { name: "Боль в крестце" },
+        { name: "Боль в мышцах" },
+        { name: "Вялость" },
+        { name: "Вывих кисти" },
+        { name: "Синдром карпального канала" },
+        { name: "Онемение пальцев" },
+        { name: "Онемение кисти руки" },
+        { name: "Боль в мышцах" },
+        { name: "Болезнь Нотта" },
+    ],
+    Стопа: [
+        { name: "Боль в костях" },
+        { name: "Вальгусная деформация стоп" },
+        { name: "Гиперкератоз стоп" },
+        { name: "Синдром диабетической стопы" },
+        { name: "Искривления пальцев ног" },
+        { name: "Косточки на ногах" },
+        { name: "Натоптыши в передней части стопы" },
+        { name: "Перекос пятки" },
+        { name: "Подошвенный фасциит" },
+        { name: "Пяточная шпора" },
+    ],
 };
 
 export default symptoms;
@@ -1290,6 +1332,9 @@ export enum EBodyParts {
     "Позвоночник" = "Позвоночник",
     "Сердце" = "Сердце",
     "Легкие" = "Легкие",
+    "Стопа" = " Стопа",
+    "Рука" = "Рука",
+    "Молочные железы" = "Молочные железы",
 }
 
 export const BodyPartsToSpecialities = {
