@@ -1,36 +1,5 @@
-import dotenv from "dotenv";
-
-// Config env
-if (process.env.MODE === "testing") {
-    console.log("server running in testing mode");
-
-    // load testing config
-    const result = dotenv.config({ path: "./configs/.env.testing" });
-    if (result.error) {
-        console.error(result.error);
-    }
-} else if (process.env.MODE === "production") {
-    // load production config
-    const result = dotenv.config({ path: "./configs/.env" });
-    if (result.error) {
-        console.error(result.error);
-    }
-} else if (process.env.MODE === "dev") {
-    console.log("server running in development mode");
-
-    // load dev config
-    const result = dotenv.config({ path: "./configs/.env.dev" });
-    if (result.error) {
-        console.error(result.error);
-    }
-} else if (process.env.MODE === "fake") {
-    console.log("server running in fake mode");
-    // load fake config
-    const result = dotenv.config({ path: "./configs/fake.env" });
-    if (result.error) {
-        console.error(result.error);
-    }
-}
+import EnvHelper from "./helpers/env_helper";
+new EnvHelper().loadEnv();
 
 import setupModels from "./models";
 import fs from "fs";
@@ -41,14 +10,11 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import socketio from "socket.io";
-import { PeerServer } from "peer";
 import https from "https";
 import SocketServices from "./services/socket_services";
 
 import ApiRouter from "./routes/index";
 import FakeRouter from "./routes/fake_api_routes";
-
-// email_services.sendResetPasswordMail("the1i");
 
 // Limit request from one IP per hour
 const appLimitter = rateLimit({
