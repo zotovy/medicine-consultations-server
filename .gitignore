@@ -6,3 +6,4 @@ logs
 sandbox.ts
 coverage
 /security/
+docker-compose.yaml
