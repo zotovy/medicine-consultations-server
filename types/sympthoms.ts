@@ -1322,7 +1322,7 @@ export const BodyParts = Object.keys(symptoms);
 export enum EBodyParts {
     "Глаза" = "Глаза",
     "Голова" = "Голова",
-    "Мжуская мочеполовая система" = "Мужская мочеполовая система",
+    "Мужская мочеполовая система" = "Мужская мочеполовая система",
     "Женская мочеполовая система" = "Женская мочеполовая система",
     "Ухо" = "Ухо",
     "Рот" = "Рот",
@@ -1332,7 +1332,7 @@ export enum EBodyParts {
     "Позвоночник" = "Позвоночник",
     "Сердце" = "Сердце",
     "Легкие" = "Легкие",
-    "Стопа" = " Стопа",
+    "Стопа" = "Стопа",
     "Рука" = "Рука",
     "Молочные железы" = "Молочные железы",
 }
@@ -1353,4 +1353,7 @@ export const BodyPartsToSpecialities = {
     Позвоночник: [ESpeciality.Orthopedist],
     Сердце: [ESpeciality.Cardiologist],
     Легкие: [ESpeciality.Pulmonologist],
+    Стопа: [ESpeciality.Orthopedist],
+    Рука: [ESpeciality.Orthopedist],
+    "Молочные железы": [ESpeciality.Gynecologis],
 };
