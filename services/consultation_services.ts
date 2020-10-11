@@ -1,17 +1,11 @@
 import Ajv from "ajv";
 import User from "../models/user";
-import { Socket } from "socket.io";
 import Doctor from "../models/doctor";
 import Consultation from "../models/consultation";
-import { ConsultationObject, IConsultation } from "../types/models";
 import { ConsultationValidationSchema } from "../types/services";
-import { IConsultationToConsultationObj } from "./types_services";
-import user_services from "./user_services";
 import { Types } from "mongoose";
-import consultation from "../models/consultation";
 import token_services from "./token_services";
-import SocketServices from "./socket_services";
-import { io } from "../server";
+import server from "../server";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -127,9 +121,9 @@ class ConsultationServices {
 
         socket.on("call", (data) => {
             console.log(`call user`, data.from);
-            console.log(Object.keys(io.sockets.sockets));
+            console.log(Object.keys(server.io.sockets.sockets));
 
-            io.to(data.userToCall).emit("call", {
+            server.io.to(data.userToCall).emit("call", {
                 signal: data.signalData,
                 from: data.from,
             });

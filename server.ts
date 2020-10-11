@@ -1,120 +1,92 @@
-import EnvHelper from "./helpers/env_helper";
-new EnvHelper().loadEnv();
-
 import setupModels from "./models";
 import fs from "fs";
-import express from "express";
+import express, { Express } from "express";
 import mongoose from "mongoose";
-import * as Sentry from "@sentry/node";
-import bodyParser from "body-parser";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
 import socketio from "socket.io";
+import logger from "./logger";
 import https from "https";
-import SocketServices from "./services/socket_services";
+import cors from "cors";
+import bodyParser from "body-parser";
+import ApiRouter from "./routes";
+import * as Sentry from "@sentry/node";
 
-import ApiRouter from "./routes/index";
-import FakeRouter from "./routes/fake_api_routes";
+class Server {
+    app: Express;
+    port: number;
+    url: string;
+    db: mongoose.Connection;
+    server: https.Server;
+    io: SocketIO.Server;
+    useSentry: boolean = false;
 
-// Limit request from one IP per hour
-const appLimitter = rateLimit({
-    windowMs: 1000,
-    max: 100, // Not more than 100 request in 10 seconds
-});
-
-// HTTPS optiosn
-const httpsOptions = {
-    key: fs.readFileSync(process.env.ssl_key_path ?? "").toString(),
-    cert: fs.readFileSync(process.env.ssl_cert_path ?? "").toString(),
-};
-
-// Create app
-const PORT: number = parseInt(process.env.PORT ?? "") || 5000;
-const app = express();
-
-// Config sentry
-if (process.env.MODE === "production") {
-    Sentry.init({
-        dsn:
-            "https://65f48faa380a4894a949c0819a27c068@o433163.ingest.sentry.io/5389090",
-    });
-    app.use(Sentry.Handlers.requestHandler());
-}
-
-// Apply middlewares
-app.use(appLimitter);
-app.use(cors());
-app.use(
-    bodyParser.urlencoded({
-        extended: true,
-    })
-);
-app.use("/static", express.static("static"));
-app.use(bodyParser.json());
-app.use("/api", ApiRouter);
-
-// todo
-app.get("/reset-password/:id", (req, res) => {
-    return res.send(`<h1>your id is ${req.params.id}</h1>`);
-});
-app.get("/unsubscribe-from-password/:id", (req, res) => {
-    return res.send(`<h1>your id is ${req.params.id}</h1>`);
-});
-
-if (process.env.MODE === "production") {
-    app.use(Sentry.Handlers.errorHandler());
-}
-
-if (process.env.MODE === "fake") {
-    // load fake api
-    app.use("/fake", FakeRouter);
-}
-
-// for what??
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static("client/build"));
-}
-
-setupModels();
-
-const main = async () => {
-    if (process.env.MODE === "testing") return;
-
-    try {
-        console.log(process.env.mongodb_url);
-
-        // connect to db
-        await mongoose.connect(process.env.mongodb_url ?? "", {
-            useNewUrlParser: true,
-            useFindAndModify: false,
-            useUnifiedTopology: true,
-        });
-        const db = mongoose.connection;
-        console.log("successfully connect to db");
-
-        // catch error
-        db.on("error", (error: Error) => console.log(error));
-
-        // io.listen(server);
-    } catch (e) {
-        console.log(e);
+    constructor({ useSentry = false } = {}) {
+        this.app = express();
+        this.port = parseInt(process.env.PORT ?? "") || 5000;
+        this.url = process.env.url ?? "";
+        this.db = mongoose.connection;
+        this.server = https.createServer({});
+        this.io = socketio();
+        this.useSentry = useSentry;
     }
-};
 
-// run server
-main();
+    setupDatabase = async (): Promise<void> => {
+        await mongoose
+            .connect(process.env.mongodb_url ?? "", {
+                useNewUrlParser: true,
+                useFindAndModify: false,
+                useUnifiedTopology: true,
+            })
+            .catch((e) => logger.e(e));
+        this.db = mongoose.connection;
+        this.db.on("error", (e) => logger.e(e));
+        logger.i("successfully connected to database");
+    };
 
-// Listen server & setup socket.io
-const server = https
-    .createServer(httpsOptions, app)
-    .listen(PORT, process.env.url ?? "", () =>
-        console.log(`server listening on https://${process.env.url}:${PORT}`)
-    );
-const io = socketio(server, {
-    transports: ["websocket"],
-});
+    setupExpress = async (): Promise<void> => {
+        if (this.useSentry && process.env.MODE === "production") {
+            Sentry.init({ dsn: process.env.sentryDns });
+            this.app.use(Sentry.Handlers.requestHandler());
+        }
 
-export default app;
-export { server, io };
+        this.app.use(cors());
+        this.app.use(
+            bodyParser.urlencoded({
+                extended: true,
+            })
+        );
+        this.app.use(bodyParser.json());
+        this.app.use("/static", express.static("static"));
+        this.app.use("/api", ApiRouter);
 
-new SocketServices();
+        if (this.useSentry && process.env.MODE === "production") {
+            this.app.use(Sentry.Handlers.errorHandler());
+        }
+    };
+
+    public get setupModels() {
+        return setupModels;
+    }
+
+    setupServer = async (): Promise<void> => {
+        const httpsOptions = {
+            key: fs.readFileSync(process.env.ssl_key_path ?? "").toString(),
+            cert: fs.readFileSync(process.env.ssl_cert_path ?? "").toString(),
+        };
+
+        this.server = https
+            .createServer(httpsOptions, this.app)
+            .listen(this.port, this.url, () => {
+                console.log(
+                    `server listening on https://${this.url}:${this.port}`
+                );
+            });
+    };
+
+    setupSocketIO = async (): Promise<void> => {
+        this.io = socketio(this.server, {
+            transports: ["websocket"],
+        });
+    };
+}
+
+export default new Server();

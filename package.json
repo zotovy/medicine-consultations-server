@@ -4,11 +4,11 @@
     "description": "web server for medecine consulation app",
     "main": "server.ts",
     "scripts": {
-        "start": "set MODE=production&&node ./build/server.js",
-        "dev": "set MODE=dev&&ts-node-dev --respawn ./server.ts",
+        "start": "set MODE=production&&node ./build/index.js",
+        "dev": "set MODE=dev&&ts-node-dev --respawn ./index.ts",
         "build": "tsc",
         "test": "",
-        "fake": "set MODE=fake&&ts-node ./server.ts",
+        "fake": "set MODE=fake&&ts-node ./index.ts",
         "isolate": "ts-node-dev --respawn test.ts",
         "postinstall": "npm run build",
         "sandbox": "set MODE=dev&&ts-node-dev --respawn ./sandbox.ts"
