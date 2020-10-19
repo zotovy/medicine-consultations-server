@@ -41,6 +41,9 @@ export type TCheckUserEmailAndPassword = {
 
     // Return operation results if success
     id?: string;
+
+    // is user
+    isUser?: boolean;
 };
 
 /**

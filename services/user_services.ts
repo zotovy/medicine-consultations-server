@@ -95,9 +95,11 @@ class UserServices {
         password: string
     ): Promise<TCheckUserEmailAndPassword> {
         let user: IUser | IDoctor | null = await User.findOne({ email });
+        let isUser = true;
 
         if (!user) {
             user = await Doctor.findOne({ email });
+            isUser = false;
         }
 
         // invalid email
@@ -114,6 +116,7 @@ class UserServices {
             return {
                 success: true,
                 id: user._id,
+                isUser,
             };
         }
 

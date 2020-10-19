@@ -204,6 +204,7 @@ Router.post("/login-user", loginTokenLimitter, async (req, res) => {
         success: true,
         id: dbcode.id,
         tokens,
+        isUser: dbcode.isUser,
     });
 });
 
