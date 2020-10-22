@@ -118,7 +118,7 @@ const authenticateToken = (req: any, res: any, next: Function): void => {
         }
 
         // Set valid authorize user id
-        req.userId = userId;
+        req.headers.userId = userId;
 
         next();
     });

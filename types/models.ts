@@ -134,8 +134,8 @@ export interface DoctorTile {
  *  Consultation model interface
  */
 export interface IConsultation extends Document {
-    patientId: string;
-    doctorId: string;
+    patientId: Types.ObjectId | IUser;
+    doctorId: Types.ObjectId | IDoctor;
     date: Date;
     note?: string;
 }

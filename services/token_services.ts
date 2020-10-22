@@ -50,6 +50,11 @@ class TokenServices {
     ): Promise<void> => {
         const header: string | undefined = req.headers.auth;
 
+        if (process.env.MODE === "dev" && req.headers.auth !== "") {
+            req.headers.userId = req.headers.auth;
+            return next();
+        }
+
         if (!header) {
             logger.w(
                 "User must be authorize to go to this page but no token was found"
@@ -103,7 +108,7 @@ class TokenServices {
                 }
 
                 // Set valid authorize user id
-                req.userId = userId;
+                req.headers.userId = userId;
 
                 next();
             }
@@ -175,7 +180,7 @@ class TokenServices {
                 }
 
                 // Set valid authorize user id
-                req.adminId = adminId;
+                req.headers.adminId = adminId;
 
                 next();
             }

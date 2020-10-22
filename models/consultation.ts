@@ -5,12 +5,13 @@ const requiredField = [true, "required_error"];
 
 const Consultation = new Schema({
     patientId: {
-        type: String,
+        type: Types.ObjectId,
+        ref: "User",
         required: requiredField,
     },
-
     doctorId: {
-        type: String,
+        type: Types.ObjectId,
+        ref: "Doctor",
         required: requiredField,
     },
     date: {
