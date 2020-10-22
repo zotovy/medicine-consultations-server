@@ -50,7 +50,11 @@ class TokenServices {
     ): Promise<void> => {
         const header: string | undefined = req.headers.auth;
 
-        if (process.env.MODE === "dev" && req.headers.auth !== "") {
+        if (
+            process.env.MODE === "dev" &&
+            req.headers.auth &&
+            req.headers.auth[0] !== "B"
+        ) {
             req.headers.userId = req.headers.auth;
             return next();
         }
@@ -108,7 +112,7 @@ class TokenServices {
                 }
 
                 // Set valid authorize user id
-                req.headers.userId = userId;
+                req.headers.userId = userId.id;
 
                 next();
             }
@@ -180,7 +184,7 @@ class TokenServices {
                 }
 
                 // Set valid authorize user id
-                req.headers.adminId = adminId;
+                req.headers.adminId = adminId.id;
 
                 next();
             }

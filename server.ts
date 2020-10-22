@@ -9,6 +9,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import ApiRouter from "./routes";
 import * as Sentry from "@sentry/node";
+import SocketServices from "./services/socket_services";
 
 class Server {
     app: Express;
@@ -86,6 +87,7 @@ class Server {
         this.io = socketio(this.server, {
             transports: ["websocket"],
         });
+        new SocketServices();
     };
 }
 

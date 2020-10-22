@@ -23,21 +23,20 @@ Router.post("/create", async (req, res) => {
 Router.get("/:id", token_services.authenticateToken, async (req, res) => {
     const { id } = req.params;
 
+    console.log(req.headers.userId);
+
     try {
         const consultation = await Consultation.findById(id)
             .select("-_id -__v")
             .populate([
                 { path: "patientId", select: "fullName photoUrl _id" },
-                { path: "doctorId", select: "fullName photoUrl _id" },
+                {
+                    path: "doctorId",
+                    select: "fullName photoUrl _id speciality",
+                },
             ])
             .lean()
             .exec();
-
-        console.log(consultation);
-
-        const members = [(consultation?.patientId as IUser)._id];
-
-        console.log(typeof members[0]._id);
 
         // If user is not a patiens and is not a doctor
         if (
