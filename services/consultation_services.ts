@@ -32,7 +32,9 @@ class ConsultationServices {
         return String(_id);
     };
 
-    connect = async (socket: SocketIO.Socket): Promise<boolean> => {
+    connect = async (
+        socket: SocketIO.Socket
+    ): Promise<{ room: string; uid: string }> => {
         const {
             consultationId,
             userId,
@@ -129,7 +131,16 @@ class ConsultationServices {
             });
         });
 
-        return true;
+        socket.on("mute", (status) =>
+            socket
+                .to(`consultation-${consultationId}`)
+                .broadcast.emit("mute", status)
+        );
+
+        return {
+            room: `consultation-${consultationId}`,
+            uid: userId,
+        };
     };
 
     private _onNewMessage = (
