@@ -4,10 +4,12 @@ FROM node:12
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
-ADD . /usr/src/app
+COPY . .
+
+EXPOSE 443
+
+# Build
 RUN npm run build
-RUN ls /usr/src/app/build
 
 # start
 CMD [ "npm", "run", "start" ]
-EXPOSE 5000

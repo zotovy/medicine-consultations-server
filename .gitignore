@@ -6,7 +6,7 @@ logs
 sandbox.ts
 coverage
 /security/
-docker-compose.yaml
+docker-compose-example.yaml
 deploy_rsa.pub
 deploy_rsa
 .idea

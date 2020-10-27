@@ -2,20 +2,18 @@ version: "3"
 
 services:
     mcserver:
-        build:
-            context: .
-            dockerfile: Dockerfile
+        build: .
         environment:
             MODE: production
             url: 0.0.0.0
-            port: 5000
+            port: 443
             mongodb_url:
             jwt_access:
             jwt_refresh:
             jwt_admin_access:
             jwt_admin_refresh:
             websiteUrl:
-            ssl_key_path:
-            ssl_cert_path:
+            ssl_key_path: ./security/cert.key
+            ssl_cert_path: ./security/cert.pem
         ports:
-            - 5000:5000
+            - "5000:443"

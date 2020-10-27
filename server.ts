@@ -22,7 +22,7 @@ class Server {
 
     constructor({ useSentry = false } = {}) {
         this.app = express();
-        this.port = parseInt(process.env.PORT ?? "") || 5000;
+        this.port = parseInt(process.env.port ?? "") || 5000;
         this.url = process.env.url ?? "";
         this.db = mongoose.connection;
         this.server = https.createServer({});
