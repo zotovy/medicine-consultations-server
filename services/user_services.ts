@@ -1,4 +1,6 @@
 import { Types } from "mongoose";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 // Modules
 import User from "../models/user";
@@ -569,6 +571,8 @@ class UserServices {
                 };
             }
 
+            data.password = this.encryptPassword(data.password);
+
             const user: IUser = new User(data);
 
             if (!user) {
@@ -750,6 +754,10 @@ class UserServices {
 
         return await this.generateNewTokens(userId);
     };
+
+    encryptPassword =  (password: string) : string => {
+        return crypto.createHash('sha256').update(password).digest("base64");
+    }
 }
 
 export default new UserServices();

@@ -34,6 +34,7 @@ import {
 } from "./types_services";
 import logger from "../logger";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
+import user_services from "./user_services";
 
 class DoctorServices {
     // constructor() {
@@ -217,6 +218,8 @@ class DoctorServices {
                 message: "User is not validated",
             };
         }
+
+        data.password = user_services.encryptPassword(data.password);
 
         const doctor: IDoctor = new Doctor(data);
 
@@ -533,6 +536,8 @@ class DoctorServices {
             // TYPE_ERROR or EMPTY_FILTER_RESPONSE
             return {};
         }
+
+        // console.log(123);
 
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};

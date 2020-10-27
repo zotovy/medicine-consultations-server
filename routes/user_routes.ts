@@ -166,16 +166,16 @@ Router.post("/generate-token", generateTokenLimitter, async (req, res) => {
 
 // ANCHOR: login-user
 // Limit request
-const loginTokenLimitter = rateLimitter({
+const loginTokenLimiter = rateLimitter({
     windowMs: 10 * 60 * 1000,
     max: 10, // 10 per 10 min
 });
 /**
  *  This function check user received email & password
  */
-Router.post("/login-user", loginTokenLimitter, async (req, res) => {
+Router.post("/login-user", loginTokenLimiter, async (req, res) => {
     const email: string | undefined = req.body.email;
-    const password: string | undefined = req.body.password;
+    let password: string | undefined = req.body.password;
 
     if (!email || !password) {
         return res.status(412).json({
@@ -184,6 +184,8 @@ Router.post("/login-user", loginTokenLimitter, async (req, res) => {
             message: "No email or password found in body",
         });
     }
+
+    password = await userServices.encryptPassword(password);
 
     const dbcode = await userServices.checkUserEmailAndPassword(
         email,
@@ -422,7 +424,7 @@ Router.post("/user", async (req, res) => {
     user.lastActiveAt = new Date(user.lastActiveAt);
 
     // no body
-    // 2 - createdAt & lastActiveAt aslo in user obj
+    // 2 - createdAt & lastActiveAt also in user obj
     if (!user || Object.keys(user).length === 2) {
         logger.w("body is null");
         return res.status(412).json({
