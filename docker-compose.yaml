@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
     mcserver:
@@ -7,13 +7,17 @@ services:
             MODE: production
             url: 0.0.0.0
             port: 443
-            mongodb_url:
-            jwt_access:
-            jwt_refresh:
-            jwt_admin_access:
-            jwt_admin_refresh:
-            websiteUrl:
+            mongodb_url: mongodb+srv://admin:assassin21@cluster0.osiyo.mongodb.net/database?retryWrites=true&w=majority
+            jwt_access: mOgamTMiw6W3fT2Kx7X5lUVraugmIrpsRG8eh1969ucGdGq9bImliOSzc9oA
+            jwt_refresh: 2isyD25gYTZwyQNVehpDixXl5DHlVWS4PbeClHI5xYyvTqCcUXxAm42OycCw
+            jwt_admin_access: IOEknYikti7X7MPDNhJn1powXN4WEkwGNSvFHfATArdxHhyFlCRmNYTuKlE1
+            jwt_admin_refresh: GmFtOzsFC1BogK7OH64qE51eEps6EYoR3bqqGhAPfvbjF5ui2hm2Hogy71gi
+            websiteUrl: localhost:3000
             ssl_key_path: ./security/cert.key
             ssl_cert_path: ./security/cert.pem
         ports:
             - "5000:443"
+        volumes:
+            - ./security:/usr/src/app/security
+
+
