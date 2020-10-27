@@ -7,7 +7,7 @@
         "start": "set MODE=production&&node ./build/index.js",
         "dev": "set MODE=dev&&ts-node-dev --respawn ./index.ts",
         "build": "tsc",
-        "test": "",
+        "test": "echo 123",
         "fake": "set MODE=fake&&ts-node ./index.ts",
         "isolate": "ts-node-dev --respawn test.ts",
         "postinstall": "npm run build",
