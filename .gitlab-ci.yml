@@ -38,6 +38,13 @@ deploy:
   stage: deploy
   image: kroniak/ssh-client
 
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$MASTER_SSH_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    -
+
   script:
 #    - chmod 400 $MASTER_SSH_KEY
 #    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "docker login -u ${$DOCKER_USER} -p ${$DOCKER_PASSWORD} "
