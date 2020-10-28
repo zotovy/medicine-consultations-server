@@ -32,4 +32,3 @@ deploy:
 
   script:
     - ssh -o StrictHostKeyChecking=no "${MASTER_SSH_USER}@${MASTER_HOST}" "cd /var/www/mc-server && git pull && npm run build && docker-compose build && docker-compose up"
-
