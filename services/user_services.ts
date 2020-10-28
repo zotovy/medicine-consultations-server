@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import bcrypt from "bcrypt";
 import crypto from "crypto";
 
 // Modules
