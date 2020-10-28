@@ -1,18 +1,18 @@
 stages:
-#  - test
   - deploy
+  - test
 
 
-#test:
-#  stage: test
-#  image: node:latest
-#
-#  services:
-#    - mongo
-#
-#  script:
-#    - npm install
-#    - npm run test
+test:
+  stage: test
+  image: node:latest
+
+  services:
+    - mongo
+
+  script:
+    - npm install
+    - npm run test
 
 
 
