@@ -39,7 +39,7 @@ deploy:
   image: kroniak/ssh-client
 
   script:
-    - chmod 400 $MASTER_SSH_KEY
+#    - chmod 400 $MASTER_SSH_KEY
 #    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "docker login -u ${$DOCKER_USER} -p ${$DOCKER_PASSWORD} "
 #    # Remove old containers and images if exists
 #    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "docker rm -f ${$DOCKER_IMAGE_NAME} || true"
