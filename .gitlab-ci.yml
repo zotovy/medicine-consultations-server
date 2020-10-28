@@ -1,13 +1,47 @@
-image: node:latest
+stages:
+  - test
+#  - build
+  - deploy
 
-services:
-  - mongo
-
-cache:
-  paths:
-    - node_modules/
 
 test:
+  stage: test
+  image: node:latest
+
+  services:
+    - mongo
+
   script:
     - npm install
     - npm run test
+
+#build:
+#  stage: build
+#
+#  script:
+#    # Login to Container registry
+#    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+#    # Pull last image
+#    - docker pull "$DOCKER_REPOSITORY"
+#    # Build image
+#    - docker build .
+#    # Tag pulled image with created
+#    - docker tag "$DOCKER_REPOSITORY" "$DOCKER_IMAGE_NAME"
+#    # Push image to docker hub
+#    - docker push "$DOCKER_REPOSITORY"
+
+
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  image: kroniak/ssh-client
+
+  script:
+    - chmod 400 $MASTER_SSH_KEY
+#    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "docker login -u ${$DOCKER_USER} -p ${$DOCKER_PASSWORD} "
+#    # Remove old containers and images if exists
+#    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "docker rm -f ${$DOCKER_IMAGE_NAME} || true"
+#    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "docker rmi \$(docker images -q ${$DOCKER_REPOSITORY}) || true"
+    - ssh -o StrictHostKeyChecking=no -i $MASTER_SSH_KEY "${MASTER_SSH_USER}@${MASTER_HOST}" "cd /var/www/mc-server && git pull && npm run build && docker-compose build && docker-compose up"

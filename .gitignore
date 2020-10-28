@@ -7,6 +7,7 @@ sandbox.ts
 coverage
 /security/
 docker-compose-example.yaml
+docker-compose.yaml
 deploy_rsa.pub
 deploy_rsa
 .idea
