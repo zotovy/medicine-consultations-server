@@ -31,4 +31,4 @@ deploy:
     - ssh-keyscan -H 'gitlab.com' >> ~/.ssh/known_hosts
 
   script:
-    - ssh -o StrictHostKeyChecking=no "${MASTER_SSH_USER}@${MASTER_HOST}" "cd /var/www/mc-server && git pull && npm run build && docker-compose build && docker-compose up"
+    - ssh -o StrictHostKeyChecking=no "${MASTER_SSH_USER}@${MASTER_HOST}" "cd /var/www/mc-server && sudo git pull && sudo npm run build && sudo docker-compose build && sudo docker-compose up"
