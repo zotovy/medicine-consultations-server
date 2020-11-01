@@ -477,6 +477,8 @@ class DoctorServices {
             queryFilter.isAdult = filter.isAdult;
         }
 
+        console.log(queryFilter);
+
         const raw = await Doctor.find(queryFilter)
             .sort({
                 rating: filter.isDownward ? -1 : 1,
