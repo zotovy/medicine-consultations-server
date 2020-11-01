@@ -138,11 +138,15 @@ Router.get("/doctors", async (req, res) => {
         "workPlan",
         "rating",
         "bodyParts",
+        "symptoms",
     ];
 
-    JSON.stringify({});
 
     const data = encoder.query(req.query, qKeys);
+
+    data.bodyParts = Object.keys(data.symptoms);
+
+    console.log(data.bodyParts);
 
     if (typeof data.from !== "number") {
         data.from = undefined;

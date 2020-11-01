@@ -35,6 +35,7 @@ import {
 import logger from "../logger";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
 import user_services from "./user_services";
+import {query} from "express";
 
 class DoctorServices {
     // constructor() {
@@ -476,6 +477,8 @@ class DoctorServices {
             queryFilter.isAdult = filter.isAdult;
         }
 
+        console.log(queryFilter);
+
         const raw = await Doctor.find(queryFilter)
             .sort({
                 rating: filter.isDownward ? -1 : 1,
@@ -537,7 +540,6 @@ class DoctorServices {
             return {};
         }
 
-        // console.log(123);
 
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};
@@ -569,6 +571,27 @@ class DoctorServices {
         //* IsDownward?
         if (typeof filter.isDownward === "boolean") {
             config.isDownward = filter.isDownward;
+        }
+
+        //* Body part
+        if (filter.bodyParts) {
+            const field = validateByEnum<EBodyParts>(
+                filter.bodyParts,
+                ESpeciality
+            );
+            if (field) {
+                const specialities : ESpeciality[] = [];
+                Object.keys(filter.bodyParts).forEach((e) => {
+                    // @ts-ignore
+                    const part = BodyPartsToSpecialities[e];
+                    if (part) {
+                        specialities.push(part);
+                    }
+                });
+
+                config.speciality = specialities;
+
+            }
         }
 
         //* Speciality?
