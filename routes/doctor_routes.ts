@@ -145,7 +145,7 @@ Router.get("/doctors", async (req, res) => {
     const data = encoder.query(req.query, qKeys);
 
     if (data.symptoms) {
-        data.bodyParts = Object.keys(data.symptoms);
+        data.bodyParts = data.symptoms;
     }
 
     if (typeof data.from !== "number") {
