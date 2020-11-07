@@ -354,18 +354,18 @@ class DoctorServices {
 
         const doctor: IDoctor | null = await Doctor.findById(id).populate({
             path: "clientsReviews",
-            // populate: {
-            //     path: "patientId",
-            //     select: {
-            //         name: 1,
-            //         surname: 1,
-            //         photoUrl: 1,
-            //     },
-            //     options: {
-            //         limit: 4, // todo
-            //         sort: { created: -1 },
-            //     },
-            // },
+            populate: {
+                path: "patientId",
+                select: {
+                    name: 1,
+                    surname: 1,
+                    photoUrl: 1,
+                },
+                options: {
+                    limit: 4, // todo
+                    sort: { created: -1 },
+                },
+            },
         });
 
         if (!doctor) {
