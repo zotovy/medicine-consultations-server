@@ -135,10 +135,8 @@ const generateTokenLimitter = rateLimitter({
  */
 Router.post("/generate-token", generateTokenLimitter, async (req, res) => {
     const id: string | undefined = req.body?.id;
-    const accessToken: string | undefined = req.body?.accessToken;
-    const refreshToken: string | undefined = req.body?.refreshToken;
 
-    if (!id || !accessToken || !refreshToken) {
+    if (!id) {
         return res.status(412).json({
             success: false,
             error: "empty_body",
@@ -186,6 +184,8 @@ Router.post("/login-user", loginTokenLimiter, async (req, res) => {
     }
 
     password = await userServices.encryptPassword(password);
+
+    console.log(password);
 
     const dbcode = await userServices.checkUserEmailAndPassword(
         email,
@@ -268,11 +268,7 @@ Router.post("/token", async (req, res) => {
         });
     }
 
-    const tokens = await userServices.generateTokenAndDeleteOld(
-        userId,
-        accessToken,
-        refreshToken
-    );
+    const tokens = await userServices.generateTokenAndDeleteOld(userId);
 
     return res.status(201).json({
         success: true,

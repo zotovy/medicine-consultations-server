@@ -730,27 +730,8 @@ class UserServices {
 
     // ANCHOR: generate new tokens
     generateTokenAndDeleteOld = async (
-        userId: string,
-        oldAccessToken: string,
-        oldRefreshToken: string
+        userId: string
     ): Promise<{ access: string; refresh: string }> => {
-        // Shortcut for loggin
-        const onError = (where: "Access" | "Refresh", e: any) => {
-            logger.e(
-                `Error while remove ${where} token. userId="${userId}",
-                 oldAccessToken="${oldAccessToken}", oldRefreshToken="${oldRefreshToken}".
-                 Trace = ${e}`
-            );
-        };
-
-        // Delete old
-        await AccessToken.remove({ value: oldAccessToken }, (e) =>
-            onError("Access", e)
-        );
-        await RefreshToken.remove({ value: oldRefreshToken }, (e) =>
-            onError("Refresh", e)
-        );
-
         return await this.generateNewTokens(userId);
     };
 

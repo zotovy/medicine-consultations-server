@@ -85,19 +85,6 @@ class TokenServices {
             });
         }
 
-        const founded = await AccessToken.find({ value: token });
-
-        // No token in DB
-        if (founded.length === 0) {
-            logger.i("invalid token was provide");
-            return res.status(401).json({
-                success: false,
-                error: "not_authorize",
-                message:
-                    "User must be authorize to go to this page but invalid token were provide",
-            });
-        }
-
         jwt.verify(
             token,
             process.env.jwt_access ?? "",
@@ -154,19 +141,6 @@ class TokenServices {
             });
         }
 
-        const founded = await AdminAccessToken.find({ value: token });
-        // console.info(token, await AdminAccessToken.find({}));
-
-        // No token in DB
-        if (founded.length === 0) {
-            logger.i("invalid token was provide");
-            return res.status(401).json({
-                success: false,
-                error: "not_authorize",
-                message:
-                    "User must be authorize to go to this page but invalid token were provide",
-            });
-        }
 
         // Validate id
         jwt.verify(
@@ -227,23 +201,6 @@ class TokenServices {
             return false;
         }
 
-        let founded: Array<any> = [];
-
-        switch (key) {
-            case "jwt_access":
-                founded = await AccessToken.find({ value: token });
-                break;
-            case "jwt_refresh":
-                founded = await RefreshToken.find({ value: token });
-                break;
-            case "jwt_admin_access":
-                founded = await AdminAccessToken.find({ value: token });
-                break;
-            case "jwt_admin_refresh":
-                founded = await AdminRefreshToken.find({ value: token });
-                break;
-        }
-
         // logger.i(`Is ${key} token ok? ${
         //     adminId === id && adminId.length !== 0 && founded.length === 1
         // }:
@@ -253,7 +210,7 @@ class TokenServices {
         //           `);
 
         // @ts-ignore
-        return adminId === id && adminId.length !== 0 && founded.length >= 1;
+        return adminId === id && adminId.length !== 0;
     };
 }
 

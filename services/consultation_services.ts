@@ -12,6 +12,9 @@ const throwInvalidError = (): { _id: any } => {
 };
 
 class ConsultationServices {
+
+    connectedAmount : {[key: string]: number} = {};
+
     create = async (raw: any): Promise<string> => {
         // if date is instanse of Date --> convert to iso date
         if (raw.date && raw.date instanceof Date)
@@ -52,7 +55,7 @@ class ConsultationServices {
 
         // Check is consultationId correct
         const consultation = await Consultation.findById(consultationId)
-            .select("date -_id")
+            .select("date -_id patientId doctorId")
             .exec();
         ``;
 
@@ -65,6 +68,9 @@ class ConsultationServices {
 
         // Throw error if its not this user
         if (isUser == "true") {
+            console.log(consultation.patientId, userId);
+            if (consultation.patientId != userId) throw "no_access_error";
+
             // Add ref to this consultation to doctor
             await User.findByIdAndUpdate(
                 userId,
@@ -80,6 +86,9 @@ class ConsultationServices {
                 }
             );
         } else {
+
+            if (consultation.doctorId != userId) throw "no_access_error";
+
             // Add ref to this consultation to doctor
             await Doctor.findByIdAndUpdate(
                 userId,
@@ -96,11 +105,22 @@ class ConsultationServices {
             );
         }
 
-        socket.join(`consultation-${consultationId}`);
+        const room = `consultation-${consultationId}`;
+        socket.join(room);
 
+        if (this.connectedAmount[room] && this.connectedAmount[room] > 1) {
+            socket.leaveAll();
+            socket.disconnect();
+            throw "too_many_users_error"
+        }
+
+        if (this.connectedAmount[room]) this.connectedAmount[room] += 1;
+        else this.connectedAmount[room] = 1;
+
+        // @ts-ignore
         socket.on("user-connected", (id) => {
-            console.log("new user connected");
-            socket.broadcast.emit("user-connected", id);
+            console.log(123);
+            socket.broadcast.to(room).emit("user-connected", id);
         });
 
         socket.on("new_message", (message: string, userId: string) => {
@@ -136,6 +156,11 @@ class ConsultationServices {
                 .to(`consultation-${consultationId}`)
                 .broadcast.emit("mute", status)
         );
+
+        socket.on("disconnect", () => {
+            this.connectedAmount[room] -= 1;
+            socket.to(`consultation-${consultationId}`).emit("disconnected", socket.id);
+        });
 
         return {
             room: `consultation-${consultationId}`,
