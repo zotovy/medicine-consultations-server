@@ -330,6 +330,7 @@ const setUserAvatarLimitter = rateLimitter({
 Router.post(
     "/user/setAvatar/:id",
     setUserAvatarLimitter,
+    token_services.authenticateToken,
     // @ts-ignore
     async (req: FileRequest, res) => {
 
@@ -355,7 +356,7 @@ Router.post(
 
             const user = await User.findById(userId).select("photoUrl");
             if (!user) return res.status(400).json({ status: false, error: "no_user_found" });
-            user.photoUrl = process.env.server_url + "/user-pics/" + filename
+            user.photoUrl = process.env.server_url + "/static/user-pics/" + filename
             await user.save();
             return res.status(200).json({
                 success: true,
