@@ -10,16 +10,12 @@ import userServices from "../services/user_services";
 import mail_services from "../services/mail_services";
 import logger from "../logger";
 import User from '../models/user';
+import fs from "fs";
 
 // @types
 import { UserObject } from "../types/models";
 import { ServerError } from "../types/errors";
 import token_services from "../services/token_services";
-import { config } from "dotenv";
-
-// get secret keys to crypt/encrypt tokens
-// const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
-// const process.env.jwt_access ?? "" = process.env.jwt_refresh ?? "";
 
 // Used to process the http request
 const Router = express.Router();
@@ -356,7 +352,9 @@ Router.post(
 
             const user = await User.findById(userId).select("photoUrl");
             if (!user) return res.status(400).json({ status: false, error: "no_user_found" });
+            const oldImagePath = path.join(__dirname, "../",user.photoUrl.substring(22));
             user.photoUrl = process.env.server_url + "/static/user-pics/" + filename
+            fs.unlink(oldImagePath, () => {});
             await user.save();
             return res.status(200).json({
                 success: true,
