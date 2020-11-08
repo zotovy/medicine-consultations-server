@@ -474,6 +474,7 @@ Router.put("/user/:id", async (req, res, next) => {
                 success: false,
                 error: dbcode.error,
                 message: dbcode.message,
+                errors: dbcode.validationErrors,
             });
         }
 

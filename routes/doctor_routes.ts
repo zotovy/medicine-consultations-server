@@ -140,7 +140,6 @@ Router.get("/doctors", async (req, res) => {
         "bodyParts",
     ];
 
-
     const data = encoder.query(req.query, qKeys);
 
     if (data.symptoms) {

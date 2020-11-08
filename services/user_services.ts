@@ -461,7 +461,8 @@ class UserServices {
                 ) {
                     errors.email = ErrorType.EmailFormatError;
                 } else {
-                    const users = await User.find({ email: user.email }).select("_id");
+                    let users = await User.find({ email: user.email }).select("_id");
+                    if (users.length === 0) users = await Doctor.find({ email: user.email }).select("_id");
                     if (users.length > 0 && String(users[0]._id) !== user.id) errors.email = ErrorType.UniqueError;
                 }
             }
@@ -682,8 +683,6 @@ class UserServices {
     async updateUser(newUser: any): Promise<TUpdateUser> {
         // Check received user
         const responce = await this.validateUpdateUser(newUser);
-
-        console.log(responce);
 
         // not validated
         if (!responce.success) {
