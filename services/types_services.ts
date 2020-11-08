@@ -41,6 +41,7 @@ export function IUserToUserObj(e: IUser): UserObject {
         favourites: [...e.favourites],
         age: e.age,
         activeConsultations: [...e.activeConsultations],
+        birthday: e.birthday,
     };
 }
 

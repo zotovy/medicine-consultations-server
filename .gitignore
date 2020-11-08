@@ -11,3 +11,4 @@ docker-compose.yaml
 deploy_rsa.pub
 deploy_rsa
 .idea
+/static/

@@ -59,9 +59,9 @@ class UserServices {
     ): Promise<TGetUsers> {
         try {
             const raw: IUser[] = await User.find({})
-                .skip(from)
-                .limit(amount)
-                .lean();
+                                           .skip(from)
+                                           .limit(amount)
+                                           .lean();
 
             // no user were found
             if (!raw)
@@ -217,7 +217,7 @@ class UserServices {
             } else {
                 if (user.name.trim() == "") errors.name = ErrorType.LengthError;
             }
-        } else errors.name = ErrorType.RequiredError;
+        } else if (needUnique) errors.name = ErrorType.RequiredError;
 
         if (user.surname) {
             if (typeof user.surname != "string") {
@@ -226,7 +226,7 @@ class UserServices {
                 if (user.surname.trim() == "")
                     errors.surname = ErrorType.LengthError;
             }
-        } else errors.surname = ErrorType.RequiredError;
+        } else if (needUnique) errors.surname = ErrorType.RequiredError;
 
         // phone
         if (!user.phone == undefined || user.phone != -1) {
@@ -256,12 +256,12 @@ class UserServices {
                 } else {
                     const users = await User.find({
                         email: user.email,
-                    });
+                    }).select("_id")
                     if (users.length != 0) {
                         if (needUnique) {
                             errors.email = ErrorType.UniqueError;
                         } else {
-                            if (users[0].id !== user.id) {
+                            if (users[0]._id !== user.id) {
                                 errors.email = ErrorType.UniqueError;
                             }
                         }
@@ -269,7 +269,7 @@ class UserServices {
 
                     const doctors = await Doctor.find({
                         email: user.email,
-                    }).select("id");
+                    }).select("_id");
 
                     console.log(doctors);
 
@@ -422,6 +422,79 @@ class UserServices {
         }
     }
 
+    async validateUpdateUser(user: any): Promise<TValidateUser> {
+        let errors: TUserValidationErrors = {};
+        const ErrorType = TValidationErrorType;
+
+        // Name
+        if (user.name) {
+            if (typeof user.name !== "string") errors.name = ErrorType.TypeError;
+            else if (user.name.length === 0 || user.name.length > 256) errors.name = ErrorType.LengthError;
+        }
+
+        // Surname
+        if (user.surname) {
+            if (typeof user.surname !== "string") errors.surname = ErrorType.TypeError;
+            else if (user.surname.length === 0 || user.surname.length > 256) errors.surname = ErrorType.LengthError;
+        }
+
+        // patronymic
+        if (user.patronymic) {
+            if (typeof user.patronymic !== "string") errors.patronymic = ErrorType.TypeError;
+            else if (user.patronymic.length === 0 || user.patronymic.length > 256) errors.patronymic = ErrorType.LengthError;
+        }
+
+        // phone
+        if (user.phone) {
+            if (typeof user.phone !== "number") errors.phone = ErrorType.TypeError;
+            else if (user.phone.toString().length !== 11) errors.surname = ErrorType.PhoneFormatError;
+        }
+
+        // email
+        if (user.email) {
+            if (typeof user.email !== "string") errors.phone = ErrorType.TypeError;
+            else {
+                if (
+                    !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+                        user.email
+                    )
+                ) {
+                    errors.email = ErrorType.EmailFormatError;
+                } else {
+                    const users = await User.find({ email: user.email }).select("_id");
+                    if (users.length > 0 && String(users[0]._id) !== user.id) errors.email = ErrorType.UniqueError;
+                }
+            }
+        }
+
+        // country
+        if (user.country) {
+            if (typeof user.country !== "string") errors.country = ErrorType.TypeError;
+            else if (user.country.length === 0 || user.country.length > 256) errors.country = ErrorType.LengthError;
+        }
+
+        // city
+        if (user.city) {
+            if (typeof user.city !== "string") errors.city = ErrorType.TypeError;
+            else if (user.city.length === 0 || user.city.length > 256) errors.city = ErrorType.LengthError;
+        }
+
+        // birthday
+        if (user.birthday) {
+            if (!(user.birthday instanceof Date)) errors.birthday = ErrorType.TypeError;
+        }
+
+        // isMale
+        if (user.sex) {
+            if (typeof user.sex !== "boolean") errors.sex = ErrorType.TypeError;
+        }
+
+        return {
+            success: Object.keys(errors).length == 0,
+            errors,
+        };
+    }
+
     // ANCHOR: set avatar
     /**
      * This function set received  photo url to received  user
@@ -515,7 +588,7 @@ class UserServices {
                         error = err;
                     }
                 }
-            );
+            ).select("-__v -password");
 
             if (error) {
                 console.log(error);
@@ -608,7 +681,9 @@ class UserServices {
      */
     async updateUser(newUser: any): Promise<TUpdateUser> {
         // Check received user
-        const responce = await this.validateUser(newUser, false);
+        const responce = await this.validateUpdateUser(newUser);
+
+        console.log(responce);
 
         // not validated
         if (!responce.success) {
@@ -618,6 +693,21 @@ class UserServices {
                 message: "User is not validated",
                 validationErrors: responce.errors,
             };
+        }
+
+        if (newUser.name || newUser.surname || newUser.patronymic) {
+            const u = await User.findById(newUser.id ?? "").select("name surname patronymic");
+            if (!u) return {
+                success: false,
+                error: "updated_user_is_null",
+                message: "Updated user is null",
+            };
+
+            let name = u.name ?? "", surname = u.surname ?? "", patronymic = u.patronymic ?? "";
+            if (newUser.name) name = newUser.name;
+            if (newUser.surname) surname = newUser.surname;
+            if (newUser.patronymic) patronymic = newUser.patronymic;
+            newUser.fullName = `${name} ${surname} ${patronymic}`;
         }
 
         try {
@@ -735,7 +825,7 @@ class UserServices {
         return await this.generateNewTokens(userId);
     };
 
-    encryptPassword =  (password: string) : string => {
+    encryptPassword = (password: string): string => {
         return crypto.createHash('sha256').update(password).digest("base64");
     }
 }

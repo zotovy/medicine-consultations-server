@@ -8,12 +8,14 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import userServices from "../services/user_services";
 import mail_services from "../services/mail_services";
-import tokenServices from "../services/token_services";
 import logger from "../logger";
+import User from '../models/user';
 
 // @types
 import { UserObject } from "../types/models";
 import { ServerError } from "../types/errors";
+import token_services from "../services/token_services";
+import { config } from "dotenv";
 
 // get secret keys to crypt/encrypt tokens
 // const process.env.jwt_access ?? "" = process.env.jwt_access ?? "";
@@ -73,56 +75,6 @@ const upload = multer({
 //     );
 // };
 
-// ANCHOR: authenticate token
-/**
- * Middleware to auth-required routes
- * Validate token and run next() if success
- */
-const authenticateToken = (req: any, res: any, next: Function): void => {
-    const header: string | undefined = req.headers.auth;
-
-    if (!header) {
-        return res.status(401).json({
-            success: false,
-            error: "not_authorize",
-            message:
-                "User must be authorize to go to this page but no token was found",
-        });
-    }
-
-    // header example:
-    // auth: "Bearer ds8f9a0udfd9safjdsafu9fuads9f0uasfd9fus9dfduds9fua9sdc"
-
-    // Remove Bearer keyword
-    const splitted = header.split(" ");
-    const token = splitted.length > 1 ? splitted[1] : undefined;
-
-    // No token
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            error: "not_authorize",
-            message:
-                "User must be authorize to go to this page but no token was found",
-        });
-    }
-
-    jwt.verify(token, process.env.jwt_access ?? "", (err: any, userId: any) => {
-        // Not validated
-        if (err) {
-            return res.status(403).json({
-                success: false,
-                error: "invalid_token",
-                message: "Some token was passed but it's invalid token",
-            });
-        }
-
-        // Set valid authorize user id
-        req.headers.userId = userId;
-
-        next();
-    });
-};
 
 // ANCHOR: generate-token
 // Limit request
@@ -321,9 +273,10 @@ const getUserLimitter = rateLimitter({
 /**
  *  Get user by received id
  */
-Router.get("/user/:id", getUserLimitter, async (req, res, next) => {
+Router.get("/user/:id", getUserLimitter, token_services.authenticateToken, async (req, res, next) => {
     // Get id from params
     const id = req.params.id;
+
 
     // no id found
     if (!id) {
@@ -358,6 +311,13 @@ Router.get("/user/:id", getUserLimitter, async (req, res, next) => {
     }
 });
 
+interface FileRequest extends Request {
+    files: any;
+    params: {
+        id: string
+    }
+}
+
 // ANCHOR: set user avatar
 // Limit request
 const setUserAvatarLimitter = rateLimitter({
@@ -368,11 +328,12 @@ const setUserAvatarLimitter = rateLimitter({
  *  This function upload resized photo to storage and update photo url field in user model
  */
 Router.post(
-    "/user/setAvatar",
+    "/user/setAvatar/:id",
     setUserAvatarLimitter,
-    upload.single("photoUrl"),
-    async (req, res) => {
-        const userId = req.body.userId;
+    // @ts-ignore
+    async (req: FileRequest, res) => {
+
+        const userId = req.params.id;
 
         if (!userId) {
             return res.status(412).json({
@@ -382,28 +343,29 @@ Router.post(
             });
         }
 
-        // generate photo url
-        const photoUrl = process.env.url + req.file.path;
+        if (!req.files || Object.keys(req.files).length !== 1) {
+            return res.status(400).json({ success: true, error: "no_files_found" });
+        }
 
         try {
-            const dbcode = await userServices.setUserAvatar(userId, photoUrl);
+            const filename = Math.random().toString(36).substring(2, 15)
+                + Math.random().toString(36).substring(2, 15) + ".jpg";
+            req.files["1"].mv(path.join(__dirname, "../static/user-pics", filename));
 
-            if (!dbcode.success) {
-                return res.status(500).json({
-                    success: false,
-                    error: dbcode.error,
-                    message: dbcode.message,
-                });
-            }
 
-            return res.status(201).json({
+            const user = await User.findById(userId).select("photoUrl");
+            if (!user) return res.status(400).json({ status: false, error: "no_user_found" });
+            user.photoUrl = process.env.server_url + "/user-pics/" + filename
+            await user.save();
+            return res.status(200).json({
                 success: true,
+                photoUrlPath: process.env.server_url + "/static/user-pics/" +filename
             });
         } catch (e) {
-            logger.e(e, e.stack);
-
-            throw new ServerError(e);
+            console.log(e);
+            return res.status(500).json({ success: false, error: "invalid_error" });
         }
+
     }
 );
 
@@ -420,8 +382,7 @@ Router.post("/user", async (req, res) => {
     user.lastActiveAt = new Date(user.lastActiveAt);
 
     // no body
-    // 2 - createdAt & lastActiveAt also in user obj
-    if (!user || Object.keys(user).length === 2) {
+    if (!user || Object.keys(user).length === 0) {
         logger.w("body is null");
         return res.status(412).json({
             success: false,
@@ -503,19 +464,7 @@ Router.put("/user/:id", async (req, res, next) => {
     }
 
     // Convert String Date ---> Date
-    newUser.createdAt = new Date(newUser.createdAt);
-    newUser.lastActiveAt = new Date(newUser.lastActiveAt);
-
-    const isValidated = await userServices.validateUser(newUser, false);
-
-    if (!isValidated.success) {
-        return res.status(412).json({
-            success: false,
-            errors: isValidated.errors,
-            error: "not_validated_error",
-            message: "User is not validated",
-        });
-    }
+    if (newUser.birthday) newUser.birthday = new Date(newUser.birthday);
 
     try {
         const dbcode = await userServices.updateUser(newUser);

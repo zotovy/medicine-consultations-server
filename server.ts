@@ -10,6 +10,7 @@ import bodyParser from "body-parser";
 import ApiRouter from "./routes";
 import * as Sentry from "@sentry/node";
 import SocketServices from "./services/socket_services";
+import fileUpload from "express-fileupload";
 
 class Server {
     app: Express;
@@ -57,7 +58,9 @@ class Server {
         );
         this.app.use(bodyParser.json());
         this.app.use("/static", express.static("static"));
+        this.app.use(fileUpload());
         this.app.use("/api", ApiRouter);
+
 
         if (this.useSentry && process.env.MODE === "production") {
             this.app.use(Sentry.Handlers.errorHandler());

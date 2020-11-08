@@ -84,6 +84,7 @@ export enum TValidationErrorType {
 export type TUserValidationErrors = {
     name?: TValidationErrorType;
     surname?: TValidationErrorType;
+    patronymic?: TValidationErrorType;
     phone?: TValidationErrorType;
     email?: TValidationErrorType;
     password?: TValidationErrorType;
@@ -96,6 +97,9 @@ export type TUserValidationErrors = {
     createdAt?: TValidationErrorType;
     lastActiveAt?: TValidationErrorType;
     favourites?: TValidationErrorType;
+    country?: TValidationErrorType;
+    city?: TValidationErrorType;
+    birthday?: TValidationErrorType;
 };
 
 /**
