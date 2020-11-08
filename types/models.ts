@@ -33,6 +33,7 @@ export interface IUser extends Document {
     lastActiveAt: Date;
     favourites: mongoose.Types.ObjectId[];
     activeConsultations: mongoose.Types.ObjectId[];
+    birthday?: Date;
 }
 
 /**
@@ -61,6 +62,7 @@ export interface UserObject {
     favourites: mongoose.Types.ObjectId[];
     age?: IUser["age"];
     activeConsultations: mongoose.Types.ObjectId[];
+    birthday?: IUser['birthday'];
 }
 
 /**

@@ -138,7 +138,6 @@ Router.get("/doctors", async (req, res) => {
         "workPlan",
         "rating",
         "bodyParts",
-        "symptoms",
     ];
 
 

@@ -108,6 +108,7 @@ const UserSchema = new Schema({
             ref: "Consultation",
         },
     ],
+    birthday: Date,
 });
 
 export default model<IUser>("User", UserSchema);
