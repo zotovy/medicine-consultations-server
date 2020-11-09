@@ -5,8 +5,10 @@ import { Types } from "mongoose";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
 import encoder from "./encoder";
-import symptoms, { BodyParts } from "../types/sympthoms";
+import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/sympthoms";
 import { DoctorObject, DoctorTile } from "../types/models";
+import { transcode } from "buffer";
+import { translateSpeciality } from "../types/services";
 
 // Used to process the http request
 const Router = express.Router();
@@ -137,13 +139,21 @@ Router.get("/doctors", async (req, res) => {
         "experience",
         "workPlan",
         "rating",
-        "bodyParts",
+        "bodyPart",
     ];
 
     const data = encoder.query(req.query, qKeys);
 
     if (data.symptoms) {
         data.bodyParts = data.symptoms;
+    }
+
+    if (data.bodyPart) {
+        data.speciality = [];
+        (data.bodyPart as string[]).forEach(e => {
+            // @ts-ignore
+            data.speciality = data.speciality.concat(BodyPartsToSpecialities[e]);
+        })
     }
 
     if (typeof data.from !== "number") {
@@ -154,13 +164,23 @@ Router.get("/doctors", async (req, res) => {
     }
 
     try {
-        let doctors: any = await doctorServices.getAll(
+        let doctors = await doctorServices.getAll(
             data,
             data.from,
             data.amount
         );
 
+        doctors.forEach((e, i) => {
+            const sp : any = [];
+            doctors[i].speciality.forEach(el => {
+                // @ts-ignore
+                return sp.push(translateSpeciality[el]);
+            });
+            doctors[i].speciality = sp;
+        })
+
         if (req.query.type === "tile") {
+            // @ts-ignore
             doctors = doctors.map((e: DoctorObject) => ({
                 name: e.name,
                 photoUrl: e.photoUrl,
