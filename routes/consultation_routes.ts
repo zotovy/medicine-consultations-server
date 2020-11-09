@@ -4,7 +4,7 @@ import token_services from "../services/token_services";
 import Consultation from "../models/consultation";
 import logger from "../logger";
 import { IDoctor, IUser } from "../types/models";
-import { Types } from "mongoose";
+import User from "../models/user";
 
 const Router = Express();
 
@@ -58,6 +58,30 @@ Router.get("/:id", token_services.authenticateToken, async (req, res) => {
         logger.e(`error while get consultation with id = ${id}`);
         return res.status(500).json({ success: false, error: "invalid_error" });
     }
+});
+
+Router.get("/user/:id", async (req, res) => {
+
+    const { id } = req.params;
+
+    const user = await User.findById(id).populate({
+        path: "consultations",
+        select: "doctorId date",
+        populate: [
+            {
+                path: "doctorId",
+                select: "fullName photoUrl _id speciality"
+
+            }
+        ]
+    }).select("consultations").lean().exec();
+
+    return res.status(user !== null ? 404 : 200).json({
+        success: user !== null,
+        consultations: user?.consultations,
+        error: user === null ? "invalid_error" : undefined
+    });
+
 });
 
 export default Router;
