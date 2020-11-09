@@ -60,7 +60,7 @@ Router.get("/:id", token_services.authenticateToken, async (req, res) => {
     }
 });
 
-Router.get("/user/:id", async (req, res) => {
+Router.get("/user/:id", token_services.authenticateToken, async (req, res) => {
 
     const { id } = req.params;
 
@@ -76,7 +76,7 @@ Router.get("/user/:id", async (req, res) => {
         ]
     }).select("consultations").lean().exec();
 
-    return res.status(user !== null ? 404 : 200).json({
+    return res.status(user === null ? 404 : 200).json({
         success: user !== null,
         consultations: user?.consultations,
         error: user === null ? "invalid_error" : undefined

@@ -31,6 +31,7 @@ const Consultation = new Schema({
             ref: "User",
         },
     ],
+
 });
 
 export default model<IConsultation>("Consultation", Consultation);
