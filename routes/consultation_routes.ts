@@ -5,6 +5,7 @@ import Consultation from "../models/consultation";
 import logger from "../logger";
 import { IDoctor, IUser } from "../types/models";
 import User from "../models/user";
+import Doctor from "../models/doctor";
 
 const Router = Express();
 
@@ -63,8 +64,11 @@ Router.get("/:id", token_services.authenticateToken, async (req, res) => {
 Router.get("/user/:id", token_services.authenticateToken, async (req, res) => {
 
     const { id } = req.params;
+    let { isUser } = req.query;
 
-    const user = await User.findById(id).populate({
+    if (!isUser) isUser = "true";
+
+    const populate = {
         path: "consultations",
         select: "doctorId date",
         populate: [
@@ -74,14 +78,19 @@ Router.get("/user/:id", token_services.authenticateToken, async (req, res) => {
 
             }
         ]
-    }).select("consultations").lean().exec();
+    };
+
+    const user = isUser === "true"
+        ? await User.findById(id).populate(populate).select("consultations").lean().exec()
+        : await Doctor.findById(id).populate(populate).select("consultations").lean().exec()
 
     return res.status(user === null ? 404 : 200).json({
         success: user !== null,
         consultations: user?.consultations,
         error: user === null ? "invalid_error" : undefined
     });
-
 });
+
+
 
 export default Router;

@@ -411,7 +411,7 @@ class DoctorServices {
         //* Speciality
         if (filter.speciality) {
             queryFilter.speciality = {
-                $all: filter.speciality,
+                $in: filter.speciality,
             };
         }
 

@@ -427,9 +427,10 @@ export interface IGetDoctorsFilterQuery {
     fullName?: {
         $regex: RegExp;
     };
-    speciality?: {
-        $all: string[];
-    };
+    // speciality?: {
+    //     $all: string[];
+    // };
+    speciality?: any,
     $or?: {
         [key: string]: {
             $gte?: number;
