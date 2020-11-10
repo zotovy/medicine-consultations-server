@@ -70,7 +70,7 @@ Router.get("/user/:id", token_services.authenticateToken, async (req, res) => {
 
     const populate = {
         path: "consultations",
-        select: "doctorId date",
+        select: "doctorId date note",
         populate: [
             {
                 path: "doctorId",
