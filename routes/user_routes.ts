@@ -16,6 +16,7 @@ import fs from "fs";
 import { UserObject } from "../types/models";
 import { ServerError } from "../types/errors";
 import token_services from "../services/token_services";
+import Doctor from "../models/doctor";
 
 // Used to process the http request
 const Router = express.Router();
@@ -352,13 +353,14 @@ Router.post(
 
             const user = await User.findById(userId).select("photoUrl");
             if (!user) return res.status(400).json({ status: false, error: "no_user_found" });
-            const oldImagePath = path.join(__dirname, "../",user.photoUrl.substring(22));
+            const oldImagePath = path.join(__dirname, "../", user.photoUrl.substring(22));
             user.photoUrl = process.env.server_url + "/static/user-pics/" + filename
-            fs.unlink(oldImagePath, () => {});
+            fs.unlink(oldImagePath, () => {
+            });
             await user.save();
             return res.status(200).json({
                 success: true,
-                photoUrlPath: process.env.server_url + "/static/user-pics/" +filename
+                photoUrlPath: process.env.server_url + "/static/user-pics/" + filename
             });
         } catch (e) {
             console.log(e);
@@ -561,9 +563,10 @@ Router.post("/send-reset-password-email", async (req, res) => {
 Router.get("/user/:id/reviews", async (req, res) => {
 
     const { id } = req.params;
-    const isTile = req.query.tile;
+    const { tile, isUser } = req.query;
 
-    const populate = isTile == "true" ? [
+
+    const populate = tile == "true" ? [
         {
             path: "doctorId",
             select: "photoUrl fullName"
@@ -571,16 +574,21 @@ Router.get("/user/:id/reviews", async (req, res) => {
     ] : [];
 
     try {
-        const reviews = await User.findById(id).select("reviews").populate({
-            path: "reviews",
-            populate,
-        });
+        const reviews = isUser == "false"
+            ? await Doctor.findById(id).select("reviews").populate({
+                path: "reviews",
+                populate,
+            })
+            : await User.findById(id).select("reviews").populate({
+                path: "reviews",
+                populate,
+            });
 
         if (!reviews) {
             return res.status(400).json({ success: false, error: "no_found" });
         }
 
-        return res.status(200).json({ success: true, reviews: reviews.reviews  });
+        return res.status(200).json({ success: true, reviews: reviews.reviews });
     } catch (e) {
         console.log(e);
         return res.status(500).json({ success: false, error: "invalid_error" });
