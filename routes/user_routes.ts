@@ -558,4 +558,34 @@ Router.post("/send-reset-password-email", async (req, res) => {
     return res.status(response.success ? 200 : 400).json(response);
 });
 
+Router.get("/user/:id/reviews", async (req, res) => {
+
+    const { id } = req.params;
+    const isTile = req.query.tile;
+
+    const populate = isTile == "true" ? [
+        {
+            path: "doctorId",
+            select: "photoUrl fullName"
+        }
+    ] : [];
+
+    try {
+        const reviews = await User.findById(id).select("reviews").populate({
+            path: "reviews",
+            populate,
+        });
+
+        if (!reviews) {
+            return res.status(400).json({ success: false, error: "no_found" });
+        }
+
+        return res.status(200).json({ success: true, reviews: reviews.reviews  });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ success: false, error: "invalid_error" });
+    }
+
+});
+
 export default Router;
