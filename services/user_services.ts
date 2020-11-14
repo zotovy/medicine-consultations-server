@@ -452,7 +452,7 @@ class UserServices {
 
         // email
         if (user.email) {
-            if (typeof user.email !== "string") errors.phone = ErrorType.TypeError;
+            if (typeof user.email !== "string") errors.email = ErrorType.TypeError;
             else {
                 if (
                     !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
@@ -464,6 +464,25 @@ class UserServices {
                     let users = await User.find({ email: user.email }).select("_id");
                     if (users.length === 0) users = await Doctor.find({ email: user.email }).select("_id");
                     if (users.length > 0 && String(users[0]._id) !== user.id) errors.email = ErrorType.UniqueError;
+                }
+            }
+        }
+
+        // notification email
+        if (user.notificationEmail) {
+            if (typeof user.notificationEmail !== "string") errors.notificationEmail = ErrorType.TypeError;
+            else {
+                if (
+                    !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+                        user.notificationEmail
+                    )
+                ) {
+                    errors.notificationEmail = ErrorType.EmailFormatError;
+                } else {
+                    let users = await User.find({ email: user.notificationEmail }).select("_id");
+                    if (users.length === 0) users = await Doctor.find({ email: user.notificationEmail }).select("_id");
+                    console.log(users);
+                    if (users.length > 0 && String(users[0]._id) !== user.id) errors.notificationEmail = ErrorType.UniqueError;
                 }
             }
         }
@@ -710,7 +729,7 @@ class UserServices {
         }
 
         try {
-            const user: IUser | null = await User.findOneAndUpdate(
+            let user: IUser | null = await User.findOneAndUpdate(
                 {
                     _id: newUser.id,
                 },
@@ -719,12 +738,22 @@ class UserServices {
             );
 
             if (!user) {
-                console.log(`Updated user is null data = ${newUser}`);
-                return {
-                    success: false,
-                    error: "updated_user_is_null",
-                    message: "Updated user is null",
-                };
+
+                user = await Doctor.findOneAndUpdate({
+                        _id: newUser.id,
+                    },
+                    newUser,
+                    { new: true }
+                );
+
+                if (!user) {
+                    console.log(`Updated user is null data`, newUser);
+                    return {
+                        success: false,
+                        error: "updated_user_is_null",
+                        message: "Updated user is null",
+                    };
+                }
             }
 
             return {
