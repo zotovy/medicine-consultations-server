@@ -493,6 +493,16 @@ class UserServices {
             else if (user.country.length === 0 || user.country.length > 256) errors.country = ErrorType.LengthError;
         }
 
+        // sendNotificationToEmail
+        if (user.sendNotificationToEmail) {
+            if (typeof user.sendNotificationToEmail !== "boolean") errors.sendNotificationToEmail = ErrorType.TypeError;
+        }
+
+        // sendMailingsToEmail
+        if (user.sendMailingsToEmail) {
+            if (typeof user.sendMailingsToEmail !== "boolean") errors.sendMailingsToEmail = ErrorType.TypeError;
+        }
+
         // city
         if (user.city) {
             if (typeof user.city !== "string") errors.city = ErrorType.TypeError;
