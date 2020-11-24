@@ -1074,7 +1074,7 @@ const symptoms = {
         Snizhenie_sluha,
         Shum_v_ushah,
     ],
-    Рот: {
+    Рот: [
         Bolit_zub,
         Bol_v_desne,
         Bol_v_yazyke,
@@ -1108,8 +1108,8 @@ const symptoms = {
         Toshnota,
         Hrap,
         Chuvstvitelnost_zubov,
-    },
-    Горло: {
+    ],
+    Горло: [
         Bolit_zub,
         Bol_v_desne,
         Bol_v_yazyke,
@@ -1143,7 +1143,7 @@ const symptoms = {
         Toshnota,
         Hrap,
         Chuvstvitelnost_zubov,
-    },
+    ],
     "Пищеварительная система": [
         Analnyj_zud,
         Bol_abdominalnaya,
