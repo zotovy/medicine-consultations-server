@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import {Types} from "mongoose";
 import crypto from "crypto";
 
 // Modules
@@ -7,7 +7,7 @@ import Doctor from "../models/doctor";
 
 // Services
 import emailServices from "./mail_services";
-import { IUserToUserObj } from "./types_services";
+import {IUserToUserObj} from "./types_services";
 
 // @types
 import {
@@ -21,7 +21,7 @@ import {
     TValidateUser,
     TUserValidationErrors,
     TValidationErrorType,
-    TResetPassword,
+    TResetPassword, TLinksUpdate,
 } from "../types/services";
 import {
     IUser,
@@ -29,10 +29,10 @@ import {
     IResetPasswordRequest,
     IDoctor,
 } from "../types/models";
-import { AccessToken, RefreshToken } from "../models/tokens";
+import {AccessToken, RefreshToken} from "../models/tokens";
 import token_services from "./token_services";
 import logger from "../logger";
-import { ResetPasswordRequest } from "../models/mails";
+import {ResetPasswordRequest} from "../models/mails";
 
 class UserServices {
     /**
@@ -59,9 +59,9 @@ class UserServices {
     ): Promise<TGetUsers> {
         try {
             const raw: IUser[] = await User.find({})
-                                           .skip(from)
-                                           .limit(amount)
-                                           .lean();
+                .skip(from)
+                .limit(amount)
+                .lean();
 
             // no user were found
             if (!raw)
@@ -95,11 +95,11 @@ class UserServices {
         email: string,
         password: string
     ): Promise<TCheckUserEmailAndPassword> {
-        let user: IUser | IDoctor | null = await User.findOne({ email });
+        let user: IUser | IDoctor | null = await User.findOne({email});
         let isUser = true;
 
         if (!user) {
-            user = await Doctor.findOne({ email });
+            user = await Doctor.findOne({email});
             isUser = false;
         }
 
@@ -157,7 +157,7 @@ class UserServices {
         }
 
         // delete request
-        await ResetPasswordRequest.findOneAndDelete({ _id: requestId });
+        await ResetPasswordRequest.findOneAndDelete({_id: requestId});
 
         // Check work time of request (24 hours)
         const msDiff = new Date().getTime() - request?.timestamp.getTime();
@@ -173,8 +173,8 @@ class UserServices {
         // Set new password
         try {
             const user = await User.findOneAndUpdate(
-                { _id: request.userId },
-                { password }
+                {_id: request.userId},
+                {password}
             ).catch((e) => null);
 
             if (!user) {
@@ -461,8 +461,8 @@ class UserServices {
                 ) {
                     errors.email = ErrorType.EmailFormatError;
                 } else {
-                    let users = await User.find({ email: user.email }).select("_id");
-                    if (users.length === 0) users = await Doctor.find({ email: user.email }).select("_id");
+                    let users = await User.find({email: user.email}).select("_id");
+                    if (users.length === 0) users = await Doctor.find({email: user.email}).select("_id");
                     if (users.length > 0 && String(users[0]._id) !== user.id) errors.email = ErrorType.UniqueError;
                 }
             }
@@ -479,8 +479,8 @@ class UserServices {
                 ) {
                     errors.notificationEmail = ErrorType.EmailFormatError;
                 } else {
-                    let users = await User.find({ email: user.notificationEmail }).select("_id");
-                    if (users.length === 0) users = await Doctor.find({ email: user.notificationEmail }).select("_id");
+                    let users = await User.find({email: user.notificationEmail}).select("_id");
+                    if (users.length === 0) users = await Doctor.find({email: user.notificationEmail}).select("_id");
                     console.log(users);
                     if (users.length > 0 && String(users[0]._id) !== user.id) errors.notificationEmail = ErrorType.UniqueError;
                 }
@@ -744,7 +744,7 @@ class UserServices {
                     _id: newUser.id,
                 },
                 newUser,
-                { new: true }
+                {new: true}
             );
 
             if (!user) {
@@ -753,7 +753,7 @@ class UserServices {
                         _id: newUser.id,
                     },
                     newUser,
-                    { new: true }
+                    {new: true}
                 );
 
                 if (!user) {
@@ -849,11 +849,7 @@ class UserServices {
         const access = token_services.generateToken(userId, "jwt_access");
         const refresh = token_services.generateToken(userId, "jwt_refresh");
 
-        // Add new tokens to db
-        await AccessToken.create({ value: access });
-        await RefreshToken.create({ value: refresh });
-
-        return { access, refresh };
+        return {access, refresh};
     };
 
     // ANCHOR: generate new tokens
@@ -865,6 +861,24 @@ class UserServices {
 
     encryptPassword = (password: string): string => {
         return crypto.createHash('sha256').update(password).digest("base64");
+    }
+
+    /** This function update links for giving uid */
+    updateLinks = async (uid: string, links: TLinksUpdate): Promise<void> => {
+        try {
+            await User.findByIdAndUpdate(uid, {
+                vkLink: links.vk,
+                instagramLink: links.instagram,
+                telegramLink: links.telegram,
+                whatsAppLink: links.whatsApp,
+                viberLink: links.viber,
+                emailLink: links.email,
+            });
+
+            logger.i(`UserServices.updateLinks: successfully update links for user (uid=${uid});`)
+        } catch (e) {
+            logger.e(`Invalid error happened while update links for user (uid=${uid}): ${e}`);
+        }
     }
 }
 

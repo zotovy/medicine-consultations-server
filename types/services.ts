@@ -206,6 +206,18 @@ export type TRemoveUser = {
     user?: UserObject;
 };
 
+/**
+ * This type describe input object for UserServices.updateLinks() function
+ */
+export type TLinksUpdate = {
+    vk?: string;
+    instagram?: string;
+    telegram?: string;
+    whatsApp?: string;
+    viber?: string;
+    email?: string;
+}
+
 //========================================================================================
 /*                                                                                      *
  *                                        Doctor                                        *
