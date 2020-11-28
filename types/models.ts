@@ -124,6 +124,12 @@ export interface DoctorObject extends UserObject {
     workPlan?: EWorkPlan;
     isChild?: IDoctor["isChild"];
     isAdult?: IDoctor["isAdult"];
+    vkLink?: IDoctor["vkLink"];
+    instagramLink?: IDoctor["instagramLink"];
+    telegramLink?: IDoctor["telegramLink"];
+    whatsAppLink?: IDoctor["whatsAppLink"];
+    viberLink?:IDoctor["viberLink"];
+    emailLink?: IDoctor["emailLink"];
 }
 
 /**

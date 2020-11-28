@@ -109,6 +109,12 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         serviceExperience: e.serviceExperience,
         qualification: e.qualification,
         activeConsultations: [...e.activeConsultations],
+        vkLink: e.vkLink,
+        instagramLink: e.instagramLink,
+        telegramLink: e.telegramLink,
+        whatsAppLink: e.whatsAppLink,
+        viberLink: e.viberLink,
+        emailLink: e.emailLink,
     };
 }
 /**

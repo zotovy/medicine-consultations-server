@@ -366,7 +366,7 @@ class DoctorServices {
                     sort: { created: -1 },
                 },
             },
-        });
+        }).select("-password -__v" )
 
         if (!doctor) {
             logger.w(`No doctor found, id=${id}`);
@@ -377,7 +377,7 @@ class DoctorServices {
             };
         }
 
-        logger.i(`successfully get user, id=${id}`);
+        logger.i(`successfully get doctor, id=${id}`);
         return {
             success: true,
             doctor: IDoctorToDoctorObj(doctor),
