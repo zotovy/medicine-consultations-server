@@ -22,7 +22,7 @@ import {
     EWorkExperience,
     EWorkPlan,
     IGetDoctorsFilterQuery,
-    MWorkExperience,
+    MWorkExperience, TLinksUpdate,
 } from "../types/services";
 
 // Services
@@ -687,6 +687,24 @@ class DoctorServices {
             return this.handleRawGetAllFilter(filter);
         }
     };
+
+    /** This function update links for giving uid */
+    updateLinks = async (uid: string, links: TLinksUpdate): Promise<void> => {
+        try {
+            await Doctor.findByIdAndUpdate(uid, {
+                vkLink: links.vk,
+                instagramLink: links.instagram,
+                telegramLink: links.telegram,
+                whatsAppLink: links.whatsApp,
+                viberLink: links.viber,
+                emailLink: links.email,
+            });
+
+            logger.i(`UserServices.updateLinks: successfully update links for user (uid=${uid});`)
+        } catch (e) {
+            logger.e(`Invalid error happened while update links for user (uid=${uid}): ${e}`);
+        }
+    }
 }
 
 export default new DoctorServices();

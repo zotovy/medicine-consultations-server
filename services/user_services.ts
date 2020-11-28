@@ -862,24 +862,6 @@ class UserServices {
     encryptPassword = (password: string): string => {
         return crypto.createHash('sha256').update(password).digest("base64");
     }
-
-    /** This function update links for giving uid */
-    updateLinks = async (uid: string, links: TLinksUpdate): Promise<void> => {
-        try {
-            await User.findByIdAndUpdate(uid, {
-                vkLink: links.vk,
-                instagramLink: links.instagram,
-                telegramLink: links.telegram,
-                whatsAppLink: links.whatsApp,
-                viberLink: links.viber,
-                emailLink: links.email,
-            });
-
-            logger.i(`UserServices.updateLinks: successfully update links for user (uid=${uid});`)
-        } catch (e) {
-            logger.e(`Invalid error happened while update links for user (uid=${uid}): ${e}`);
-        }
-    }
 }
 
 export default new UserServices();

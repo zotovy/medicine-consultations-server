@@ -9,6 +9,9 @@ import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/sympthoms
 import { DoctorObject, DoctorTile } from "../types/models";
 import { transcode } from "buffer";
 import { translateSpeciality } from "../types/services";
+import token_services from "../services/token_services";
+import userServices from "../services/user_services";
+import Ajv from "ajv";
 
 // Used to process the http request
 const Router = express.Router();
@@ -253,5 +256,40 @@ Router.get("/symptoms", async (req, res) => {
         });
     }
 });
+const updateLinksAjv = new Ajv();
+const updateLinksSchema = {
+    type: "object",
+    properties: {
+        vk: { type: "string", maxLength: 256 },
+        instagram: { type: "string", maxLength: 256 },
+        telegram: { type: "string", maxLength: 256 },
+        whatsApp: { type: "string", maxLength: 256 },
+        viber: { type: "string", maxLength: 256 },
+        email: { type: "string", maxLength: 256 },
+    },
+};
+const updateLinksValidate = updateLinksAjv.compile(updateLinksSchema);
+
+
+
+Router.post("/doctor/:id/update-links", token_services.authenticateToken, async (req, res) => {
+    const { id } = req.params;
+
+    // validate id & body
+    if (!id || (id.length != 24 && id.length != 12)) return res.status(400).json({
+        status: false, error: "invalid_id"
+    });
+
+    if (!updateLinksValidate(req.body)) return res.status(400).json({
+        status: false, error: "invalid_body"
+    });
+
+    // Update links
+    const response = await doctorServices.updateLinks(id, req.body)
+        .catch(e => ({ status: false, error: e }))
+        .then(() => ({ status: true }));
+
+    return res.status(response.status ? 202 : 500).json(response);
+})
 
 export default Router;

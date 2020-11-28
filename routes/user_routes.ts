@@ -11,12 +11,14 @@ import mail_services from "../services/mail_services";
 import logger from "../logger";
 import User from '../models/user';
 import fs from "fs";
+import Ajv from "ajv";
 
 // @types
 import { UserObject } from "../types/models";
 import { ServerError } from "../types/errors";
 import token_services from "../services/token_services";
 import Doctor from "../models/doctor";
+import { TLink } from "../../client/src/modules/consultations/controllers/consultation-controller";
 
 // Used to process the http request
 const Router = express.Router();
@@ -595,5 +597,6 @@ Router.get("/user/:id/reviews", async (req, res) => {
     }
 
 });
+
 
 export default Router;
