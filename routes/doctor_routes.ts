@@ -216,7 +216,6 @@ Router.post("/doctor-request/send", async (req, res) => {
             message: "Invalid  ",
         });
     }
-
     const response = await doctorServices.saveBecomeDoctorRequest(request);
 
     if (response.success) {

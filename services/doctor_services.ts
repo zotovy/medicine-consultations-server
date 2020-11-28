@@ -517,6 +517,8 @@ class DoctorServices {
                 };
             }
 
+            request.password = user_services.encryptPassword(request.password ?? "");
+
             await BecomeDoctorRequest.create(request);
 
             logger.i(`successfully save become doctor request for ${email}`);
