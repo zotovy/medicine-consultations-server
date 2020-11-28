@@ -92,6 +92,12 @@ export interface IDoctor extends IUser {
     workPlan?: string;
     isChild?: boolean;
     isAdult?: boolean;
+    vkLink?: string,
+    instagramLink?: string,
+    telegramLink?: string,
+    whatsAppLink?: string,
+    viberLink?: string,
+    emailLink?: string,
 }
 
 export interface DoctorObject extends UserObject {

@@ -95,6 +95,12 @@ const Doctor = extendedSchema(User.schema, {
     isChild: Boolean,
     isAdult: Boolean,
     qualification: String,
+    vkLink: String,
+    instagramLink: String,
+    telegramLink: String,
+    whatsAppLink: String,
+    viberLink: String,
+    emailLink: String,
 });
 
 export default model<IDoctor>("Doctor", Doctor);
