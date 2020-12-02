@@ -32,14 +32,7 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: reqiredField,
-        unique: uniqueField,
-        validate: [
-            (val) => {
-                var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-                return re.test(val);
-            },
-            "email_format_error",
-        ],
+        unique: uniqueField
     },
     password: {
         type: String,

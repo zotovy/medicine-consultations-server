@@ -18,6 +18,7 @@ import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
 import admin from "../models/admin";
 import token_services from "../services/token_services";
 import { BecomeDoctorObj, IBecomeDoctor, AdminRole } from "../types/models";
+import FormatHelper from "../helpers/format_helper";
 
 class AdminServices {
     // constructor() {
@@ -130,6 +131,7 @@ class AdminServices {
                 passportSeries: founded.passportSeries,
                 workExperience: founded.workExperience,
                 workPlaces: founded.workPlaces,
+                fullName: FormatHelper.fullName(founded)
             };
             // @ts-ignore
             const doctor = await Doctor.create(doctorObject);
