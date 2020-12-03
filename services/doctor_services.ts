@@ -469,7 +469,7 @@ class DoctorServices {
         if (typeof filter.isAdult === "boolean") {
             queryFilter.isAdult = filter.isAdult;
         }
-        
+
         const raw = await Doctor.find(queryFilter)
             .sort(filter.sortBy == ESortBy.experience
                 ? { experience: filter.isDownward ? 1 : -1 }

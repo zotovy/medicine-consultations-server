@@ -18,7 +18,6 @@ import { UserObject } from "../types/models";
 import { ServerError } from "../types/errors";
 import token_services from "../services/token_services";
 import Doctor from "../models/doctor";
-import { TLink } from "../../client/src/modules/consultations/controllers/consultation-controller";
 
 // Used to process the http request
 const Router = express.Router();
