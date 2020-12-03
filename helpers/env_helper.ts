@@ -8,7 +8,7 @@ class EnvHelper {
                 this._loadEnv("testing", ".env.testing");
                 break;
             case "production":
-                // this._loadEnv("production", ".env");
+                this._loadEnv("production", ".env");
                 console.log(`server running in production mode`);
                 break;
             case "dev":
@@ -18,7 +18,7 @@ class EnvHelper {
                 this._loadEnv("fake", "fake.env");
                 break;
             default:
-                console.error("no MODE specefied");
+                console.error("no MODE specified");
         }
     };
 
