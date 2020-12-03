@@ -1,41 +1,34 @@
 /// <reference path="../declaration/mongoose-extended-schema.d.ts" />
 
 import { Types } from "mongoose";
-import User from "../models/user";
-import Review from "../models/review";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
-
 // types
-import { DoctorObject, IDoctor, BecomeDoctorObj } from "../types/models";
+import { BecomeDoctorObj, DoctorObject, IDoctor } from "../types/models";
 
 import {
-    TValidateDoctor,
-    TDoctorValidationErrors,
-    TValidationErrorType,
+    ESortBy,
     ESpeciality,
-    TCreateDoctor,
-    TUpdateDoctor,
-    TRemoveDoctor,
-    TGetOneDoctor,
-    TSaveBecomeDoctorRequest,
-    IGetDoctorsFilter,
     EWorkExperience,
     EWorkPlan,
+    IGetDoctorsFilter,
     IGetDoctorsFilterQuery,
-    MWorkExperience, TLinksUpdate,
+    MWorkExperience,
+    TCreateDoctor,
+    TDoctorValidationErrors,
+    TGetOneDoctor,
+    TLinksUpdate,
+    TRemoveDoctor,
+    TSaveBecomeDoctorRequest,
+    TUpdateDoctor,
+    TValidateDoctor,
+    TValidationErrorType,
 } from "../types/services";
-
 // Services
 import UserServices from "./user_services";
-import {
-    IDoctorToDoctorObj,
-    consistingOf,
-    validateByEnum,
-} from "./types_services";
+import user_services from "./user_services";
+import { consistingOf, IDoctorToDoctorObj, validateByEnum, } from "./types_services";
 import logger from "../logger";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
-import user_services from "./user_services";
-import {query} from "express";
 
 class DoctorServices {
     // constructor() {
@@ -366,7 +359,7 @@ class DoctorServices {
                     sort: { created: -1 },
                 },
             },
-        }).select("-password -__v" )
+        }).select("-password -__v")
 
         if (!doctor) {
             logger.w(`No doctor found, id=${id}`);
@@ -476,13 +469,12 @@ class DoctorServices {
         if (typeof filter.isAdult === "boolean") {
             queryFilter.isAdult = filter.isAdult;
         }
-
-
-
+        
         const raw = await Doctor.find(queryFilter)
-            .sort({
-                rating: filter.isDownward ? -1 : 1,
-            })
+            .sort(filter.sortBy == ESortBy.experience
+                ? { experience: filter.isDownward ? 1 : -1 }
+                : { rating: filter.isDownward ? 1 : -1 }
+            )
             .skip(from)
             .limit(amount);
 
@@ -546,6 +538,12 @@ class DoctorServices {
         // This object will be our final filter config
         let config: IGetDoctorsFilter = {};
 
+        //* sortBy
+        if (filter.sortBy) {
+            if (filter.sortBy == ESortBy.rating) config.sortBy = ESortBy.rating;
+            else if (filter.sortBy == ESortBy.experience) config.sortBy = ESortBy.experience;
+        }
+
         //* BodyParts
         if (filter.bodyParts) {
             const field = validateByEnum<EBodyParts>(
@@ -582,7 +580,7 @@ class DoctorServices {
                 ESpeciality
             );
             if (field) {
-                const specialities : ESpeciality[] = [];
+                const specialities: ESpeciality[] = [];
                 Object.keys(filter.bodyParts).forEach((e) => {
                     // @ts-ignore
                     const part = BodyPartsToSpecialities[e];

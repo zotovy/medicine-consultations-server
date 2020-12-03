@@ -404,6 +404,14 @@ export enum EWorkExperience {
 }
 
 /**
+ * This enum describe doctor sortBy query
+ */
+export enum ESortBy {
+    rating = "rating",
+    experience = "experience",
+}
+
+/**
  * This type describe doctor qualification
  */
 export type TQualification = "second" | "first" | "highest";
@@ -430,6 +438,7 @@ export interface IGetDoctorsFilter {
     workPlan?: EWorkPlan[];
     isChild?: boolean;
     isAdult?: boolean;
+    sortBy?: ESortBy;
 }
 
 /**
@@ -439,9 +448,6 @@ export interface IGetDoctorsFilterQuery {
     fullName?: {
         $regex: RegExp;
     };
-    // speciality?: {
-    //     $all: string[];
-    // };
     speciality?: any,
     $or?: {
         [key: string]: {

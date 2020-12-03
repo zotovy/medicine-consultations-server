@@ -143,10 +143,10 @@ Router.get("/doctors", async (req, res) => {
         "workPlan",
         "rating",
         "bodyPart",
+        "sortBy"
     ];
 
     const data = encoder.query(req.query, qKeys);
-
     if (data.symptoms) {
         data.bodyParts = data.symptoms;
     }
