@@ -6,7 +6,7 @@ import Admin from "../../models/admin";
 import Doctor from "../../models/doctor";
 
 // Testable
-import adminServices from "../admin_services";
+import adminServices from "../../services/admin_services";
 
 // @types
 import {
@@ -15,7 +15,7 @@ import {
     BecomeDoctorObj,
     DoctorObject,
 } from "../../types/models";
-import { DoctorObjToBecomeDoctorObj } from "../types_services";
+import { DoctorObjToBecomeDoctorObj } from "../../services/types_services";
 import { BecomeDoctorRequest } from "../../models/doctor";
 import { AdminAccessToken, AdminRefreshToken } from "../../models/tokens";
 import { access } from "fs";
@@ -68,7 +68,7 @@ const sampleDoctor: DoctorObject = {
     lastActiveAt: new Date(),
     blankNumber: "12345678",
     blankSeries: "12345678",
-    education: "МГУ",
+    _education: "МГУ",
     issueDate: "21.11.2015",
     yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
@@ -83,7 +83,7 @@ const sampleDoctor: DoctorObject = {
     passportIssueDate: "21.11.2015",
     passportIssuedByWhom: "МВД г. Москвы",
     passportSeries: "123123",
-    workExperience: "1 год",
+    _workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
     serviceExperience: 365,
     age: 35,

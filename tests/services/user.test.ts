@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import User from "../../models/user";
 
 // Testable
-import userServices from "../user_services";
+import userServices from "../../services/user_services";
 
 // @types
 import { UserObject } from "../../types/models";

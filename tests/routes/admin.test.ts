@@ -4,7 +4,7 @@ import supertest from "supertest";
 import mongoose from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 import Admin from "../../models/admin";
-import app, { server } from "../../server";
+import server from "../../server";
 import jwt from "jsonwebtoken";
 
 // Testable
@@ -77,7 +77,7 @@ const sampleDoctor: DoctorObject = {
     lastActiveAt: new Date(),
     blankNumber: "12345678",
     blankSeries: "12345678",
-    education: "МГУ",
+    _education: "МГУ",
     issueDate: "12.11.2015",
     yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
@@ -92,7 +92,7 @@ const sampleDoctor: DoctorObject = {
     passportIssueDate: "21.11.2015",
     passportIssuedByWhom: "МВД г. Москвы",
     passportSeries: "123123",
-    workExperience: "1 год",
+    _workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
     serviceExperience: 365,
     age: 25,

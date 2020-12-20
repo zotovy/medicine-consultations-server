@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../../models/doctor";
 
 // Testable
-import doctorServices from "../doctor_services";
+import doctorServices from "../../services/doctor_services";
 
 // @types
 import { DoctorObject, BecomeDoctorObj } from "../../types/models";
@@ -12,10 +12,10 @@ import {
     IDoctorToDoctorObj,
     DoctorObjToBecomeDoctorObj,
     IBecomeDoctorToBecomeDoctorObj,
-} from "../types_services";
-import doctor_services from "../doctor_services";
+} from "../../services/types_services";
 import setupModels from "../../models";
 import { EWorkPlan, EWorkExperience } from "../../types/services";
+import { excludePassword } from "../helpers/password";
 
 /**
  *  ? This test module testing doctor services
@@ -38,7 +38,7 @@ const sampleDoctor: DoctorObject = {
     photoUrl: "",
     phone: 79028319028,
     email: "ivanov_ivan@mail.ru",
-    password: "ivanovcoolguy911",
+    password: "12345678",
     sex: true,
     city: "Москва",
     country: "Россия",
@@ -51,7 +51,7 @@ const sampleDoctor: DoctorObject = {
     lastActiveAt: new Date(),
     blankNumber: "12345678",
     blankSeries: "12345678",
-    education: "МГУ",
+    _education: "МГУ",
     issueDate: "21.11.2015",
     yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
@@ -66,7 +66,7 @@ const sampleDoctor: DoctorObject = {
     passportIssueDate: "21.11.2015",
     passportIssuedByWhom: "МВД г. Москвы",
     passportSeries: "123123",
-    workExperience: "1 год",
+    _workExperience: "1 год",
     workPlaces: "Городская поликлиника №1 г. Москва",
     age: 35,
     isAdult: true,
@@ -121,7 +121,7 @@ describe("Test Doctor services", () => {
         );
     });
 
-    // Close MongodDB connection after all test cases have done
+    // Close MongoDB connection after all test cases have done
     afterAll(async () => {
         db.disconnect();
     });
@@ -366,12 +366,13 @@ describe("Test Doctor services", () => {
         test("should get sample doctor", async () => {
             //* Arrange
             const { _id } = await Doctor.create(sampleDoctor);
-            const doctor = { ...sampleDoctor, id: String(_id) };
+            let doctor = { ...sampleDoctor, id: String(_id) };
 
             //* Act
             const response = await doctorServices.getOne(_id);
 
             //* Assert
+            doctor = excludePassword<DoctorObject>(doctor);
             expect(response).toEqual({ success: true, doctor });
         });
 
@@ -710,7 +711,7 @@ describe("Test Doctor services", () => {
             const { _id } = await Doctor.create(sampleDoctor);
             const doctor = { ...sampleDoctor, id: String(_id) };
             const filter = {
-                qualification: ["first"],
+                _qualification: ["first"],
             };
 
             //* Act
@@ -726,7 +727,7 @@ describe("Test Doctor services", () => {
             await Doctor.create(secondSampleUser);
             await Doctor.create(sampleDoctor);
             const filter = {
-                qualification: ["second"],
+                _qualification: ["second"],
             };
 
             //* Act
@@ -963,7 +964,7 @@ describe("Test Doctor services", () => {
         // ANCHOR: should save sample doctor request
         test("should save sample doctor request", async () => {
             //* Act
-            const response = await doctor_services.saveBecomeDoctorRequest(
+            const response = await doctorServices.saveBecomeDoctorRequest(
                 sampleRequest
             );
 
@@ -984,7 +985,7 @@ describe("Test Doctor services", () => {
             await BecomeDoctorRequest.create(sampleRequest);
 
             //* Act
-            const response = await doctor_services.saveBecomeDoctorRequest(
+            const response = await doctorServices.saveBecomeDoctorRequest(
                 sampleRequest
             );
 
@@ -1100,7 +1101,7 @@ describe("Test Doctor services", () => {
         test("shouldn't pass experience", async () => {
             //* Act
             const filter = {
-                qualification: ["first"],
+                _qualification: ["first"],
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 
@@ -1112,7 +1113,7 @@ describe("Test Doctor services", () => {
         test("shouldn't pass experience", async () => {
             //* Act
             const filter = {
-                qualification: ["123"],
+                _qualification: ["123"],
             };
             const cfg = doctorServices.testHandleRawGetAllFilter(filter);
 

@@ -1,11 +1,11 @@
 /// <reference types="../../node_modules/@types/jest/index" />
 
 import supertest from "supertest";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { ConsultationObject } from "../../types/models";
 import setupModels from "../../models";
 import Consultation from "../../models/consultation";
-import app, { server } from "../../server";
+import server from "../../server";
 
 /**
  *  ? This test module testing consultation routes
@@ -21,8 +21,8 @@ import app, { server } from "../../server";
 
 const sampleConsultation: ConsultationObject = {
     date: new Date(),
-    doctorId: "5f479fbe84148e0918c320e7",
-    patientId: "5f479fbe84148e0918c320e8",
+    doctorId: "5f479fbe84148e0918c320e7" as ObjectId,
+    patientId: "5f479fbe84148e0918c320e8" as ObjectId,
     note: "This is a note",
 };
 

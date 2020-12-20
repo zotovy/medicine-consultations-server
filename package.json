@@ -1,11 +1,11 @@
 {
     "name": "server",
     "version": "0.0.1",
-    "description": "web server for medecine consulation app",
+    "description": "web server for medicine consultation app",
     "main": "server.ts",
     "scripts": {
         "start": "set MODE=production&&node ./build/index.js",
-        "dev": "set MODE=dev&&ts-node-dev --respawn ./index.ts",
+        "dev": "export MODE=dev&&ts-node-dev --respawn ./index.ts",
         "build": "tsc",
         "test": "echo 123",
         "fake": "set MODE=fake&&ts-node ./index.ts",

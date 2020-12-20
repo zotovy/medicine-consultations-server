@@ -4,7 +4,7 @@ import supertest from "supertest";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import User from "../../models/user";
-import app, { server } from "../../server";
+import server from "../../server";
 
 // @types
 import { UserObject } from "../../types/models";

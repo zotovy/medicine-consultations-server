@@ -1,6 +1,6 @@
 /// <reference types="../../node_modules/@types/jest/index" />
 import supertest from "supertest";
-import app, { server } from "../../server";
+import server from "../../server";
 import mongoose from "mongoose";
 import ConsultationPayment from "../../models/payment";
 import { UserObject } from "../../types/models";

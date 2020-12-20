@@ -12,3 +12,4 @@ deploy_rsa.pub
 deploy_rsa
 .idea
 /static/
+.DS_Store
