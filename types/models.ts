@@ -69,7 +69,7 @@ export interface UserObject {
  * Doctor interface model
  */
 export interface IDoctor extends IUser {
-    education: string;
+    _education: string;
     yearEducation: string;
     blankSeries: string;
     blankNumber: string;
@@ -86,8 +86,8 @@ export interface IDoctor extends IUser {
     passportIssuedByWhom: string;
     passportSeries: string;
     passportIssueDate: string;
-    workExperience: string;
-    workPlaces: string;
+    _workExperience: string;
+    _workPlaces: string;
     qualification?: string;
     workPlan?: string;
     isChild?: boolean;
@@ -98,10 +98,15 @@ export interface IDoctor extends IUser {
     whatsAppLink?: string,
     viberLink?: string,
     emailLink?: string,
+    information?: string;
+    price: number;
+    workPlaces?: DoctorWorkplaceType[];
+    education?: DoctorEducationType[];
+    qualificationProofs?: DoctorQualificationDocumentType[];
 }
 
 export interface DoctorObject extends UserObject {
-    education: IDoctor["education"];
+    _education: IDoctor["_education"];
     yearEducation: IDoctor["yearEducation"];
     blankSeries: IDoctor["blankSeries"];
     blankNumber: IDoctor["blankNumber"];
@@ -118,8 +123,8 @@ export interface DoctorObject extends UserObject {
     passportIssuedByWhom: IDoctor["passportIssuedByWhom"];
     passportSeries: IDoctor["passportSeries"];
     passportIssueDate: IDoctor["passportIssueDate"];
-    workExperience: IDoctor["workExperience"];
-    workPlaces: IDoctor["workPlaces"];
+    _workExperience: IDoctor["_workExperience"];
+    _workPlaces: IDoctor["_workPlaces"];
     qualification?: IDoctor["qualification"];
     workPlan?: EWorkPlan;
     isChild?: IDoctor["isChild"];
@@ -130,6 +135,47 @@ export interface DoctorObject extends UserObject {
     whatsAppLink?: IDoctor["whatsAppLink"];
     viberLink?:IDoctor["viberLink"];
     emailLink?: IDoctor["emailLink"];
+    information?: IDoctor['information'];
+    price: IDoctor['price'];
+    workPlaces?: IDoctor['workPlaces'];
+    education?: IDoctor['education'];
+    qualificationProofs?: IDoctor['qualificationProofs'];
+}
+
+/**
+ * This type used to describe doctor workplace
+ */
+export type DoctorWorkplaceType = {
+    fromYear: number;
+    toYear: number;
+    organisation: string;
+    speciality: string;
+}
+
+/**
+ * This type used to describe doctor workplace
+ */
+export type DoctorEducationType = {
+    year: number;
+    institute: string;
+    educationType: Education;
+}
+
+/**
+ * This type used to describe doctor qualification document
+ */
+export type DoctorQualificationDocumentType = {
+    imageUrl: string;
+    name: string;
+}
+
+/**
+ * This enum used to describe types of doctor education
+ */
+export enum Education {
+    Baccalaureate,  // Бакалавриат
+    Specialty,      // Специалитет
+    Master,         // Магистратура
 }
 
 /**

@@ -90,14 +90,14 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         whosFavourite: [...e.whosFavourite],
         blankNumber: e.blankNumber,
         blankSeries: e.blankSeries,
-        education: e.education,
+        _education: e._education,
         issueDate: e.issueDate,
         yearEducation: e.yearEducation.toString(),
         passportIssueDate: e.passportIssueDate,
         passportIssuedByWhom: e.passportIssuedByWhom,
         passportSeries: e.passportSeries,
-        workExperience: e.workExperience,
-        workPlaces: e.workPlaces,
+        _workExperience: e._workExperience,
+        _workPlaces: e._workPlaces,
         age: e.age,
         isAdult: e.isAdult,
         isChild: e.isChild,
@@ -115,6 +115,12 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         whatsAppLink: e.whatsAppLink,
         viberLink: e.viberLink,
         emailLink: e.emailLink,
+        birthday: e.birthday,
+        education: e.education,
+        information: e.information,
+        workPlaces: e.workPlaces,
+        price: e.price,
+        qualificationProofs: e.qualificationProofs,
     };
 }
 /**
@@ -129,7 +135,7 @@ export function DoctorObjToBecomeDoctorObj(e: DoctorObject): BecomeDoctorObj {
         email: e.email,
         sex: e.sex,
         password: e.password,
-        education: e.education,
+        education: e._education,
         speciality: e.speciality.join(", "),
         yearEducation: e.yearEducation,
         blankSeries: e.blankSeries,
@@ -139,8 +145,8 @@ export function DoctorObjToBecomeDoctorObj(e: DoctorObject): BecomeDoctorObj {
         passportIssueDate: e.passportIssueDate,
         passportIssuedByWhom: e.passportIssuedByWhom,
         passportSeries: e.passportSeries,
-        workExperience: e.workExperience,
-        workPlaces: e.workPlaces,
+        workExperience: e._workExperience,
+        workPlaces: e._workPlaces,
     };
 }
 

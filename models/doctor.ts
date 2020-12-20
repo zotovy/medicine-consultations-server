@@ -1,14 +1,22 @@
 /// <reference path="../declaration/mongoose-extended-schema.d.ts" />
 
-import mongoose, { model, Schema } from "mongoose";
+import mongoose, { Model, model, Schema } from "mongoose";
 import extendedSchema from "mongoose-extend-schema";
 
 // Will extends Doctor model from user
 import User from "./user";
-import { IDoctor, IBecomeDoctor } from "../types/models";
+import {
+    IDoctor,
+    IBecomeDoctor,
+    DoctorWorkplaceType,
+    DoctorEducationType,
+    DoctorQualificationDocumentType
+} from "../types/models";
+import logger from "../logger";
+import ModelHelper from "../helpers/model_helper";
 
 const Doctor = extendedSchema(User.schema, {
-    education: {
+    _education: {
         type: String,
         required: true,
     },
@@ -48,11 +56,11 @@ const Doctor = extendedSchema(User.schema, {
         type: String,
         required: true,
     },
-    workExperience: {
+    _workExperience: {
         type: String,
         required: true,
     },
-    workPlaces: {
+    _workPlaces: {
         type: String,
         required: true,
     },
@@ -94,13 +102,22 @@ const Doctor = extendedSchema(User.schema, {
     workPlan: String,
     isChild: Boolean,
     isAdult: Boolean,
-    qualification: String,
+    _qualification: String,
     vkLink: String,
     instagramLink: String,
     telegramLink: String,
     whatsAppLink: String,
     viberLink: String,
     emailLink: String,
+    information: String,
+    price: {
+        type: Number,
+        required: true,
+        default: 1000,
+    },
+    workPlace: ModelHelper.JsonArrayField<DoctorWorkplaceType>(),
+    education: ModelHelper.JsonArrayField<DoctorEducationType>(),
+    qualificationProofs: ModelHelper.JsonArrayField<DoctorQualificationDocumentType>(),
 });
 
 export default model<IDoctor>("Doctor", Doctor);
@@ -112,7 +129,7 @@ const BecomeDoctorRequestSchema = new Schema({
     email: String,
     sex: Boolean,
     password: String,
-    education: String,
+    _education: String,
     speciality: String,
     yearEducation: String,
     blankSeries: String,
@@ -122,7 +139,7 @@ const BecomeDoctorRequestSchema = new Schema({
     passportIssuedByWhom: String,
     passportSeries: String,
     passportIssueDate: String,
-    workExperience: String,
+    _workExperience: String,
     workPlaces: String,
 });
 

@@ -114,7 +114,7 @@ class AdminServices {
                 lastActiveAt: new Date(),
                 blankNumber: founded.blankNumber,
                 blankSeries: founded.blankSeries,
-                education: founded.education,
+                _education: founded.education,
                 issueDate: founded.issueDate,
                 yearEducation: founded.yearEducation,
                 beginDoctorDate: new Date(),
@@ -129,7 +129,7 @@ class AdminServices {
                 passportIssueDate: founded.passportIssueDate,
                 passportIssuedByWhom: founded.passportIssuedByWhom,
                 passportSeries: founded.passportSeries,
-                workExperience: founded.workExperience,
+                _workExperience: founded.workExperience,
                 workPlaces: founded.workPlaces,
                 fullName: FormatHelper.fullName(founded)
             };
