@@ -119,6 +119,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         workPlaces: e.workPlaces ? [...e.workPlaces] : undefined,
         price: e.price,
         qualificationProofs: e.qualificationProofs,
+        workingTime: e.workingTime
     };
 }
 /**

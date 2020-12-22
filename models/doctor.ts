@@ -10,10 +10,11 @@ import {
     IBecomeDoctor,
     DoctorWorkplaceType,
     DoctorEducationType,
-    DoctorQualificationDocumentType
+    DoctorQualificationDocumentType, DoctorWorkingType
 } from "../types/models";
 import logger from "../logger";
 import ModelHelper from "../helpers/model_helper";
+import { defaultDoctorWorkingTime } from "../helpers/constants";
 
 const Doctor = extendedSchema(User.schema, {
     _education: {
@@ -105,11 +106,7 @@ const Doctor = extendedSchema(User.schema, {
     workPlaces: ModelHelper.JsonArrayField<DoctorWorkplaceType>(true),
     education: ModelHelper.JsonArrayField<DoctorEducationType>(true),
     qualificationProofs: ModelHelper.JsonArrayField<DoctorQualificationDocumentType>(true),
-    workingTime: {
-        type: String,
-        required: true,
-        default: "9:00-10:00",
-    }
+    workingTime: ModelHelper.JsonField<DoctorWorkingType>(true, defaultDoctorWorkingTime),
 });
 
 export default model<IDoctor>("Doctor", Doctor);

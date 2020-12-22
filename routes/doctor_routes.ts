@@ -195,6 +195,8 @@ Router.get("/doctors", async (req, res) => {
             }));
         }
 
+        console.log(doctors);
+    
         return res.status(200).json({
             success: true,
             doctors,

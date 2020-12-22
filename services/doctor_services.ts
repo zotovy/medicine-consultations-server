@@ -345,21 +345,26 @@ class DoctorServices {
             };
         }
 
-        const doctor: IDoctor | null = await Doctor.findById(id).populate({
-            path: "clientsReviews",
-            populate: {
-                path: "patientId",
-                select: {
-                    name: 1,
-                    surname: 1,
-                    photoUrl: 1,
-                },
-                options: {
-                    limit: 4, // todo
-                    sort: { created: -1 },
+        const doctor: IDoctor | null = await Doctor.findById(id).populate([
+            {
+                path: "clientsReviews",
+                populate: {
+                    path: "patientId",
+                    select: {
+                        name: 1,
+                        surname: 1,
+                        photoUrl: 1,
+                    },
+                    options: {
+                        limit: 4, // todo
+                        sort: { created: -1 },
+                    },
                 },
             },
-        }).select("-password -__v")
+            {
+                path: "schedule"
+            },
+        ]).select("-password -__v")
 
         if (!doctor) {
             logger.w(`No doctor found, id=${id}`);
@@ -477,7 +482,7 @@ class DoctorServices {
             )
             .skip(from)
             .limit(amount);
-        
+
         return raw.map((e) => IDoctorToDoctorObj(e));
     };
 

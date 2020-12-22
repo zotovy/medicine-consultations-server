@@ -177,6 +177,21 @@ export enum Education {
 }
 
 /**
+ * This type used to describe doctor working time
+ */
+export type DoctorWorkingType = {
+    from: {
+        h: number,
+        m: number,
+    },
+    to: {
+        h: number,
+        m: number,
+    },
+    consultationTimeInMin: number,
+}
+
+/**
  * Doctor tile interface model
  */
 export interface DoctorTile {
