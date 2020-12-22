@@ -50,7 +50,7 @@ const UserSchema = new Schema({
     country: {
         type: String,
     },
-    consultations: [
+    consultations: [ // Consultations which already have gone
         {
             // Store Array<ObjectId> of consultations
             // We can get user with consultation running .populate("consultation")
@@ -95,7 +95,7 @@ const UserSchema = new Schema({
             ref: "Doctor",
         },
     ],
-    activeConsultations: [
+    activeConsultations: [ // Consultation which is going now
         {
             type: Schema.Types.ObjectId,
             ref: "Consultation",

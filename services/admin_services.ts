@@ -123,7 +123,7 @@ class AdminServices {
                 experience: 0,
                 favourites: [],
                 rating: 0,
-                sheldure: [],
+                schedule: [],
                 speciality: [],
                 whosFavourite: [],
                 passportIssueDate: founded.passportIssueDate,

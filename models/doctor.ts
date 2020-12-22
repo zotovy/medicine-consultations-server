@@ -78,25 +78,12 @@ const Doctor = extendedSchema(User.schema, {
             required: true,
         },
     ],
-    clientsReviews: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "Review",
-        },
-    ],
-
-    clientsConsultations: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "Consultation",
-            required: true,
-        },
-    ],
-    sheldure: [
+    schedule: [
         {
             type: mongoose.Types.ObjectId,
             ref: "Appointment",
             required: true,
+            default: [],
         },
     ],
     workPlan: String,
@@ -115,9 +102,14 @@ const Doctor = extendedSchema(User.schema, {
         required: true,
         default: 1000,
     },
-    workPlaces: ModelHelper.JsonArrayField<DoctorWorkplaceType>(),
-    education: ModelHelper.JsonArrayField<DoctorEducationType>(),
-    qualificationProofs: ModelHelper.JsonArrayField<DoctorQualificationDocumentType>(),
+    workPlaces: ModelHelper.JsonArrayField<DoctorWorkplaceType>(true),
+    education: ModelHelper.JsonArrayField<DoctorEducationType>(true),
+    qualificationProofs: ModelHelper.JsonArrayField<DoctorQualificationDocumentType>(true),
+    workingTime: {
+        type: String,
+        required: true,
+        default: "9:00-10:00",
+    }
 });
 
 export default model<IDoctor>("Doctor", Doctor);

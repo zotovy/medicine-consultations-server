@@ -23,14 +23,14 @@ export default class ModelHelper {
         }
     );
 
-    public static JsonArrayField = <T>(): JsonArrayField<any> => (
+    public static JsonArrayField = <T>(required = false): JsonArrayField<any> => (
         {
             type: [String],
             get: (data) => data.map(ModelHelper.getter<T>()),
             set: (data: T[]) => data.map(ModelHelper.setter<T>()),
+            required,
         }
     )
-
 }
 
 export type JsonField<T> = {
@@ -43,4 +43,5 @@ export interface JsonArrayField<T> {
     type: [StringConstructor];
     get: (data: string[]) => T[];
     set: (data: T[]) => string[];
+    required?: boolean;
 }

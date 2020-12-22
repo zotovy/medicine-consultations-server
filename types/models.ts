@@ -80,9 +80,7 @@ export interface IDoctor extends IUser {
     serviceExperience: number;
     rating: number;
     whosFavourite: mongoose.Types.ObjectId[];
-    clientsReviews: mongoose.Types.ObjectId[];
-    clientsConsultations: mongoose.Types.ObjectId[];
-    sheldure: mongoose.Types.ObjectId[];
+    schedule: mongoose.Types.ObjectId[];
     passportIssuedByWhom: string;
     passportSeries: string;
     passportIssueDate: string;
@@ -103,6 +101,7 @@ export interface IDoctor extends IUser {
     workPlaces?: DoctorWorkplaceType[];
     education?: DoctorEducationType[];
     qualificationProofs?: DoctorQualificationDocumentType[];
+    workingTime: string;
 }
 
 export interface DoctorObject extends UserObject {
@@ -117,9 +116,7 @@ export interface DoctorObject extends UserObject {
     serviceExperience: IDoctor["serviceExperience"];
     rating: IDoctor["rating"];
     whosFavourite: IDoctor["whosFavourite"];
-    clientsReviews: IDoctor["clientsReviews"];
-    clientsConsultations: IDoctor["clientsConsultations"];
-    sheldure: IDoctor["sheldure"];
+    schedule: IDoctor["schedule"];
     passportIssuedByWhom: IDoctor["passportIssuedByWhom"];
     passportSeries: IDoctor["passportSeries"];
     passportIssueDate: IDoctor["passportIssueDate"];
@@ -140,6 +137,7 @@ export interface DoctorObject extends UserObject {
     workPlaces?: IDoctor['workPlaces'];
     education?: IDoctor['education'];
     qualificationProofs?: IDoctor['qualificationProofs'];
+    workingTime: IDoctor['workingTime'];
 }
 
 /**

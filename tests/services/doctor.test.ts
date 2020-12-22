@@ -60,7 +60,7 @@ const sampleDoctor: DoctorObject = {
     experience: 364,
     favourites: [], // will add later
     rating: 4.6,
-    sheldure: [], // will add later
+    schedule: [], // will add later
     speciality: ["Pediatrician", "Nutritionist"],
     whosFavourite: [], // will add later
     passportIssueDate: "21.11.2015",
@@ -157,7 +157,7 @@ describe("Test Doctor services", () => {
                 whosFavourite: "type_error",
                 clientsReviews: "type_error",
                 clientsConsultations: "type_error",
-                sheldure: "type_error",
+                schedule: "type_error",
             };
 
             const doctor = {
@@ -169,7 +169,7 @@ describe("Test Doctor services", () => {
                 whosFavourite: 123,
                 clientsReviews: 123,
                 clientsConsultations: 123,
-                sheldure: 123,
+                schedule: 123,
             };
 
             //* Act
@@ -191,7 +191,7 @@ describe("Test Doctor services", () => {
                 whosFavourite: "required_error",
                 clientsReviews: "required_error",
                 clientsConsultations: "required_error",
-                sheldure: "required_error",
+                schedule: "required_error",
             };
 
             const doctor = {
@@ -202,7 +202,7 @@ describe("Test Doctor services", () => {
                 whosFavourite: undefined,
                 clientsReviews: undefined,
                 clientsConsultations: undefined,
-                sheldure: undefined,
+                schedule: undefined,
             };
 
             //* Act

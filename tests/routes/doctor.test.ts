@@ -66,7 +66,7 @@ const sampleDoctor: DoctorObject = {
     experience: 3 * 365,
     favourites: [], // will add later
     rating: 4.6,
-    sheldure: [], // will add later
+    schedule: [], // will add later
     speciality: [],
     whosFavourite: [], // will add later
     passportIssueDate: "21.11.2015",
