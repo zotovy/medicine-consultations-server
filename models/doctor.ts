@@ -115,7 +115,7 @@ const Doctor = extendedSchema(User.schema, {
         required: true,
         default: 1000,
     },
-    workPlace: ModelHelper.JsonArrayField<DoctorWorkplaceType>(),
+    workPlaces: ModelHelper.JsonArrayField<DoctorWorkplaceType>(),
     education: ModelHelper.JsonArrayField<DoctorEducationType>(),
     qualificationProofs: ModelHelper.JsonArrayField<DoctorQualificationDocumentType>(),
 });

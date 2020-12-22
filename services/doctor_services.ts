@@ -477,7 +477,7 @@ class DoctorServices {
             )
             .skip(from)
             .limit(amount);
-
+        
         return raw.map((e) => IDoctorToDoctorObj(e));
     };
 
