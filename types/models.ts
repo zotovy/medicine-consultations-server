@@ -240,6 +240,8 @@ export interface ConsultationRequestObject {
     appointment: IConsultationRequest['appointment'];
 }
 
+
+
 /**
  * Review model interface
  */
@@ -260,16 +262,42 @@ export interface ReviewObject {
 }
 
 /**
- * Appointment model interace
+ * Appointment model interface
  */
 export interface IAppointment extends Document {
     from: Date;
     to: Date;
+    consultation: Types.ObjectId | IConsultation;
+    patientName: string;
+    phone: number;
+    birthday: Date;
+    sex: boolean;
+    chronicDiseases: string;
+    symptoms: string;
+    documents: ConsultationDocument;
 }
 
 export interface AppointmentObject {
     from: IAppointment["from"];
     to: IAppointment["to"];
+    consultation: IAppointment["consultation"];
+    patientName: IAppointment["patientName"];
+    phone: IAppointment["phone"];
+    birthday: IAppointment["birthday"];
+    sex: IAppointment["sex"];
+    chronicDiseases: IAppointment["chronicDiseases"];
+    symptoms: IAppointment["symptoms"];
+    documents: IAppointment["documents"];
+}
+
+/**
+ * Consultation document object
+ */
+export type ConsultationDocument = {
+    path: string;
+    type: "img" | "pdf" | "file";
+    size: string;
+    name: string;
 }
 
 /**
