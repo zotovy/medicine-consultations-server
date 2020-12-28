@@ -257,6 +257,8 @@ Router.get("/symptoms", async (req, res) => {
         });
     }
 });
+
+
 const updateLinksAjv = new Ajv();
 const updateLinksSchema = {
     type: "object",
@@ -271,13 +273,11 @@ const updateLinksSchema = {
 };
 const updateLinksValidate = updateLinksAjv.compile(updateLinksSchema);
 
-
-
 Router.post("/doctor/:id/update-links", token_services.authenticateToken, async (req, res) => {
     const { id } = req.params;
 
     // validate id & body
-    if (!id || (id.length != 24 && id.length != 12)) return res.status(400).json({
+    if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(400).json({
         status: false, error: "invalid_id"
     });
 
@@ -287,10 +287,26 @@ Router.post("/doctor/:id/update-links", token_services.authenticateToken, async 
 
     // Update links
     const response = await doctorServices.updateLinks(id, req.body)
-        .catch(e => ({ status: false, error: e }))
-        .then(() => ({ status: true }));
+        .catch(e => ({ success: false, error: e }))
+        .then(() => ({ success: true }));
 
-    return res.status(response.status ? 202 : 500).json(response);
+    return res.status(response.success ? 202 : 500).json(response);
 })
+
+Router.get("/doctor/:id/consultation-requests", token_services.authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const detail = req.query.detail === "true";
+
+    // validate id & body
+    if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(400).json({
+        status: false, error: "invalid_id"
+    });
+
+    const response = await doctorServices.getConsultationRequests(id, detail)
+        .then((v) => ({ success: true, requests: v }))
+        .catch(e => ({ success: false, error: e }));
+
+    return res.status(response.success ? 200 : 500).json(response);
+});
 
 export default Router;

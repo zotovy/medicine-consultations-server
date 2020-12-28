@@ -3,7 +3,13 @@
 import { Types } from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 // types
-import { BecomeDoctorObj, DoctorObject, IDoctor } from "../types/models";
+import {
+    BecomeDoctorObj,
+    ConsultationRequestObject,
+    DoctorObject,
+    IConsultationRequest,
+    IDoctor
+} from "../types/models";
 
 import {
     ESortBy,
@@ -24,8 +30,7 @@ import {
     TValidationErrorType,
 } from "../types/services";
 // Services
-import UserServices from "./user_services";
-import user_services from "./user_services";
+import userServices from "./user_services";
 import { consistingOf, IDoctorToDoctorObj, validateByEnum, } from "./types_services";
 import logger from "../logger";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
@@ -55,7 +60,7 @@ class DoctorServices {
 
         // Doctor model is extended from User model,
         // so, if obj is not validate as user this will never validated as doctor
-        const response = await UserServices.validateUser(doctor, needUnique);
+        const response = await userServices.validateUser(doctor, needUnique);
 
         if (!response.success) {
             return {
@@ -68,7 +73,7 @@ class DoctorServices {
         const ErrorType = TValidationErrorType;
 
         // Education
-        if (!doctor.education) {
+        if (!doctor._education) {
             errors.education = ErrorType.RequiredError;
         } else if (typeof doctor.education !== "string") {
             errors.education = ErrorType.TypeError;
@@ -213,7 +218,7 @@ class DoctorServices {
             };
         }
 
-        data.password = user_services.encryptPassword(data.password);
+        data.password = userServices.encryptPassword(data.password);
 
         const doctor: IDoctor = new Doctor(data);
 
@@ -514,7 +519,7 @@ class DoctorServices {
                 };
             }
 
-            request.password = user_services.encryptPassword(request.password ?? "");
+            request.password = userServices.encryptPassword(request.password ?? "");
 
             await BecomeDoctorRequest.create(request);
 
@@ -709,6 +714,35 @@ class DoctorServices {
         } catch (e) {
             logger.e(`Invalid error happened while update links for user (uid=${uid}): ${e}`);
         }
+    }
+
+    /** This function get doctor consultation requests */
+    getConsultationRequests = async (uid: string, detail: boolean = false): Promise<ConsultationRequestObject[]> => {
+        const populate = detail
+            ? [
+                { path: "patient", select: "fullName sex city country photoUrl" },
+                { path: "appointment" }
+            ]
+            : [
+                { path: "patient", select: "_id fullName photoUrl" },
+                { path: "appointment" }
+            ]
+
+        const raw = await Doctor.findById(uid)
+            .populate({
+                path: "consultationRequests",
+                populate,
+            })
+            .select("consultationRequests")
+            .lean() as DoctorObject;
+
+        if (!raw || raw.consultationRequests == undefined) {
+            logger.w(`trying to get doctor consultation but no doctor found with id=${uid}, raw=`, raw);
+            throw "not-found"
+        }
+
+        logger.i(`successfully get consultation requests for ${uid}`, raw.consultationRequests);
+        return raw.consultationRequests as ConsultationRequestObject[];
     }
 }
 
