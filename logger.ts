@@ -54,26 +54,25 @@ class Logger {
         this.saveStack();
     };
 
-    warning = (message: any, trace: any = null): void => {
+    warning = (message: any, ...args: any[]): void => {
         const time = new Date();
 
-        console.log(`${" Warning: ".black.bgYellow} ${message}`);
+        console.log(`${" Warning: ".black.bgYellow} ${message}`, ...args);
         console.log(`${new Date().toISOString()}`);
 
         const log: Log = {
             type: LogType.Warning,
             message: message,
             timestamp: time,
-            trace,
         };
 
         this.saveToStack(log);
     };
 
-    info = (message: string): void => {
+    info = (message: string, ...args: any[]): void => {
         const time = new Date();
 
-        console.log(`${"logger:".italic} ${message}`);
+        console.log(`${"logger:".italic} ${message}`, ...args);
 
         const log: Log = {
             type: LogType.Warning,

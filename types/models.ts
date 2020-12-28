@@ -102,6 +102,7 @@ export interface IDoctor extends IUser {
     education?: DoctorEducationType[];
     qualificationProofs?: DoctorQualificationDocumentType[];
     workingTime: string;
+    consultationRequests: mongoose.Types.ObjectId[] | IConsultationRequest[];
 }
 
 export interface DoctorObject extends UserObject {
@@ -138,6 +139,7 @@ export interface DoctorObject extends UserObject {
     education?: IDoctor['education'];
     qualificationProofs?: IDoctor['qualificationProofs'];
     workingTime: IDoctor['workingTime'];
+    consultationRequests: IDoctor['consultationRequests']
 }
 
 /**
@@ -189,6 +191,7 @@ export type DoctorWorkingType = {
         m: number,
     },
     consultationTimeInMin: number,
+    weekends: number[],
 }
 
 /**
@@ -218,6 +221,23 @@ export interface ConsultationObject {
     doctorId: IConsultation["doctorId"];
     date: IConsultation["date"];
     note?: IConsultation["note"];
+}
+
+/**
+ *  Consultation Request model interface
+ */
+export interface IConsultationRequest extends Document{
+    patient: Types.ObjectId | IUser;
+    doctor: Types.ObjectId | IDoctor;
+    createdAt: Date;
+    appointment: Types.ObjectId | IAppointment;
+}
+
+export interface ConsultationRequestObject {
+    patient: IConsultationRequest['patient'];
+    doctor: IConsultationRequest['doctor'];
+    createdAt: IConsultationRequest['createdAt'];
+    appointment: IConsultationRequest['appointment'];
 }
 
 /**

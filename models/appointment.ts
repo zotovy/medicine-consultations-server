@@ -1,7 +1,7 @@
 // Doctor consultation / appointments
-// Used for sheldure
+// Used for schedule
 
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { IAppointment } from "../types/models";
 
 const Appointment = new Schema({
@@ -13,6 +13,11 @@ const Appointment = new Schema({
         type: Date,
         required: true,
     },
+    consultation: {
+        type: Types.ObjectId,
+        ref: "Consultation",
+        required: true,
+    }
 });
 
 export default model<IAppointment>("Appointment", Appointment);

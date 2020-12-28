@@ -9,5 +9,6 @@ export const defaultDoctorWorkingTime: DoctorWorkingType = {
     to: {
         h: 18,
         m: 0
-    }
+    },
+    weekends: [5, 6]
 }

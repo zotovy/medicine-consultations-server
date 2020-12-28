@@ -107,6 +107,13 @@ const Doctor = extendedSchema(User.schema, {
     education: ModelHelper.JsonArrayField<DoctorEducationType>(true),
     qualificationProofs: ModelHelper.JsonArrayField<DoctorQualificationDocumentType>(true),
     workingTime: ModelHelper.JsonField<DoctorWorkingType>(true, defaultDoctorWorkingTime),
+    consultationRequests: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "ConsultationRequest",
+            required: true,
+        }
+    ]
 });
 
 export default model<IDoctor>("Doctor", Doctor);

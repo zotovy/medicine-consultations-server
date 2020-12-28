@@ -10,7 +10,7 @@ import {
     IAdmin,
     AdminObj,
     IConsultation,
-    ConsultationObject,
+    ConsultationObject, IConsultationRequest,
 } from "../types/models";
 import { EWorkPlan } from "../types/services";
 
@@ -119,7 +119,8 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         workPlaces: e.workPlaces ? [...e.workPlaces] : undefined,
         price: e.price,
         qualificationProofs: e.qualificationProofs,
-        workingTime: e.workingTime
+        workingTime: e.workingTime,
+        consultationRequests: e.consultationRequests,
     };
 }
 /**
@@ -240,3 +241,5 @@ export const IConsultationToConsultationObj = (
         note: e.note,
     };
 };
+
+
