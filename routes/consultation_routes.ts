@@ -37,8 +37,6 @@ Router.get("/:id", token_services.authenticateToken, async (req, res) => {
             .lean()
             .exec();
 
-        console.log(consultation);
-
         // If user is not a patient and is not a doctor
         if (
             req.headers.userId != (consultation?.doctor as IDoctor)?._id &&

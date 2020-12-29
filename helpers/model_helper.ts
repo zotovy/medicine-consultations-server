@@ -25,15 +25,17 @@ export default class ModelHelper {
         }
     );
 
-    public static JsonArrayField = <T>(required = false, def: T[] = []): JsonArrayField<any> => (
-        {
-            type: [String],
-            get: (data) => data.map(ModelHelper.getter<T>()),
-            set: (data: T[]) => data.map(ModelHelper.setter<T>()),
-            required,
-            default: def,
-        }
-    )
+    public static JsonArrayField = <T>(required = false, def: T[] = []): JsonArrayField<any> => {
+        return (
+            {
+                type: [String],
+                get: (data) => data.map(ModelHelper.getter<T>()),
+                set: (data: T[]) => data.map(ModelHelper.setter<T>()),
+                required,
+                default: def,
+            }
+        );
+    }
 }
 
 export type JsonField<T> = {

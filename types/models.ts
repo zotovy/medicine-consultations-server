@@ -80,7 +80,7 @@ export interface IDoctor extends IUser {
     serviceExperience: number;
     rating: number;
     whosFavourite: mongoose.Types.ObjectId[];
-    schedule: mongoose.Types.ObjectId[];
+    schedule: (mongoose.Types.ObjectId| IAppointment)[];
     passportIssuedByWhom: string;
     passportSeries: string;
     passportIssueDate: string;
@@ -274,7 +274,7 @@ export interface IAppointment extends Document {
     sex: boolean;
     chronicDiseases: string;
     symptoms: string;
-    documents: ConsultationDocument;
+    documents: ConsultationDocument[];
 }
 
 export interface AppointmentObject {

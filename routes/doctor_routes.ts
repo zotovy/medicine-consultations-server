@@ -272,6 +272,21 @@ class DoctorRoutes {
         return res.status(response.success ? 202 : 500).json(response);
     }
 
+    public static getAppoints: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
+
+        // validate id & body
+        if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(403).json({
+            status: false, error: "invalid_id"
+        });
+
+        const response = await doctorServices.getAppoints(id)
+            .then(v => ({ success: true, appoints: v }))
+            .catch(e => ({ success: true, error: e }));
+
+        return res.status(response.success ? 200 : 500).json(response);
+    }
+
     public static getAppointsRequests: IRouteHandler = async (req, res) => {
         const { id } = req.params;
         const detail = req.query.detail === "true";
@@ -281,7 +296,7 @@ class DoctorRoutes {
             status: false, error: "invalid_id"
         });
 
-        const response = await doctorServices.getConsultationRequests(id, detail)
+        const response = await doctorServices.getAppointsRequests(id, detail)
             .then((v) => ({ success: true, requests: v }))
             .catch(e => ({ success: false, error: e }));
 
@@ -299,6 +314,7 @@ Router.get("/doctors", DoctorRoutes.getDoctors);
 Router.post("/doctor-request/send", DoctorRoutes.sendDoctorRequests);
 Router.get("/symptoms", DoctorRoutes.getSymptoms);
 Router.post("/doctor/:id/update-links", token_services.authenticateToken, DoctorRoutes.updateLinks);
+Router.get("/doctor/:id/appoints", token_services.authenticateToken, DoctorRoutes.getAppoints);
 Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, DoctorRoutes.getAppointsRequests);
 
 export default Router;

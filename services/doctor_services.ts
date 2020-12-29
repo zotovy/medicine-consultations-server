@@ -3,11 +3,12 @@
 import { Types } from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 // types
+// types
 import {
+    AppointmentObject,
     BecomeDoctorObj,
     ConsultationRequestObject,
-    DoctorObject,
-    IConsultationRequest,
+    DoctorObject, IAppointment,
     IDoctor
 } from "../types/models";
 
@@ -717,7 +718,7 @@ class DoctorServices {
     }
 
     /** This function get doctor consultation requests */
-    getConsultationRequests = async (uid: string, detail: boolean = false): Promise<ConsultationRequestObject[]> => {
+    getAppointsRequests = async (uid: string, detail: boolean = false): Promise<ConsultationRequestObject[]> => {
         const populate = detail
             ? [
                 { path: "patient", select: "fullName sex city country photoUrl" },
@@ -755,6 +756,34 @@ class DoctorServices {
         }
         return doctor;
     };
+
+    public getAppoints = async (id: string): Promise<AppointmentObject[]> => {
+        const raw = await Doctor.findById(id).populate({
+            path: "schedule",
+            options: { getters: true },
+        }).select("schedule").lean();
+
+        if (!raw || raw.schedule == undefined) {
+            logger.w(`trying to get doctor appoints but no doctor found with id=${id}, raw=`, raw);
+            throw "not-found"
+        }
+
+
+                // .map(e => e?.documents.map(el => JSON.parse(el.toString())));
+
+        for (let i = 0; i < (raw.schedule as AppointmentObject[]).length; i++) {
+            // if (raw.schedule[i])
+            if ((raw.schedule as AppointmentObject[])[i].documents) {
+                for (let j = 0; j < (raw.schedule as AppointmentObject[])[i].documents.length; j++) {
+                    (raw.schedule as AppointmentObject[])[i].documents[j] = JSON.parse((raw.schedule as AppointmentObject[])[i].documents[j].toString());
+                }
+            }
+        }
+
+
+        logger.i(`successfully get consultation requests for ${id}`, raw.schedule)
+        return raw.schedule as AppointmentObject[];
+    }
 }
 
 export default new DoctorServices();
