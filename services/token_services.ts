@@ -63,7 +63,7 @@ class TokenServices {
             logger.w(
                 "User must be authorize to go to this page but no token was found"
             );
-            return res.status(401).json({
+            return res.status(403).json({
                 success: false,
                 error: "not_authorize",
                 message:
@@ -77,7 +77,7 @@ class TokenServices {
         // No token
         if (!token) {
             logger.i("no token were provide");
-            return res.status(401).json({
+            return res.status(403).json({
                 success: false,
                 error: "not_authorize",
                 message:

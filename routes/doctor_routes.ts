@@ -15,7 +15,6 @@ import IRouteHandler from "../types/routes";
 const Router = express.Router();
 
 class DoctorRoutes {
-
     public static createDoctor: IRouteHandler = async (req, res) => {
         const doctor = doctorServices.convertDoctorFields(req.body);
 
