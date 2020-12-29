@@ -744,6 +744,17 @@ class DoctorServices {
         logger.i(`successfully get consultation requests for ${uid}`, raw.consultationRequests);
         return raw.consultationRequests as ConsultationRequestObject[];
     }
+
+    /** converts doctor's string dates to usual JS Date object  */
+    public convertDoctorFields = (doctor: any) => {
+        if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
+            // Convert String --> new Date
+            doctor.lastActiveAt = new Date(doctor.lastActiveAt);
+            doctor.createdAt = new Date(doctor.createdAt);
+            doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
+        }
+        return doctor;
+    };
 }
 
 export default new DoctorServices();

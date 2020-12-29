@@ -16,20 +16,8 @@ const Router = express.Router();
 
 class DoctorRoutes {
 
-    // Todo: create helper for that
-    private static convertDoctorFields = (doctor: any) => {
-        if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {
-            // Convert String --> new Date
-            doctor.lastActiveAt = new Date(doctor.lastActiveAt);
-            doctor.createdAt = new Date(doctor.createdAt);
-            doctor.beginDoctorDate = new Date(doctor.beginDoctorDate);
-        }
-        return doctor;
-    };
-
-
     public static createDoctor: IRouteHandler = async (req, res) => {
-        const doctor = DoctorRoutes.convertDoctorFields(req.body);
+        const doctor = doctorServices.convertDoctorFields(req.body);
 
         const response = await doctorServices.create(doctor);
 
@@ -49,7 +37,7 @@ class DoctorRoutes {
     }
 
     public static updateDoctor: IRouteHandler = async (req, res) => {
-        const doctor = DoctorRoutes.convertDoctorFields(req.body);
+        const doctor = doctorServices.convertDoctorFields(req.body);
 
         const oldDoctor = await doctorServices.getOne(doctor.id);
         const newDoctor = { ...oldDoctor, ...doctor };
@@ -191,8 +179,6 @@ class DoctorRoutes {
                     id: e.id,
                 }));
             }
-
-            console.log(doctors);
 
             return res.status(200).json({
                 success: true,
