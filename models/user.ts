@@ -95,7 +95,7 @@ const UserSchema = new Schema({
             ref: "Doctor",
         },
     ],
-    activeConsultations: [ // Consultation which is going now
+    activeConsultations: [ // Consultation which is going now and in the future
         {
             type: Schema.Types.ObjectId,
             ref: "Consultation",

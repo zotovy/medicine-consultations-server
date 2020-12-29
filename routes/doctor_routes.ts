@@ -10,6 +10,7 @@ import { translateSpeciality } from "../types/services";
 import token_services from "../services/token_services";
 import Ajv from "ajv";
 import IRouteHandler from "../types/routes";
+import doctor from "../models/doctor";
 
 // Used to process the http request
 const Router = express.Router();
@@ -302,6 +303,22 @@ class DoctorRoutes {
 
         return res.status(response.success ? 200 : 500).json(response);
     }
+
+    public static confirmAppointRequest: IRouteHandler = async (req, res) => {
+        const { doctorId, appointId } = req.params;
+
+        // validate id & body
+        if ((doctorId.length != 24 && doctorId.length != 12) || doctorId !== req.headers.userId
+            || appointId.length != 24 && appointId.length != 12) return res.status(403).json({
+            status: false, error: "invalid_id"
+        });
+
+        const response = await doctorServices.confirmAppointRequest(doctorId, appointId)
+            .then(() => ({ success: true }))
+            .catch((e) => ({ success: false, error: e }));
+
+        return res.status(response.success ? 201 : 500).json(response);
+    }
 }
 
 
@@ -316,5 +333,6 @@ Router.get("/symptoms", DoctorRoutes.getSymptoms);
 Router.post("/doctor/:id/update-links", token_services.authenticateToken, DoctorRoutes.updateLinks);
 Router.get("/doctor/:id/appoints", token_services.authenticateToken, DoctorRoutes.getAppoints);
 Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, DoctorRoutes.getAppointsRequests);
+Router.post("/doctor/:doctorId/appoint/:appointId/confirm", token_services.authenticateToken, DoctorRoutes.confirmAppointRequest);
 
 export default Router;

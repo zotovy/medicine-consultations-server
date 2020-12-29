@@ -2,7 +2,8 @@
 
 import { Types } from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
-// types
+import User from "../models/user";
+
 // types
 import {
     AppointmentObject,
@@ -32,9 +33,11 @@ import {
 } from "../types/services";
 // Services
 import userServices from "./user_services";
+import consultationServices from "./consultation_services";
 import { consistingOf, IDoctorToDoctorObj, validateByEnum, } from "./types_services";
 import logger from "../logger";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
+import { ConsultationRequest } from "../models/consultation";
 
 class DoctorServices {
     // constructor() {
@@ -783,6 +786,33 @@ class DoctorServices {
 
         logger.i(`successfully get consultation requests for ${id}`, raw.schedule)
         return raw.schedule as AppointmentObject[];
+    }
+
+    public confirmAppointRequest = async (doctorId: string, requestId: string): Promise<void> => {
+        const request = await ConsultationRequest.findById(requestId)
+            .populate("appointment")
+            .lean();
+        if (!request) throw "request_not_found";
+
+        const doctor = await Doctor.findById(doctorId);
+        if (!doctor) throw "doctor_not_found";
+
+        const patient = await User.findById(request.patient);
+        if (!patient) throw "patient_not_found";
+
+        // Change doctor
+        doctor.schedule.push(request._id);
+        doctor.activeConsultations.push((request.appointment as AppointmentObject).consultation as Types.ObjectId);
+        (doctor.consultationRequests as Types.ObjectId[]).filter(e => e.toString() != requestId);
+        await doctor.save();
+
+        // Change user
+        patient.activeConsultations.push((request.appointment as AppointmentObject).consultation as Types.ObjectId);
+        await patient.save();
+
+        console.log(patient);
+
+        logger.i("confirm appoint requests with id =", requestId);
     }
 }
 

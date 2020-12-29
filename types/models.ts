@@ -214,6 +214,8 @@ export interface IConsultation extends Document {
     doctor: Types.ObjectId | IDoctor;
     date: Date;
     note?: string;
+    messages: string[];
+    connected: (Types.ObjectId | IUser)[];
 }
 
 export interface ConsultationObject {
@@ -221,6 +223,8 @@ export interface ConsultationObject {
     doctorId: IConsultation["doctor"];
     date: IConsultation["date"];
     note?: IConsultation["note"];
+    messages: IConsultation["messages"];
+    connected: IConsultation["connected"];
 }
 
 /**
