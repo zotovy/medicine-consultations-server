@@ -68,8 +68,7 @@ class ConsultationServices {
 
         // Throw error if its not this user
         if (isUser == "true") {
-            console.log(consultation.patientId, userId);
-            if (consultation.patientId != userId) throw "no_access_error";
+            if (consultation.patient != userId) throw "no_access_error";
 
             // Add ref to this consultation to doctor
             await User.findByIdAndUpdate(
@@ -87,7 +86,7 @@ class ConsultationServices {
             );
         } else {
 
-            if (consultation.doctorId != userId) throw "no_access_error";
+            if (consultation.doctor != userId) throw "no_access_error";
 
             // Add ref to this consultation to doctor
             await Doctor.findByIdAndUpdate(

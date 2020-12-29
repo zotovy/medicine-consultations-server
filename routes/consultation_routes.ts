@@ -24,34 +24,34 @@ Router.post("/create", async (req, res) => {
 Router.get("/:id", token_services.authenticateToken, async (req, res) => {
     const { id } = req.params;
 
-    console.log(req.headers.userId);
-
     try {
         const consultation = await Consultation.findById(id)
             .select("-_id -__v")
             .populate([
-                { path: "patientId", select: "fullName photoUrl _id" },
+                { path: "patient", select: "fullName photoUrl _id" },
                 {
-                    path: "doctorId",
+                    path: "doctor",
                     select: "fullName photoUrl _id speciality",
                 },
             ])
             .lean()
             .exec();
 
-        // If user is not a patiens and is not a doctor
+        console.log(consultation);
+
+        // If user is not a patient and is not a doctor
         if (
-            req.headers.userId != (consultation?.doctorId as IDoctor)._id &&
-            req.headers.userId != (consultation?.patientId as IUser)._id
+            req.headers.userId != (consultation?.doctor as IDoctor)?._id &&
+            req.headers.userId != (consultation?.patient as IUser)?._id
         ) {
-            return res.status(412).json({
+            return res.status(403).json({
                 success: false,
                 error: "access_denied",
             });
         }
 
         return res.status(200).json({
-            status: true,
+            success: true,
             consultation,
         });
     } catch (e) {

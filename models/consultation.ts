@@ -4,12 +4,12 @@ import { IConsultation, IConsultationRequest } from "../types/models";
 const requiredField = [true, "required_error"];
 
 const Consultation = new Schema({
-    patientId: {
+    patient: {
         type: Types.ObjectId,
         ref: "User",
         required: requiredField,
     },
-    doctorId: {
+    doctor: {
         type: Types.ObjectId,
         ref: "Doctor",
         required: requiredField,

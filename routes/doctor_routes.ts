@@ -272,12 +272,12 @@ class DoctorRoutes {
         return res.status(response.success ? 202 : 500).json(response);
     }
 
-    public static getConsultationsRequests: IRouteHandler = async (req, res) => {
+    public static getAppointsRequests: IRouteHandler = async (req, res) => {
         const { id } = req.params;
         const detail = req.query.detail === "true";
 
         // validate id & body
-        if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(400).json({
+        if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(403).json({
             status: false, error: "invalid_id"
         });
 
@@ -299,6 +299,6 @@ Router.get("/doctors", DoctorRoutes.getDoctors);
 Router.post("/doctor-request/send", DoctorRoutes.sendDoctorRequests);
 Router.get("/symptoms", DoctorRoutes.getSymptoms);
 Router.post("/doctor/:id/update-links", token_services.authenticateToken, DoctorRoutes.updateLinks);
-Router.get("/doctor/:id/consultation-requests", token_services.authenticateToken, DoctorRoutes.getConsultationsRequests);
+Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, DoctorRoutes.getAppointsRequests);
 
 export default Router;

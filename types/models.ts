@@ -210,15 +210,15 @@ export interface DoctorTile {
  *  Consultation model interface
  */
 export interface IConsultation extends Document {
-    patientId: Types.ObjectId | IUser;
-    doctorId: Types.ObjectId | IDoctor;
+    patient: Types.ObjectId | IUser;
+    doctor: Types.ObjectId | IDoctor;
     date: Date;
     note?: string;
 }
 
 export interface ConsultationObject {
-    patientId: IConsultation["patientId"];
-    doctorId: IConsultation["doctorId"];
+    patientId: IConsultation["patient"];
+    doctorId: IConsultation["doctor"];
     date: IConsultation["date"];
     note?: IConsultation["note"];
 }
