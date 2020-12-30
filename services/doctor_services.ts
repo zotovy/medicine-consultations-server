@@ -9,7 +9,7 @@ import {
     AppointmentObject,
     BecomeDoctorObj,
     ConsultationRequestObject,
-    DoctorObject, IAppointment,
+    DoctorObject, DoctorWorkingType, IAppointment,
     IDoctor
 } from "../types/models";
 
@@ -803,16 +803,36 @@ class DoctorServices {
         // Change doctor
         doctor.schedule.push(request._id);
         doctor.activeConsultations.push((request.appointment as AppointmentObject).consultation as Types.ObjectId);
-        (doctor.consultationRequests as Types.ObjectId[]).filter(e => e.toString() != requestId);
+        doctor.consultationRequests = (doctor.consultationRequests as Types.ObjectId[]).filter(e => e.toString() != requestId);
         await doctor.save();
 
         // Change user
         patient.activeConsultations.push((request.appointment as AppointmentObject).consultation as Types.ObjectId);
         await patient.save();
 
-        console.log(patient);
-
         logger.i("confirm appoint requests with id =", requestId);
+    }
+
+    public rejectAppointRequest = async (doctorId: string, requestId: string): Promise<void> => {
+        const request = await ConsultationRequest.findById(requestId)
+            .populate("appointment")
+            .lean();
+        if (!request) throw "request_not_found";
+
+        // Change doctor
+        const doctor = await Doctor.updateOne({ _id: doctorId }, {
+            $pull: {
+                consultationRequests: [ Types.ObjectId(requestId) ]
+            }
+        });
+        if (!doctor) throw "doctor_not_found";
+
+        logger.i("reject appoint requests with id =", requestId);
+    }
+
+    public updateWorkingTime = async (id: string, workingTime: DoctorWorkingType): Promise<void> => {
+        await Doctor.findByIdAndUpdate(id, { workingTime });
+        logger.i("update working time of doctor", id, "to", workingTime);
     }
 }
 

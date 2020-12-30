@@ -1,16 +1,18 @@
 import express from "express";
+import Joi from "joi";
 import doctorServices from "../services/doctor_services";
 import { Types } from "mongoose";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
 import encoder from "./encoder";
 import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/sympthoms";
-import { DoctorObject } from "../types/models";
+import { DoctorObject, DoctorWorkingType } from "../types/models";
 import { translateSpeciality } from "../types/services";
 import token_services from "../services/token_services";
 import Ajv from "ajv";
 import IRouteHandler from "../types/routes";
-import doctor from "../models/doctor";
+import ValidationHelper from "../helpers/validation_helper";
+
 
 // Used to process the http request
 const Router = express.Router();
@@ -313,11 +315,63 @@ class DoctorRoutes {
             status: false, error: "invalid_id"
         });
 
+        // todo: notify user that consultation needs to be paid for
+
         const response = await doctorServices.confirmAppointRequest(doctorId, appointId)
             .then(() => ({ success: true }))
             .catch((e) => ({ success: false, error: e }));
 
         return res.status(response.success ? 201 : 500).json(response);
+    }
+
+    public static rejectAppointRequest: IRouteHandler = async (req, res) => {
+        // todo: fix this handler
+        const { doctorId, appointId } = req.params;
+
+        // validate id & body
+        if ((doctorId.length != 24 && doctorId.length != 12) || doctorId !== req.headers.userId
+            || appointId.length != 24 && appointId.length != 12) return res.status(403).json({
+            status: false, error: "invalid_id"
+        });
+
+        // todo: notify user that consultation is rejected
+
+        const response = await doctorServices.rejectAppointRequest(doctorId, appointId)
+            .then(() => ({ success: true }))
+            .catch((e) => ({ success: false, error: e }));
+
+        return res.status(response.success ? 200 : 500).json(response);
+    }
+
+    public static updateWorkingTime: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
+        const newTime = req.body;
+
+
+        const schema = Joi.object({
+            from: ValidationHelper.customTimeSchema.default({ h: 8, m: 0 }),
+            to: ValidationHelper.customTimeSchema.default({ h: 17, m: 0 }),
+            consultationTimeInMin: Joi.number().integer().min(20).max(180).default({ h: 40, m: 0 }),
+            weekends: Joi.array().items(Joi.number().integer().min(0).max(6)).unique().default([5, 6]),
+        });
+    
+        const validation = schema.validate(newTime);
+        if (validation.error) {
+            logger.w("doctor-routes.updateWorkingTime: validate failed", validation.error);
+            return res.status(400).json({
+                status: false,
+                error: "validation_error",
+            });
+        }
+
+        const response = await doctorServices.updateWorkingTime(id, validation.value as DoctorWorkingType)
+            .then(() => ({ success: true }))
+            .catch((e) => {
+               logger.e("doctor-routes.updateWorkingTime: server error happened", e);
+               return { success: false, error: "invalid_error" };
+            });
+
+        return res.status(response.success ? 500 : 202).json(response);
     }
 }
 
@@ -334,5 +388,7 @@ Router.post("/doctor/:id/update-links", token_services.authenticateToken, Doctor
 Router.get("/doctor/:id/appoints", token_services.authenticateToken, DoctorRoutes.getAppoints);
 Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, DoctorRoutes.getAppointsRequests);
 Router.post("/doctor/:doctorId/appoint/:appointId/confirm", token_services.authenticateToken, DoctorRoutes.confirmAppointRequest);
+Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
+Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
 
 export default Router;

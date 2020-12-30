@@ -101,7 +101,7 @@ export interface IDoctor extends IUser {
     workPlaces?: DoctorWorkplaceType[];
     education?: DoctorEducationType[];
     qualificationProofs?: DoctorQualificationDocumentType[];
-    workingTime: string;
+    workingTime: DoctorWorkingType;
     consultationRequests: mongoose.Types.ObjectId[] | IConsultationRequest[];
 }
 

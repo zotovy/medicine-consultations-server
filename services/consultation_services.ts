@@ -127,10 +127,7 @@ class ConsultationServices {
                 { _id: consultationId },
                 {
                     $push: {
-                        messages: {
-                            user: userId,
-                            message: message,
-                        },
+                        messages: message,
                     },
                 },
                 (err: any, data: any) => {

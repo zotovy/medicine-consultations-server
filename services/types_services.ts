@@ -239,6 +239,8 @@ export const IConsultationToConsultationObj = (
         doctorId: e.doctor,
         patientId: e.patient,
         note: e.note,
+        connected: e.connected,
+        messages: e.messages,
     };
 };
 
