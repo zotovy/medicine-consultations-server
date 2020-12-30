@@ -351,10 +351,11 @@ class DoctorRoutes {
         const schema = Joi.object({
             from: ValidationHelper.customTimeSchema.default({ h: 8, m: 0 }),
             to: ValidationHelper.customTimeSchema.default({ h: 17, m: 0 }),
-            consultationTimeInMin: Joi.number().integer().min(20).max(180).default({ h: 40, m: 0 }),
+            consultationTimeInMin: Joi.number().integer().min(20).max(180).default(40),
             weekends: Joi.array().items(Joi.number().integer().min(0).max(6)).unique().default([5, 6]),
+            price: Joi.number().integer().min(300),
         });
-    
+
         const validation = schema.validate(newTime);
         if (validation.error) {
             logger.w("doctor-routes.updateWorkingTime: validate failed", validation.error);
@@ -365,10 +366,13 @@ class DoctorRoutes {
         }
 
         const response = await doctorServices.updateWorkingTime(id, validation.value as DoctorWorkingType)
-            .then(() => ({ success: true }))
+            .then(async () => {
+                if (validation.value.price) await doctorServices.updatePrice(id, validation.value.price);
+                return { success: status };
+            })
             .catch((e) => {
-               logger.e("doctor-routes.updateWorkingTime: server error happened", e);
-               return { success: false, error: "invalid_error" };
+                logger.e("doctor-routes.updateWorkingTime: server error happened", e);
+                return { success: false, error: "invalid_error" };
             });
 
         return res.status(response.success ? 500 : 202).json(response);

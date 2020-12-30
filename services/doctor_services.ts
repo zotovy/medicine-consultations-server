@@ -834,6 +834,11 @@ class DoctorServices {
         await Doctor.findByIdAndUpdate(id, { workingTime });
         logger.i("update working time of doctor", id, "to", workingTime);
     }
+
+    public updatePrice = async (id: string, price: number): Promise<void> => {
+        await Doctor.findByIdAndUpdate(id, { price });
+        logger.i(`update doctor (${id}) price to`, price);
+    }
 }
 
 export default new DoctorServices();
