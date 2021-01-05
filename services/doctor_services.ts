@@ -3,6 +3,7 @@
 import { Types } from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 import User from "../models/user";
+import Consultation from "../models/consultation";
 
 // types
 import {
@@ -10,7 +11,8 @@ import {
     BecomeDoctorObj,
     ConsultationRequestObject,
     DoctorObject, DoctorWorkingType, IAppointment,
-    IDoctor
+    IDoctor,
+    IUser
 } from "../types/models";
 
 import {
@@ -760,7 +762,7 @@ class DoctorServices {
         return doctor;
     };
 
-    public getAppoints = async (id: string): Promise<AppointmentObject[]> => {
+    public getAppoints = async (id: string): Promise<(AppointmentObject & { photoUrl?: string })[]> => {
         const raw = await Doctor.findById(id).populate({
             path: "schedule",
             options: { getters: true },
@@ -771,11 +773,7 @@ class DoctorServices {
             throw "not-found"
         }
 
-
-                // .map(e => e?.documents.map(el => JSON.parse(el.toString())));
-
         for (let i = 0; i < (raw.schedule as AppointmentObject[]).length; i++) {
-            // if (raw.schedule[i])
             if ((raw.schedule as AppointmentObject[])[i].documents) {
                 for (let j = 0; j < (raw.schedule as AppointmentObject[])[i].documents.length; j++) {
                     (raw.schedule as AppointmentObject[])[i].documents[j] = JSON.parse((raw.schedule as AppointmentObject[])[i].documents[j].toString());
@@ -783,9 +781,23 @@ class DoctorServices {
             }
         }
 
+        let appointments: (AppointmentObject & { photoUrl?: string })[] = [];
+        for (let i = 0; i < raw.schedule.length; i++) {
+            const appoint = raw.schedule[i] as AppointmentObject;
+            const consultation = await Consultation.findById(appoint.consultation).populate({
+                path: "patient",
+                select: "photoUrl",
+            }).select("patient");
+            console.log(consultation);
+            const patient = (consultation ? consultation?.patient : null) as IUser | null;
+            appointments.push({
+                ...appoint,
+                photoUrl:  patient?.photoUrl,
+            });
+        }
 
         logger.i(`successfully get consultation requests for ${id}`, raw.schedule)
-        return raw.schedule as AppointmentObject[];
+        return appointments;
     }
 
     public confirmAppointRequest = async (doctorId: string, requestId: string): Promise<void> => {

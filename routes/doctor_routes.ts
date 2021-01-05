@@ -285,7 +285,10 @@ class DoctorRoutes {
 
         const response = await doctorServices.getAppoints(id)
             .then(v => ({ success: true, appoints: v }))
-            .catch(e => ({ success: true, error: e }));
+            .catch(e => {
+                logger.e("doctorRoutes.getAppoints: ", e);
+                return ({ success: true, error: e });
+            });
 
         return res.status(response.success ? 200 : 500).json(response);
     }
@@ -368,7 +371,7 @@ class DoctorRoutes {
         const response = await doctorServices.updateWorkingTime(id, validation.value as DoctorWorkingType)
             .then(async () => {
                 if (validation.value.price) await doctorServices.updatePrice(id, validation.value.price);
-                return { success: status };
+                return { success: true };
             })
             .catch((e) => {
                 logger.e("doctor-routes.updateWorkingTime: server error happened", e);

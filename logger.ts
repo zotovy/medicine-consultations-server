@@ -36,18 +36,16 @@ class Logger {
         this.stack.push(log);
     };
 
-    error = (message: any, trace: any = null): void => {
+    error = (message: any, ...args: any[]): void => {
         const time = new Date();
 
-        console.log(`${colors.bgRed.white(" Error: ")} ${message}`);
-        console.log(`${"Trace:".white.bold} ${trace}`);
+        console.log(`${colors.bgRed.white(" Error: ")} ${message}`, ...args);
         console.log(`${new Date().toISOString()}`);
 
         const log: Log = {
             type: LogType.Error,
             message: message.toString(),
             timestamp: time,
-            trace,
         };
 
         this.saveToStack(log);
