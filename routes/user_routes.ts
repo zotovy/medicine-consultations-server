@@ -1,6 +1,6 @@
 // Todo: resize uploaded image
 
-import express from "express";
+import express, { Response } from "express";
 import path from "path";
 import jwt from "jsonwebtoken";
 import userServices from "../services/user_services";
@@ -14,7 +14,7 @@ import { UserObject } from "../types/models";
 import { ServerError } from "../types/errors";
 import token_services from "../services/token_services";
 import Doctor from "../models/doctor";
-import IRouteHandler, { BaseRouter, IFileRouteHandler } from "../types/routes";
+import IRouteHandler, { BaseRouter, FileRequest, IFileRouteHandler } from "../types/routes";
 
 
 export default class UserRoutes implements BaseRouter {
@@ -35,6 +35,7 @@ export default class UserRoutes implements BaseRouter {
         router.post("/reset-password", UserRoutes.resetPassword);
         router.post("/send-reset-password-email", UserRoutes.sendResetPasswordEmail);
         router.get("/user/:id/reviews", UserRoutes.getReviews);
+        router.post("/user/:id/update-password", token_services.authenticateToken, UserRoutes.updatePassword);
         return router;
     }
 
@@ -203,7 +204,7 @@ export default class UserRoutes implements BaseRouter {
         }
     }
 
-    private static setAvatar: IFileRouteHandler = async (req, res) => {
+    private static setAvatar: IFileRouteHandler = async (req: FileRequest, res: Response) => {
 
         const userId = req.params.id;
 
@@ -454,5 +455,21 @@ export default class UserRoutes implements BaseRouter {
             return res.status(500).json({ success: false, error: "invalid_error" });
         }
 
+    }
+
+    private static updatePassword: IRouteHandler = async (req, res) => {
+        const { oldPassword, newPassword, isUser } = req.body;
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ status: false, error: "no_password_in_body" })
+        }
+
+        const response = await userServices.updatePassword(req.params.id, oldPassword, newPassword, isUser)
+            .then(() => ({ success: true }))
+            .catch(e => {
+                logger.e("userServices.updatePassword:", e);
+                return ({ success: false, error: e });
+            })
+
+        return res.status(response.success ? 202 : 400).json(response);
     }
 }

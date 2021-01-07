@@ -32,11 +32,17 @@ import doctor from "../../models/doctor";
 // Fix @types
 declare function done(): any;
 
-// Used to simulate http requests
-const request = supertest(app);
 
 // Sample user will use or modify for some cases
-const sampleDoctor: DoctorObject = {
+export const sampleDoctor: DoctorObject = {
+    consultationRequests: [],
+    price: 750,
+    workingTime: {
+        from: { h: 9, m: 0 },
+        to: { h: 18, m: 0 },
+        weekends: [5, 6],
+        consultationTimeInMin: 60,
+    },
     id: undefined,
     name: "Иван",
     surname: "Иванов",
@@ -61,8 +67,6 @@ const sampleDoctor: DoctorObject = {
     issueDate: "12.11.2015",
     yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
-    clientsConsultations: [], // will add later
-    clientsReviews: [], // will add later
     experience: 3 * 365,
     favourites: [], // will add later
     rating: 4.6,
@@ -73,14 +77,14 @@ const sampleDoctor: DoctorObject = {
     passportIssuedByWhom: "МВД г. Москвы",
     passportSeries: "123123",
     _workExperience: "1 год",
-    workPlaces: "Городская поликлиника №1 г. Москва",
+    _workPlaces: "Городская поликлиника №1 г. Москва",
     age: 19,
     isAdult: false,
     isChild: true,
     workPlan: EWorkPlan.Multiple,
     serviceExperience: 365,
     fullName: "Иванов Иван Иванович",
-    activeConsultations: [],
+    activeConsultations: []
 };
 
 const sampleBecomeDoctorRequest: BecomeDoctorObj = DoctorObjToBecomeDoctorObj(
@@ -101,6 +105,7 @@ const convertDoctorFields = (doctor: any) => {
 
 describe("Test Doctor API", () => {
     let db: mongoose.Mongoose;
+    let request: supertest.SuperTest<supertest.Test>;
 
     // It's just so easy to connect to the MongoDB Memory Server
     // By using mongoose.connect
@@ -119,13 +124,14 @@ describe("Test Doctor API", () => {
                 }
             }
         );
+        server.setupExpress();
+        request = supertest(server.app)
     });
 
     // Close MongodDB connection after all test cases have done
     afterAll(async () => {
         db.disconnect();
         db.connection.dropDatabase();
-        server?.close();
         done();
     });
 

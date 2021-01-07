@@ -11,7 +11,8 @@ import { UserObject } from "../../types/models";
 import { IUserToUserObj } from "../../services/types_services";
 import user_services from "../../services/user_services";
 import { ResetPasswordRequest } from "../../models/mails";
-import token_services from "../../services/token_services";
+import Doctor from "../../models/doctor";
+import { sampleDoctor } from "./doctor.test";
 
 /**
  *  ? This test module testing user routes
@@ -68,7 +69,6 @@ const sampleUser: UserObject = {
 };
 
 // Used to simulate http requests
-const request = supertest(app);
 
 test("test env", () => {
     expect(process.env.jwt_access).toBe("test-access-string");
@@ -76,6 +76,7 @@ test("test env", () => {
 
 describe("Test user routes", () => {
     let db: mongoose.Mongoose;
+    let request: supertest.SuperTest<supertest.Test>;
 
     // It's just so easy to connect to the MongoDB Memory Server
     // By using mongoose.connect
@@ -93,19 +94,21 @@ describe("Test user routes", () => {
                 }
             }
         );
+        server.setupExpress();
+        request = supertest(server.app)
     });
 
     // Close MongodDB connection after all test cases have done
     afterAll(async (done) => {
         // await User.remove({});
         // db.connection.dropDatabase();
-        server?.close();
         done();
     });
 
     // Remove all date from mongodb after each test case
     afterEach(async () => {
         await User.remove({});
+        await Doctor.remove({});
         await ResetPasswordRequest.deleteMany({});
     });
 
@@ -863,9 +866,7 @@ describe("Test user routes", () => {
         expect((await User.find({}))[0].password).toEqual("heyItsMe123");
     });
 
-    // SECTION: reset password email
     describe("reset password email", () => {
-        // ANCHOR: should send reset password
         test("should send reset password", async () => {
             //* Arrange
             const { _id } = await User.create({
@@ -895,5 +896,161 @@ describe("Test user routes", () => {
             expect(data.success).toEqual(true);
         });
     });
-    // /SECTION
+
+    describe("update password", () => {
+        test("should update password", async (done) => {
+            //* Arrange
+            const password = user_services.encryptPassword(sampleUser.password);
+            const { _id } = await User.create({ ...sampleUser, password });
+            const newPassword = "12345678Aa";
+            const { access } = await user_services.generateNewTokens(String(_id));
+
+            //* Act
+            const response = await request
+                .post(`/api/user/${_id}/update-password`)
+                .set("auth", `Bearer ${access}`)
+                .type("json")
+                .send({
+                    oldPassword: sampleUser.password,
+                    newPassword,
+                });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(202);
+            expect(data.success).toEqual(true);
+
+            const u = await User.findById(_id);
+            const encNew = user_services.encryptPassword(newPassword);
+            expect(encNew).toEqual(u?.password);
+
+            done();
+        });
+
+
+        test("should update doctor password", async (done) => {
+            //* Arrange
+            const password = user_services.encryptPassword(sampleDoctor.password);
+            const { _id } = await Doctor.create({ ...sampleDoctor, password });
+            const newPassword = "12345678Aa";
+            const { access } = await user_services.generateNewTokens(String(_id));
+
+            //* Act
+            const response = await request
+                .post(`/api/user/${_id}/update-password`)
+                .set("auth", `Bearer ${access}`)
+                .type("json")
+                .send({
+                    oldPassword: sampleUser.password,
+                    newPassword,
+                    isUser: false,
+                });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(202);
+            expect(data.success).toEqual(true);
+
+            const u = await Doctor.findById(_id);
+            const encNew = user_services.encryptPassword(newPassword);
+            expect(encNew).toEqual(u?.password);
+
+            done();
+        });
+
+        test("shouldn't update with invalid old password", async (done) => {
+            //* Arrange
+            const password = user_services.encryptPassword(sampleDoctor.password);
+            const { _id } = await Doctor.create({ ...sampleDoctor, password });
+            const newPassword = "12345678Aa";
+            const { access } = await user_services.generateNewTokens(String(_id));
+
+            //* Act
+            const response = await request
+                .post(`/api/user/${_id}/update-password`)
+                .set("auth", `Bearer ${access}`)
+                .type("json")
+                .send({
+                    oldPassword: sampleUser.password + "invalid",
+                    newPassword,
+                    isUser: false,
+                });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("invalid_old_password");
+
+            const u = await Doctor.findById(_id);
+            expect(password).toEqual(u?.password);
+
+            done();
+        });
+
+        test("shouldn't update with easy new password", async (done) => {
+            //* Arrange
+            const password = user_services.encryptPassword(sampleDoctor.password);
+            const { _id } = await Doctor.create({ ...sampleDoctor, password });
+            const newPassword = "1234567";
+            const { access } = await user_services.generateNewTokens(String(_id));
+
+            //* Act
+            const response = await request
+                .post(`/api/user/${_id}/update-password`)
+                .set("auth", `Bearer ${access}`)
+                .type("json")
+                .send({
+                    oldPassword: sampleDoctor.password,
+                    newPassword,
+                    isUser: false,
+                });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("password_doesnt_meet_requirements");
+
+            const u = await Doctor.findById(_id);
+            expect(password).toEqual(u?.password);
+
+            done();
+        });
+
+        test("should return error on invalid user id", async (done) => {
+            //* Arrange
+            const password = user_services.encryptPassword(sampleDoctor.password);
+            const { _id } = await Doctor.create({ ...sampleDoctor, password });
+            const newPassword = "12345678Aa";
+            const { access } = await user_services.generateNewTokens(String(_id));
+
+            //* Act
+            const response = await request
+                .post(`/api/user/${123456789101}/update-password`)
+                .set("auth", `Bearer ${access}`)
+                .type("json")
+                .send({
+                    oldPassword: sampleDoctor.password,
+                    newPassword,
+                    isUser: false,
+                });
+            const status = response.status;
+            const data = JSON.parse(response.text);
+
+            //* Assert
+            expect(status).toEqual(400);
+            expect(data.success).toEqual(false);
+            expect(data.error).toEqual("no_user_found");
+
+            const u = await Doctor.findById(_id);
+            expect(password).toEqual(u?.password);
+
+            done();
+        });
+    });
 });

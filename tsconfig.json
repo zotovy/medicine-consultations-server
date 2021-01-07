@@ -20,12 +20,12 @@
   "include": [
     "*.ts",
     "*.d.ts",
+    "*.test.ts",
     "server.ts",
     "jest-preload.js",
-    "declaration/mongoose-extended-schema.d.ts",
-    "tests/services/doctor.test.ts"
+    "declaration/mongoose-extended-schema.d.ts"
   ],
-  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
+  "exclude": ["node_modules"],
   "typeAcquisition": {
     "include": ["jest"]
   }

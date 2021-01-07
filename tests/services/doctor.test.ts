@@ -55,8 +55,7 @@ const sampleDoctor: DoctorObject = {
     issueDate: "21.11.2015",
     yearEducation: "2010 - 2015",
     beginDoctorDate: new Date(),
-    clientsConsultations: [], // will add later
-    clientsReviews: [], // will add later
+    activeConsultations: [], // will add later
     experience: 364,
     favourites: [], // will add later
     rating: 4.6,
@@ -67,7 +66,7 @@ const sampleDoctor: DoctorObject = {
     passportIssuedByWhom: "МВД г. Москвы",
     passportSeries: "123123",
     _workExperience: "1 год",
-    workPlaces: "Городская поликлиника №1 г. Москва",
+    _workPlaces: "Городская поликлиника №1 г. Москва",
     age: 35,
     isAdult: true,
     isChild: false,
@@ -75,7 +74,19 @@ const sampleDoctor: DoctorObject = {
     serviceExperience: 360,
     qualification: "first",
     fullName: "Иванов Иван Иванович",
-    activeConsultations: [],
+    workingTime: {
+        from: { h: 9, m: 0 },
+        to: { h: 18, m: 0 },
+        weekends: [5, 6],
+        consultationTimeInMin: 60,
+    },
+    qualificationProofs: [],
+    workPlaces: [],
+    information: "Cool guy :)",
+    education: [],
+    birthday: new Date(),
+    consultationRequests: [],
+    price: 700,
 };
 
 const secondSampleUser = {

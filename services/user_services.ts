@@ -33,6 +33,7 @@ import { AccessToken, RefreshToken } from "../models/tokens";
 import token_services from "./token_services";
 import logger from "../logger";
 import { ResetPasswordRequest } from "../models/mails";
+import Joi from "joi";
 
 class UserServices {
     /**
@@ -49,10 +50,6 @@ class UserServices {
      * - "deleted_user_is_null"     # Deleted user is null
      */
 
-    // ANCHOR: getUsers
-    /**
-     * Async get all users
-     */
     async getUsers(
         amount: number = 50, // length of returned array, default = 50
         from: number = 0 // start index, default = 0
@@ -525,10 +522,6 @@ class UserServices {
         };
     }
 
-    // ANCHOR: set avatar
-    /**
-     * This function set received  photo url to received  user
-     */
     async setUserAvatar(
         userId: string,
         photoUrl: string
@@ -601,10 +594,6 @@ class UserServices {
         }
     }
 
-    // ANCHOR: get user by id
-    /**
-     * Async get user by received id
-     */
     async getUserById(id: string): Promise<TGetUserById> {
         try {
             let error;
@@ -654,10 +643,6 @@ class UserServices {
         }
     }
 
-    // ANCHOR: create user
-    /**
-     * Create user and return new user
-     */
     async createUser(data: UserObject): Promise<TCreateUser> {
         try {
             const validation = await this.validateUser(data);
@@ -705,10 +690,6 @@ class UserServices {
         }
     }
 
-    // ANCHOR: update user
-    /**
-     * Update received  user with the same id
-     */
     async updateUser(newUser: any): Promise<TUpdateUser> {
         // Check received user
         const responce = await this.validateUpdateUser(newUser);
@@ -779,10 +760,6 @@ class UserServices {
         }
     }
 
-    // ANCHOR: remove user
-    /**
-     * Remove user by received  id
-     */
     async removeUser(id: string): Promise<TRemoveUser> {
         const user: IUser | null = await User.findOne({
             _id: id,
@@ -829,21 +806,18 @@ class UserServices {
         }
     }
 
-    // ANCHOR: check refresh token
     checkAccessToken = async (
         userId: string,
         token: string
     ): Promise<boolean> =>
         await token_services.checkToken("jwt_access", userId, token);
 
-    // ANCHOR: check refresh token
     checkRefreshToken = async (
         userId: string,
         token: string
     ): Promise<boolean> =>
         await token_services.checkToken("jwt_refresh", userId, token);
 
-    // ANCHOR: generateNewTokens
     generateNewTokens = async (userId: string) => {
         // Generate news token
         const access = token_services.generateToken(userId, "jwt_access");
@@ -852,7 +826,6 @@ class UserServices {
         return { access, refresh };
     };
 
-    // ANCHOR: generate new tokens
     generateTokenAndDeleteOld = async (
         userId: string
     ): Promise<{ access: string; refresh: string }> => {
@@ -861,6 +834,22 @@ class UserServices {
 
     encryptPassword = (password: string): string => {
         return crypto.createHash('sha256').update(password).digest("base64");
+    }
+
+    updatePassword = async (uid: string, oldPassword: string, newPassword: string, isUser: boolean = true): Promise<void> => {
+        const schema = Joi.string().min(8);
+        if (schema.validate(newPassword).error) throw "password_doesnt_meet_requirements";
+
+        const encOldPassword = this.encryptPassword(oldPassword);
+        const encNewPassword = this.encryptPassword(newPassword);
+
+        const u = isUser ? await User.findById(uid) : await Doctor.findById(uid);
+        if (!u) throw "no_user_found";
+        if (u.password !== encOldPassword) throw "invalid_old_password";
+
+        u.password = encNewPassword;
+        await u.save();
+        logger.i(`userServices.updatePassword: successfully changed ${uid} password`);
     }
 }
 
