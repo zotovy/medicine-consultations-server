@@ -59,7 +59,7 @@ class Server {
         this.app.use(bodyParser.json());
         this.app.use("/static", express.static("static"));
         this.app.use(fileUpload());
-        this.app.use("/api", ApiRouter);
+        this.app.use("/api", new ApiRouter().router);
 
 
         if (this.useSentry && process.env.MODE === "production") {

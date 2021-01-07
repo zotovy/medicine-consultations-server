@@ -5,12 +5,17 @@ import AdminRouter from "./admin_routes";
 import PaymentRouter from "./payment_routes";
 import ConsultationRouter from "./consultation_routes";
 
-const Router = express.Router();
+export default class Router {
 
-Router.use("/", UserRouter);
-Router.use("/", DoctorRouter);
-Router.use("/admin", AdminRouter);
-Router.use("/", PaymentRouter);
-Router.use("/consultation", ConsultationRouter);
+    constructor() {
+        const router = express.Router();
+        router.use("/", UserRouter.getRouter());
+        router.use("/", DoctorRouter);
+        router.use("/admin", AdminRouter);
+        router.use("/", PaymentRouter);
+        router.use("/consultation", ConsultationRouter);
+        this.router = router;
+    }
 
-export default Router;
+    router: express.Router;
+}
