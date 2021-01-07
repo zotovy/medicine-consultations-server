@@ -3,9 +3,9 @@ export interface ObjectLiteral {
 }
 
 class Encoder {
-    query = (query: any, keys: string[]): ObjectLiteral => {
-        const final: ObjectLiteral = {};
-        keys.forEach((key) => {
+    query = <T = any>(query: any, keys: string[]): T => {
+        const final: T = {} as T;
+        (keys as (keyof T)[]).forEach((key) => {
             try {
                 if (query[key]) {
                     final[key] = JSON.parse(query[key]);

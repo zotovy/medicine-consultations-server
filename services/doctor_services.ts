@@ -24,7 +24,7 @@ import {
     IGetDoctorsFilterQuery,
     MWorkExperience,
     TCreateDoctor,
-    TDoctorValidationErrors,
+    TDoctorValidationErrors, TGetAppointsServiceOptions,
     TGetOneDoctor,
     TLinksUpdate,
     TRemoveDoctor,
@@ -33,6 +33,7 @@ import {
     TValidateDoctor,
     TValidationErrorType,
 } from "../types/services";
+
 // Services
 import userServices from "./user_services";
 import consultationServices from "./consultation_services";
@@ -762,10 +763,15 @@ class DoctorServices {
         return doctor;
     };
 
-    public getAppoints = async (id: string): Promise<(AppointmentObject & { photoUrl?: string })[]> => {
+    public getAppoints = async (id: string, options: TGetAppointsServiceOptions = {}): Promise<(AppointmentObject & { photoUrl?: string })[]> => {
+
+        const findQuery: any = {};
+        (Object.keys(options) as (keyof TGetAppointsServiceOptions)[]).forEach((e: keyof TGetAppointsServiceOptions) => findQuery[e] = options[e])
+
         const raw = await Doctor.findById(id).populate({
             path: "schedule",
             options: { getters: true },
+            match: findQuery,
         }).select("schedule").lean();
 
         if (!raw || raw.schedule == undefined) {
@@ -784,15 +790,14 @@ class DoctorServices {
         let appointments: (AppointmentObject & { photoUrl?: string })[] = [];
         for (let i = 0; i < raw.schedule.length; i++) {
             const appoint = raw.schedule[i] as AppointmentObject;
-            const consultation = await Consultation.findById(appoint.consultation).populate({
+            const consultation = await Consultation.findOne({_id: appoint.consultation, ...findQuery}).populate({
                 path: "patient",
                 select: "photoUrl",
             }).select("patient");
-            console.log(consultation);
             const patient = (consultation ? consultation?.patient : null) as IUser | null;
             appointments.push({
                 ...appoint,
-                photoUrl:  patient?.photoUrl,
+                photoUrl: patient?.photoUrl,
             });
         }
 
@@ -834,7 +839,7 @@ class DoctorServices {
         // Change doctor
         const doctor = await Doctor.updateOne({ _id: doctorId }, {
             $pull: {
-                consultationRequests: [ Types.ObjectId(requestId) ]
+                consultationRequests: [Types.ObjectId(requestId)]
             }
         });
         if (!doctor) throw "doctor_not_found";

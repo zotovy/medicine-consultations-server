@@ -1,4 +1,3 @@
-import ajv from "ajv";
 // @types
 import {
     UserObject,
@@ -493,6 +492,8 @@ export type TSaveBecomeDoctorRequest = {
     // Show error message if failed
     message?: string;
 };
+
+export type TGetAppointsServiceOptions = { numericDate?: string }
 
 //========================================================================================
 /*                                                                                      *

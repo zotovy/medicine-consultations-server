@@ -7,7 +7,7 @@ import { ServerError } from "../types/errors";
 import encoder from "./encoder";
 import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/sympthoms";
 import { DoctorObject, DoctorWorkingType } from "../types/models";
-import { translateSpeciality } from "../types/services";
+import { TGetAppointsServiceOptions, translateSpeciality } from "../types/services";
 import token_services from "../services/token_services";
 import Ajv from "ajv";
 import IRouteHandler from "../types/routes";
@@ -283,7 +283,15 @@ class DoctorRoutes {
             status: false, error: "invalid_id"
         });
 
-        const response = await doctorServices.getAppoints(id)
+        // handle query params
+        const validQueriesParams: (keyof TGetAppointsServiceOptions)[] = ["numericDate"];
+        const options: TGetAppointsServiceOptions = {};
+        validQueriesParams.forEach(e => {
+            if (req.query[e]) options[e] = req.query[e] as string;
+        });
+
+
+        const response = await doctorServices.getAppoints(id, options)
             .then(v => ({ success: true, appoints: v }))
             .catch(e => {
                 logger.e("doctorRoutes.getAppoints: ", e);

@@ -124,6 +124,8 @@ const loginTokenLimiter = rateLimitter({
 Router.post("/login-user", loginTokenLimiter, async (req, res) => {
     const email: string | undefined = req.body.email;
     let password: string | undefined = req.body.password;
+    
+    console.log(email, password, req.body);
 
     if (!email || !password) {
         return res.status(412).json({

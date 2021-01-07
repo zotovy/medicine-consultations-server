@@ -19,6 +19,10 @@ const Appointment = new Schema({
         ref: "Consultation",
         required: true,
     },
+    numericDate: {
+        type: String,
+        required: true,
+    },
     patientName: String,
     phone: Number,
     birthday: Date,

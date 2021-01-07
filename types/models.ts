@@ -279,6 +279,7 @@ export interface IAppointment extends Document {
     chronicDiseases: string;
     symptoms: string;
     documents: ConsultationDocument[];
+    numericDate: string;
 }
 
 export interface AppointmentObject {
@@ -292,6 +293,7 @@ export interface AppointmentObject {
     chronicDiseases: IAppointment["chronicDiseases"];
     symptoms: IAppointment["symptoms"];
     documents: IAppointment["documents"];
+    numericDate: IAppointment["numericDate"];
 }
 
 /**
