@@ -790,7 +790,7 @@ class DoctorServices {
         let appointments: (AppointmentObject & { photoUrl?: string })[] = [];
         for (let i = 0; i < raw.schedule.length; i++) {
             const appoint = raw.schedule[i] as AppointmentObject;
-            const consultation = await Consultation.findOne({_id: appoint.consultation, ...findQuery}).populate({
+            const consultation = await Consultation.findOne({ _id: appoint.consultation, ...findQuery }).populate({
                 path: "patient",
                 select: "photoUrl",
             }).select("patient");
@@ -806,26 +806,34 @@ class DoctorServices {
     }
 
     public confirmAppointRequest = async (doctorId: string, requestId: string): Promise<void> => {
-        const request = await ConsultationRequest.findById(requestId)
-            .populate("appointment")
-            .lean();
+        const request = await ConsultationRequest.findById(requestId).populate("appointment");
         if (!request) throw "request_not_found";
 
-        const doctor = await Doctor.findById(doctorId);
+        // Change doctor
+        const doctor = await Doctor.findByIdAndUpdate(doctorId,
+            {
+                $push: {
+                    schedule: request._id,
+                    activeConsultations: (request.appointment as AppointmentObject).consultation as Types.ObjectId,
+                },
+                $pull: {
+                    consultationRequests: Types.ObjectId(requestId)
+                }
+            },
+            { new: true }
+        ).select("_id");
         if (!doctor) throw "doctor_not_found";
 
-        const patient = await User.findById(request.patient);
-        if (!patient) throw "patient_not_found";
-
-        // Change doctor
-        doctor.schedule.push(request._id);
-        doctor.activeConsultations.push((request.appointment as AppointmentObject).consultation as Types.ObjectId);
-        doctor.consultationRequests = (doctor.consultationRequests as Types.ObjectId[]).filter(e => e.toString() != requestId);
-        await doctor.save();
-
         // Change user
-        patient.activeConsultations.push((request.appointment as AppointmentObject).consultation as Types.ObjectId);
-        await patient.save();
+        const patient = await User.findByIdAndUpdate(request.patient,
+            {
+                $push: {
+                    activeConsultations: (request.appointment as AppointmentObject).consultation as Types.ObjectId,
+                },
+            },
+            { new: true }
+        ).select("_id");
+        if (!patient) throw "patient_not_found";
 
         logger.i("confirm appoint requests with id =", requestId);
     }
@@ -839,9 +847,9 @@ class DoctorServices {
         // Change doctor
         const doctor = await Doctor.updateOne({ _id: doctorId }, {
             $pull: {
-                consultationRequests: [Types.ObjectId(requestId)]
+                consultationRequests: Types.ObjectId(requestId)
             }
-        });
+        }).exists();
         if (!doctor) throw "doctor_not_found";
 
         logger.i("reject appoint requests with id =", requestId);

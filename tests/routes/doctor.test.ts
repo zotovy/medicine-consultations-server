@@ -720,5 +720,5 @@ describe("Test Doctor API", () => {
             done();
         });
     });
-    // /SECTION
+
 });
