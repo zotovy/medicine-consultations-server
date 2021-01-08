@@ -363,6 +363,7 @@ class DoctorRoutes {
             from: ValidationHelper.customTimeSchema.default({ h: 8, m: 0 }),
             to: ValidationHelper.customTimeSchema.default({ h: 17, m: 0 }),
             consultationTimeInMin: Joi.number().integer().min(20).max(180).default(40),
+            consultationPauseInMin: Joi.number().integer().min(0).default(5),
             weekends: Joi.array().items(Joi.number().integer().min(0).max(6)).unique().default([5, 6]),
             price: Joi.number().integer().min(300),
         });
