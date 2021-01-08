@@ -10,5 +10,6 @@ export const defaultDoctorWorkingTime: DoctorWorkingType = {
         h: 18,
         m: 0
     },
-    weekends: [5, 6]
+    weekends: [5, 6],
+    consultationPauseInMin: 5,
 }

@@ -191,6 +191,7 @@ export type DoctorWorkingType = {
         m: number,
     },
     consultationTimeInMin: number,
+    consultationPauseInMin: number,
     weekends: number[],
 }
 
