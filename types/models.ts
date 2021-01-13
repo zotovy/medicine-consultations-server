@@ -34,6 +34,7 @@ export interface IUser extends Document {
     favourites: mongoose.Types.ObjectId[];
     activeConsultations: mongoose.Types.ObjectId[];
     birthday?: Date;
+    chatsWithHelpers: (mongoose.Types.ObjectId | ISupportChat)[];
 }
 
 /**
@@ -63,6 +64,7 @@ export interface UserObject {
     age?: IUser["age"];
     activeConsultations: mongoose.Types.ObjectId[];
     birthday?: IUser['birthday'];
+    chatsWithHelpers: IUser['chatsWithHelpers'];
 }
 
 /**
@@ -486,4 +488,21 @@ export interface ConsPaymentObj {
     createdAt: IConsPayment["createdAt"];
     payAt?: IConsPayment["payAt"];
     canceledAt?: IConsPayment["canceledAt"];
+}
+
+//========================================================================================
+/*                                                                                      *
+ *                                    SUPPORT                                           *
+ *                                                                                      */
+//========================================================================================
+
+export interface ISupportChat extends Document {
+    user: Types.ObjectId | IUser;
+    messages: {
+        content: string,
+        isUser: boolean,
+        date: Date,
+    }[],
+    title: string,
+    date: Date,
 }

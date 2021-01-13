@@ -851,6 +851,9 @@ class UserServices {
         await u.save();
         logger.i(`userServices.updatePassword: successfully changed ${uid} password`);
     }
+
+    exists = async (uid: string): Promise<boolean> => User.exists({ _id: uid });
 }
+
 
 export default new UserServices();

@@ -4,6 +4,7 @@ import DoctorRouter from "./doctor_routes";
 import AdminRouter from "./admin_routes";
 import PaymentRouter from "./payment_routes";
 import ConsultationRouter from "./consultation_routes";
+import SupportRouter from "./support_routes";
 
 export default class Router {
 
@@ -14,6 +15,7 @@ export default class Router {
         router.use("/admin", AdminRouter);
         router.use("/", PaymentRouter);
         router.use("/consultation", ConsultationRouter);
+        router.use("/support", SupportRouter.getRouter());
         this.router = router;
     }
 

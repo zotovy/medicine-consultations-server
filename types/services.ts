@@ -6,6 +6,7 @@ import {
     AdminObj,
     SpecialityType,
 } from "./models";
+import { Document } from "mongoose";
 
 /**
  *  This type describe return object of UserServices.getUsers() function
@@ -590,3 +591,4 @@ export const ConsultationValidationSchema = {
         },
     },
 };
+

@@ -42,6 +42,7 @@ export function IUserToUserObj(e: IUser): UserObject {
         age: e.age,
         activeConsultations: [...e.activeConsultations],
         birthday: e.birthday,
+        chatsWithHelpers: [...e.chatsWithHelpers],
     };
 }
 
@@ -121,6 +122,7 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         qualificationProofs: e.qualificationProofs,
         workingTime: e.workingTime,
         consultationRequests: e.consultationRequests,
+        chatsWithHelpers: [...e.chatsWithHelpers],
     };
 }
 /**

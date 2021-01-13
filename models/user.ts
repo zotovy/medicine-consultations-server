@@ -102,6 +102,12 @@ const UserSchema = new Schema({
         },
     ],
     birthday: Date,
+    chatsWithHelpers: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "HelpChat"
+        }
+    ]
 });
 
 export default model<IUser>("User", UserSchema);

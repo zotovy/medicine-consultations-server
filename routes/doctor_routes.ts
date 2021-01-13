@@ -322,8 +322,8 @@ class DoctorRoutes {
 
         // validate id & body
         if ((doctorId.length != 24 && doctorId.length != 12) || doctorId !== req.headers.userId
-            || appointId.length != 24 && appointId.length != 12) return res.status(403).json({
-            status: false, error: "invalid_id"
+            || appointId.length != 24 && appointId.length != 12) return res.status(400).json({
+            success: false, error: "invalid_id"
         });
 
         // todo: notify user that consultation needs to be paid for
@@ -331,7 +331,7 @@ class DoctorRoutes {
         const response = await doctorServices.confirmAppointRequest(doctorId, appointId)
             .then(() => ({ success: true }))
             .catch((e) => {
-                logger.e("doctor.confirmAppointRequest: ", e);
+                logger.e("DoctorRoutes.confirmAppointRequest: ", e);
                 return ({ success: false, error: e });
             });
 
@@ -344,7 +344,7 @@ class DoctorRoutes {
 
         // validate id & body
         if ((doctorId.length != 24 && doctorId.length != 12) || doctorId !== req.headers.userId
-            || appointId.length != 24 && appointId.length != 12) return res.status(403).json({
+            || appointId.length != 24 && appointId.length != 12) return res.status(400).json({
             success: false, error: "invalid_id"
         });
 
