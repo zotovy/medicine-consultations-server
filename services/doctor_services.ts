@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 import User from "../models/user";
 import Consultation from "../models/consultation";
+import Appointment from "../models/appointment";
 
 // types
 import {
@@ -813,11 +814,11 @@ class DoctorServices {
         const doctor = await Doctor.findByIdAndUpdate(doctorId,
             {
                 $push: {
-                    schedule: request._id,
+                    schedule: Types.ObjectId((request.appointment as IAppointment)._id),
                     activeConsultations: (request.appointment as AppointmentObject).consultation as Types.ObjectId,
                 },
                 $pull: {
-                    consultationRequests: Types.ObjectId(requestId)
+                    consultationRequests: requestId,
                 }
             },
             { new: true }
@@ -841,7 +842,6 @@ class DoctorServices {
     public rejectAppointRequest = async (doctorId: string, requestId: string): Promise<void> => {
         const request = await ConsultationRequest.findById(requestId)
             .populate("appointment")
-            .lean();
         if (!request) throw "request_not_found";
 
         // Change doctor
@@ -849,7 +849,7 @@ class DoctorServices {
             $pull: {
                 consultationRequests: Types.ObjectId(requestId)
             }
-        }).exists();
+        });
         if (!doctor) throw "doctor_not_found";
 
         logger.i("reject appoint requests with id =", requestId);
