@@ -49,7 +49,7 @@ class Logger {
         };
 
         this.saveToStack(log);
-        this.saveStack();
+        // this.saveStack();
     };
 
     warning = (message: any, ...args: any[]): void => {

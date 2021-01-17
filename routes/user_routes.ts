@@ -21,8 +21,9 @@ import RoutesHelper from "../helpers/routes_helper";
 
 
 export default class UserRoutes implements BaseRouter {
+    router: express.Router;
 
-    public static getRouter(): express.Router {
+    constructor() {
         const router = express.Router();
         router.post("/generate-token", UserRoutes.generateToken);
         router.post("/login-user", UserRoutes.loginUser);
@@ -40,7 +41,7 @@ export default class UserRoutes implements BaseRouter {
         router.get("/user/:id/reviews", UserRoutes.getReviews);
         router.post("/user/:id/update-password", token_services.authenticateToken, UserRoutes.updatePassword);
         router.get("/user/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(true));
-        return router;
+        this.router = router;
     }
 
     private static generateToken: IRouteHandler = async (req, res) => {

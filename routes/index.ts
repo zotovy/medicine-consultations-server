@@ -10,12 +10,12 @@ export default class Router {
 
     constructor() {
         const router = express.Router();
-        router.use("/", UserRouter.getRouter());
-        router.use("/", DoctorRouter);
+        router.use("/", new UserRouter().router);
+        router.use("/", new DoctorRouter().router);
         router.use("/admin", AdminRouter);
         router.use("/", PaymentRouter);
-        router.use("/consultation", ConsultationRouter.getRouter());
-        router.use("/support", SupportRouter.getRouter());
+        router.use("/consultation", new ConsultationRouter().router);
+        router.use("/support", new SupportRouter().router);
         this.router = router;
     }
 

@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Router as ExpressRouter } from "express";
 import { ParsedQs } from "qs";
 import { NextFunction, ParamsDictionary, Request, Response, } from "express-serve-static-core";
 import { FileArray } from "express-fileupload";
@@ -13,4 +13,4 @@ export interface IFileRouteHandler<P = ParamsDictionary, ResBody = any, ReqBody 
     (req: FileRequest<P, ResBody, ReqBody, ReqQuery>, res: Response<ResBody>, next: NextFunction): any;
 }
 
-export interface BaseRouter { [key: string]: any }
+export interface BaseRouter { router: ExpressRouter };

@@ -53,16 +53,16 @@ export interface UserObject {
     sex: IUser["sex"];
     city?: IUser["city"];
     country?: IUser["country"];
-    consultations: mongoose.Types.ObjectId[];
-    reviews: mongoose.Types.ObjectId[];
+    consultations: IUser["consultations"];
+    reviews: IUser["reviews"];
     notificationEmail: IUser["notificationEmail"];
     sendNotificationToEmail: IUser["sendNotificationToEmail"];
     sendMailingsToEmail: IUser["sendMailingsToEmail"];
     createdAt: IUser["createdAt"];
     lastActiveAt: IUser["lastActiveAt"];
-    favourites: mongoose.Types.ObjectId[];
+    favourites: IUser["favourites"];
     age?: IUser["age"];
-    activeConsultations: mongoose.Types.ObjectId[];
+    activeConsultations: IUser["activeConsultations"];
     birthday?: IUser['birthday'];
     chatsWithHelpers: IUser['chatsWithHelpers'];
 }

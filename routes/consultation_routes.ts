@@ -1,4 +1,4 @@
-import { Router as ExpressRouter } from "express";
+import { IRoute, Router as ExpressRouter } from "express";
 import consultationServices from "../services/consultation_services";
 import tokenServices from "../services/token_services";
 import Consultation from "../models/consultation";
@@ -8,14 +8,16 @@ import User from "../models/user";
 import Doctor from "../models/doctor";
 import IRouteHandler, { BaseRouter } from "../types/routes";
 
-export default class UserRoutes implements BaseRouter {
+export default class ConsultationRoutes implements BaseRouter {
 
-    public static getRouter(): ExpressRouter {
+    router: ExpressRouter;
+
+    constructor() {
         const Router = ExpressRouter();
-        Router.post("/create", UserRoutes.createConsultation);
-        Router.get("/:id", tokenServices.authenticateToken, UserRoutes.getById);
-        Router.get("/user/:id", tokenServices.authenticateToken, UserRoutes.getUserConsultations);
-        return Router;
+        Router.post("/create", ConsultationRoutes.createConsultation);
+        Router.get("/:id", tokenServices.authenticateToken, ConsultationRoutes.getById);
+        Router.get("/user/:id", tokenServices.authenticateToken, ConsultationRoutes.getUserConsultations);
+        this.router = Router;
     }
 
     private static createConsultation: IRouteHandler = async (req, res) => {
@@ -69,7 +71,6 @@ export default class UserRoutes implements BaseRouter {
     }
 
     private static getUserConsultations: IRouteHandler = async (req, res) => {
-
         const { id } = req.params;
         let { isUser } = req.query;
 

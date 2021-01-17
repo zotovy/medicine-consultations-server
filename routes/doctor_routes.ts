@@ -1,4 +1,4 @@
-import express from "express";
+import { Router as ExpressRouter } from "express";
 import Joi from "joi";
 import doctorServices from "../services/doctor_services";
 import { Types } from "mongoose";
@@ -10,17 +10,35 @@ import { DoctorObject, DoctorWorkingType } from "../types/models";
 import { TGetAppointsServiceOptions, translateSpeciality } from "../types/services";
 import token_services from "../services/token_services";
 import Ajv from "ajv";
-import IRouteHandler from "../types/routes";
+import IRouteHandler, { BaseRouter } from "../types/routes";
 import ValidationHelper from "../helpers/validation_helper";
 import RoutesHelper from "../helpers/routes_helper";
 import consultationServices from "../services/consultation_services";
 import UserRoutes from "./user_routes";
 
+export default class DoctorRoutes implements BaseRouter{
+    router: ExpressRouter;
 
-// Used to process the http request
-const Router = express.Router();
+    constructor() {
+        const Router = ExpressRouter();
+        Router.post("/doctor", DoctorRoutes.createDoctor);
+        Router.put("/doctor", token_services.authenticateToken, DoctorRoutes.updateDoctor);
+        Router.delete("/doctor/:id", token_services.authenticateToken, DoctorRoutes.deleteDoctor);
+        Router.get("/doctor/:id", DoctorRoutes.getDoctorById);
+        Router.get("/doctors", DoctorRoutes.getDoctors);
+        Router.post("/doctor-request/send", DoctorRoutes.sendDoctorRequests);
+        Router.get("/symptoms", DoctorRoutes.getSymptoms);
+        Router.post("/doctor/:id/update-links", token_services.authenticateToken, DoctorRoutes.updateLinks);
+        Router.get("/doctor/:id/appoints", token_services.authenticateToken, DoctorRoutes.getAppoints);
+        Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, DoctorRoutes.getAppointsRequests);
+        Router.post("/doctor/:doctorId/appoint/:appointId/confirm", token_services.authenticateToken, DoctorRoutes.confirmAppointRequest);
+        Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
+        Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
+        Router.get("/doctor/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(false));
+        Router.post("/doctor/:doctorId/consultation/:consultationId/reject", token_services.authenticateToken, DoctorRoutes.rejectConsultation);
+        this.router = Router;
+    }
 
-class DoctorRoutes {
     public static createDoctor: IRouteHandler = async (req, res) => {
         const doctor = doctorServices.convertDoctorFields(req.body);
 
@@ -396,23 +414,30 @@ class DoctorRoutes {
         return res.status(response.success ? 500 : 202).json(response);
     }
 
+    public static rejectConsultation: IRouteHandler = async (req, res) => {
+
+        // validate id & body
+        const schema = Joi.object({
+            doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).equal(req.headers.userId),
+            consultationId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+        });
+        const ok = RoutesHelper.JoiValidator(res, schema, req.params, "DoctorRoutes.rejectConsultation");
+        if (!ok) return;
+
+        // todo: notify user that consultation is rejected
+
+        let status = 202;
+        const response = await consultationServices.rejectConsultation(req.params.doctorId, req.params.consultationId)
+            .then(() => ({ success: true }))
+            .catch((e) => {
+                logger.e("DoctorRoutes.rejectConsultation:", e);
+                status = 500;
+                const e404 = ["consultation_not_found", "doctor_not_found", "user_not_found"];
+                if (e404.includes(e)) status = 404;
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
 }
 
-
-// Routes
-Router.post("/doctor", DoctorRoutes.createDoctor);
-Router.put("/doctor", token_services.authenticateToken, DoctorRoutes.updateDoctor);
-Router.delete("/doctor/:id", token_services.authenticateToken, DoctorRoutes.deleteDoctor);
-Router.get("/doctor/:id", DoctorRoutes.getDoctorById);
-Router.get("/doctors", DoctorRoutes.getDoctors);
-Router.post("/doctor-request/send", DoctorRoutes.sendDoctorRequests);
-Router.get("/symptoms", DoctorRoutes.getSymptoms);
-Router.post("/doctor/:id/update-links", token_services.authenticateToken, DoctorRoutes.updateLinks);
-Router.get("/doctor/:id/appoints", token_services.authenticateToken, DoctorRoutes.getAppoints);
-Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, DoctorRoutes.getAppointsRequests);
-Router.post("/doctor/:doctorId/appoint/:appointId/confirm", token_services.authenticateToken, DoctorRoutes.confirmAppointRequest);
-Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
-Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
-Router.post("/doctor/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(false));
-
-export default Router;

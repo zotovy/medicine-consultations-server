@@ -7,10 +7,13 @@ import SupportServices from "../services/support_services";
 import tokenServices from "../services/token_services";
 
 export default class HelperRoutes implements BaseRouter {
-    public static getRouter(): ExpressRouter {
+
+    router: ExpressRouter;
+
+    constructor() {
         const Router = ExpressRouter();
         Router.post("/create-chat", tokenServices.authenticateToken, HelperRoutes.createChat);
-        return Router;
+        this.router = Router;
     }
 
     private static createChat: IRouteHandler = async (req, res) => {
