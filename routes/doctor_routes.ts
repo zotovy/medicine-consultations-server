@@ -12,6 +12,9 @@ import token_services from "../services/token_services";
 import Ajv from "ajv";
 import IRouteHandler from "../types/routes";
 import ValidationHelper from "../helpers/validation_helper";
+import RoutesHelper from "../helpers/routes_helper";
+import consultationServices from "../services/consultation_services";
+import UserRoutes from "./user_routes";
 
 
 // Used to process the http request
@@ -392,6 +395,7 @@ class DoctorRoutes {
 
         return res.status(response.success ? 500 : 202).json(response);
     }
+
 }
 
 
@@ -409,5 +413,6 @@ Router.get("/doctor/:id/appoints-requests", token_services.authenticateToken, Do
 Router.post("/doctor/:doctorId/appoint/:appointId/confirm", token_services.authenticateToken, DoctorRoutes.confirmAppointRequest);
 Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
 Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
+Router.post("/doctor/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(false));
 
 export default Router;

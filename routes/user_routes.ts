@@ -39,7 +39,7 @@ export default class UserRoutes implements BaseRouter {
         router.post("/send-reset-password-email", UserRoutes.sendResetPasswordEmail);
         router.get("/user/:id/reviews", UserRoutes.getReviews);
         router.post("/user/:id/update-password", token_services.authenticateToken, UserRoutes.updatePassword);
-        router.get("/user/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth);
+        router.get("/user/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(true));
         return router;
     }
 
@@ -477,7 +477,7 @@ export default class UserRoutes implements BaseRouter {
         return res.status(response.success ? 202 : 400).json(response);
     }
 
-    private static getConsultationsDatesByMonth: IRouteHandler = async (req, res) => {
+    public static getConsultationsDatesByMonth: (isUser: boolean ) => IRouteHandler = (isUser) => async (req, res) => {
         const schema = Joi.object({
             date: Joi.string().regex(new RegExp("^((0)[0-9])|((1)[0-2])(\\.)\\d{4}$")).required(), // 01.2021
         });
@@ -491,7 +491,7 @@ export default class UserRoutes implements BaseRouter {
         const amount = parseInt((req.query.amount as string) ?? NaN);
 
         let status = 200
-        const response = await consultationServices.getUserConsultationsDates(id, false, { date, from, amount })
+        const response = await consultationServices.getUserConsultationsDates(id, isUser, { date, from, amount })
             .then((dates) => ({ success: true, dates }))
             .catch((error) => {
                 status = 500;
