@@ -3,9 +3,11 @@ import User from "../models/user";
 import Doctor from "../models/doctor";
 import Consultation from "../models/consultation";
 import { ConsultationValidationSchema } from "../types/services";
-import { Types } from "mongoose";
+import { IUser, IDoctor, ConsultationObject, IConsultation } from "../types/models";
+import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
 import server from "../server";
+import logger from "../logger";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -13,7 +15,7 @@ const throwInvalidError = (): { _id: any } => {
 
 class ConsultationServices {
 
-    connectedAmount : {[key: string]: number} = {};
+    connectedAmount: { [key: string]: number } = {};
 
     create = async (raw: any): Promise<string> => {
         // if date is instanse of Date --> convert to iso date
@@ -173,6 +175,48 @@ class ConsultationServices {
             .to(`consultation-${consultationId}`)
             .emit("new_message", message);
     };
+
+     getUserConsultationsDates = async (uid: string, isUser: boolean, options: getUserConsultationsDatesOptions = {}): Promise<Date[]> => {
+
+        let match = {};
+        if (options.date) {
+            const split = options.date.split(".");
+            const month = parseInt(split[0]), year = parseInt(split[1]);
+            const nextMonth = `${month === 12 ? year + 1 : year}-${month === 12 ? 1 : month + 1}-01`
+            match = {
+                match: { date: { $gte: `${year}-${month}-01`, $lt: nextMonth } },
+            }
+        }
+
+        const populate: QueryPopulateOptions[] = [
+            { path: "activeConsultations", ...match, select: "date" },
+            { path: "consultations", ...match, select: "date" },
+        ];
+
+        const model: Model<IUser | IDoctor> = isUser ? User : Doctor;
+        const u = await model
+            .findById(uid)
+            .populate(populate)
+            .select("activeConsultations consultation")
+            .skip(options.from ?? 0)
+            .limit(options.amount ?? 50)
+            .lean();
+
+        if (!u) throw "no_user_found";
+
+        const dates: Date[] = (u.activeConsultations.concat(u.consultations))
+            .map((e) => {
+                const d = (e as IConsultation).date;
+                return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0);
+            })
+             .filter((date, i, array) => array.indexOf(date) === i);
+
+        logger.i("ConsultationServices.getUserConsultationsDates: successfully get consultation dates, " +
+            `uid=${uid}, isUser=${isUser}, options = `, options, "result: ", dates);
+        return dates;
+    }
 }
+
+type getUserConsultationsDatesOptions = { from?: number, amount?: number, date?: string };
 
 export default new ConsultationServices();

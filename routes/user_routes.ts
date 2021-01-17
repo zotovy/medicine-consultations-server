@@ -4,6 +4,7 @@ import express, { Response } from "express";
 import path from "path";
 import jwt from "jsonwebtoken";
 import userServices from "../services/user_services";
+import consultationServices from "../services/consultation_services";
 import mail_services from "../services/mail_services";
 import logger from "../logger";
 import User from '../models/user';
@@ -15,6 +16,8 @@ import { ServerError } from "../types/errors";
 import token_services from "../services/token_services";
 import Doctor from "../models/doctor";
 import IRouteHandler, { BaseRouter, FileRequest, IFileRouteHandler } from "../types/routes";
+import Joi from "joi";
+import RoutesHelper from "../helpers/routes_helper";
 
 
 export default class UserRoutes implements BaseRouter {
@@ -36,6 +39,7 @@ export default class UserRoutes implements BaseRouter {
         router.post("/send-reset-password-email", UserRoutes.sendResetPasswordEmail);
         router.get("/user/:id/reviews", UserRoutes.getReviews);
         router.post("/user/:id/update-password", token_services.authenticateToken, UserRoutes.updatePassword);
+        router.get("/user/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth);
         return router;
     }
 
@@ -471,5 +475,21 @@ export default class UserRoutes implements BaseRouter {
             })
 
         return res.status(response.success ? 202 : 400).json(response);
+    }
+
+    private static getConsultationsDatesByMonth: IRouteHandler = async (req, res) => {
+        const schema = Joi.object({
+            date: Joi.string().regex(new RegExp("^((0)[0-9])|((1)[0-2])(\\.)\\d{4}$")).required(), // 01.2021
+        });
+
+        const ok = RoutesHelper.JoiValidator(res, schema, req.params, "UserRoutes.getConsultationsDatesByMonth");
+        if (!ok) return;
+
+        const { date } = req.params;
+        const id = req.headers.userId as string;
+        const response = await consultationServices.getUserConsultationsDates(id, false, { date })
+            .then((dates) => ({ success: true, dates }))
+            .catch((error) => ({ success: false, error }));
+        return res.status(response.success ? 200 : 500).json(response);
     }
 }

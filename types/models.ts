@@ -24,7 +24,7 @@ export interface IUser extends Document {
     sex: boolean;
     city?: string;
     country?: string;
-    consultations: mongoose.Types.ObjectId[];
+    consultations:  (mongoose.Types.ObjectId | IConsultation)[];
     reviews: mongoose.Types.ObjectId[];
     notificationEmail: string;
     sendNotificationToEmail: boolean;
@@ -32,7 +32,7 @@ export interface IUser extends Document {
     createdAt: Date;
     lastActiveAt: Date;
     favourites: mongoose.Types.ObjectId[];
-    activeConsultations: mongoose.Types.ObjectId[];
+    activeConsultations: (mongoose.Types.ObjectId | IConsultation)[];
     birthday?: Date;
     chatsWithHelpers: (mongoose.Types.ObjectId | ISupportChat)[];
 }
