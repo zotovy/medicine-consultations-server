@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import User from "../models/user";
 import Doctor from "../models/doctor";
-import Consultation from "../models/consultation";
+import Consultation, { ConsultationRequest } from "../models/consultation";
 import { ConsultationValidationSchema } from "../types/services";
 import { IUser, IDoctor, ConsultationObject, IConsultation } from "../types/models";
 import { Model, QueryPopulateOptions, Types } from "mongoose";
@@ -176,6 +176,12 @@ class ConsultationServices {
             .emit("new_message", message);
     };
 
+    /**
+     * @throws "no_user_found"
+     * @param uid - doctor or user id
+     * @param isUser - is giving id related to user
+     * @param options - from, amount and date options
+     */
      getUserConsultationsDates = async (uid: string, isUser: boolean, options: getUserConsultationsDatesOptions = {}): Promise<Date[]> => {
 
         let match = {};
@@ -214,6 +220,34 @@ class ConsultationServices {
         logger.i("ConsultationServices.getUserConsultationsDates: successfully get consultation dates, " +
             `uid=${uid}, isUser=${isUser}, options = `, options, "result: ", dates);
         return dates;
+    }
+
+    /**
+     * @throws consultation_not_found
+     * @throws doctor_not_found
+     * @throws user_not_found
+     * @param uid
+     * @param id
+     */
+    public rejectConsultation = async (uid: string, id: string): Promise<void> => {
+         const consultation = await Consultation.findById(id).select("patient");
+         if (!consultation) throw "consultation_not_found";
+
+         const update = {
+             $pull: {
+                 activeConsultations: Types.ObjectId(id)
+             }
+         }
+
+        // Change doctor
+        const doctor = await Doctor.findByIdAndUpdate(uid, update);
+        if (!doctor) throw "doctor_not_found";
+
+        // Change user
+        const user = await User.findByIdAndUpdate(consultation.patient, update)
+        if (!user) throw "user_not_found";
+
+        logger.i("ConsultationServices.rejectConsultation: successfully reject consultation with id =", id);
     }
 }
 
