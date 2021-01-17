@@ -1,94 +1,102 @@
-import { Router as Express } from "express";
-import consultation_services from "../services/consultation_services";
-import token_services from "../services/token_services";
+import { Router as ExpressRouter } from "express";
+import consultationServices from "../services/consultation_services";
+import tokenServices from "../services/token_services";
 import Consultation from "../models/consultation";
 import logger from "../logger";
 import { IDoctor, IUser } from "../types/models";
 import User from "../models/user";
 import Doctor from "../models/doctor";
+import IRouteHandler, { BaseRouter } from "../types/routes";
 
-const Router = Express();
+export default class UserRoutes implements BaseRouter {
 
-Router.post("/create", async (req, res) => {
-    const id = await consultation_services.create(req.body).catch((e) => e);
-
-    const status = id === "invalid_error" ? 500 : Array.isArray(id) ? 400 : 201;
-    const body =
-        Array.isArray(id) || id === "invalid_error"
-            ? { success: false, errors: id }
-            : { success: true, id };
-
-    return res.status(status).json(body);
-});
-
-Router.get("/:id", token_services.authenticateToken, async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const consultation = await Consultation.findById(id)
-            .select("-_id -__v")
-            .populate([
-                { path: "patient", select: "fullName photoUrl _id" },
-                {
-                    path: "doctor",
-                    select: "fullName photoUrl _id speciality",
-                },
-            ])
-            .lean()
-            .exec();
-
-        // If user is not a patient and is not a doctor
-        if (
-            req.headers.userId != (consultation?.doctor as IDoctor)?._id &&
-            req.headers.userId != (consultation?.patient as IUser)?._id
-        ) {
-            return res.status(403).json({
-                success: false,
-                error: "access_denied",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            consultation,
-        });
-    } catch (e) {
-        console.log(e);
-        logger.e(`error while get consultation with id = ${id}`);
-        return res.status(500).json({ success: false, error: "invalid_error" });
+    public static getRouter(): ExpressRouter {
+        const Router = ExpressRouter();
+        Router.post("/create", UserRoutes.createConsultation);
+        Router.get("/:id", tokenServices.authenticateToken, UserRoutes.getById);
+        Router.get("/user/:id", tokenServices.authenticateToken, UserRoutes.getUserConsultations);
+        return Router;
     }
-});
 
-Router.get("/user/:id", token_services.authenticateToken, async (req, res) => {
+    private static createConsultation: IRouteHandler = async (req, res) => {
+        const id = await consultationServices.create(req.body).catch((e) => e);
 
-    const { id } = req.params;
-    let { isUser } = req.query;
+        const status = id === "invalid_error" ? 500 : Array.isArray(id) ? 400 : 201;
+        const body =
+            Array.isArray(id) || id === "invalid_error"
+                ? { success: false, errors: id }
+                : { success: true, id };
 
-    if (!isUser) isUser = "true";
+        return res.status(status).json(body);
+    }
 
-    const populate = {
-        path: "consultations",
-        select: "doctorId date note",
-        populate: [
-            {
-                path: "doctorId",
-                select: "fullName photoUrl _id speciality"
+    private static getById: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
 
+        try {
+            const consultation = await Consultation.findById(id)
+                .select("-_id -__v")
+                .populate([
+                    { path: "patient", select: "fullName photoUrl _id" },
+                    {
+                        path: "doctor",
+                        select: "fullName photoUrl _id speciality",
+                    },
+                ])
+                .lean()
+                .exec();
+
+            // If user is not a patient and is not a doctor
+            if (
+                req.headers.userId != (consultation?.doctor as IDoctor)?._id &&
+                req.headers.userId != (consultation?.patient as IUser)?._id
+            ) {
+                return res.status(403).json({
+                    success: false,
+                    error: "access_denied",
+                });
             }
-        ]
-    };
 
-    const user = isUser === "true"
-        ? await User.findById(id).populate(populate).select("consultations").lean().exec()
-        : await Doctor.findById(id).populate(populate).select("consultations").lean().exec()
+            return res.status(200).json({
+                success: true,
+                consultation,
+            });
+        } catch (e) {
+            console.log(e);
+            logger.e(`error while get consultation with id = ${id}`);
+            return res.status(500).json({ success: false, error: "invalid_error" });
+        }
+    }
 
-    return res.status(user === null ? 404 : 200).json({
-        success: user !== null,
-        consultations: user?.consultations,
-        error: user === null ? "invalid_error" : undefined
-    });
-});
+    private static getUserConsultations: IRouteHandler = async (req, res) => {
 
+        const { id } = req.params;
+        let { isUser } = req.query;
 
+        if (!isUser) isUser = "true";
 
-export default Router;
+        const populate = {
+            path: "consultations",
+            select: "doctorId date note",
+            populate: [
+                {
+                    path: "doctorId",
+                    select: "fullName photoUrl _id speciality"
+
+                }
+            ]
+        };
+
+        const user = isUser === "true"
+            ? await User.findById(id).populate(populate).select("consultations").lean().exec()
+            : await Doctor.findById(id).populate(populate).select("consultations").lean().exec()
+
+        return res.status(user === null ? 404 : 200).json({
+            success: user !== null,
+            consultations: user?.consultations,
+            error: user === null ? "invalid_error" : undefined
+        });
+    }
+
+}
+
