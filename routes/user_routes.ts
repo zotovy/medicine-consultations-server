@@ -487,9 +487,17 @@ export default class UserRoutes implements BaseRouter {
 
         const { date } = req.params;
         const id = req.headers.userId as string;
-        const response = await consultationServices.getUserConsultationsDates(id, false, { date })
+        const from = parseInt((req.query.from as string) ?? NaN);
+        const amount = parseInt((req.query.amount as string) ?? NaN);
+
+        let status = 200
+        const response = await consultationServices.getUserConsultationsDates(id, false, { date, from, amount })
             .then((dates) => ({ success: true, dates }))
-            .catch((error) => ({ success: false, error }));
-        return res.status(response.success ? 200 : 500).json(response);
+            .catch((error) => {
+                status = 500;
+                if (error === "no_user_found") status = 404;
+                return { success: false, error };
+            });
+        return res.status(status).json(response);
     }
 }
