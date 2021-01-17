@@ -1,6 +1,6 @@
-stages:
-  - test
-  - deploy
+#stages:
+#  - test
+#  - deploy
 
 
 test:
