@@ -120,6 +120,10 @@ export default class SupportServices {
         if (!chat) throw "no_question_found";
         SupportServices._logger.i(`successfully send message, questionId=${questionId}, message=${message}`);
     }
+
+    public static canUserAccessQuestion = (uid: string, qid: string): Promise<boolean> => {
+        return SupportChatModel.exists({ _id: qid, user: uid });
+    }
 }
 
 type GetQuestionsType = { from?: number, amount?: number, limitMessages?: number };

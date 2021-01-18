@@ -7,5 +7,10 @@ export default class ValidationHelper {
         m: Joi.number().integer().min(0).max(59).required(),
     });
 
+    public static checkId = (id: string): boolean => {
+        const regex = new RegExp(/^[0-9a-fA-F]{24}$/);
+        return regex.test(id);
+    }
+
 }
 
