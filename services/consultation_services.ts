@@ -1,9 +1,9 @@
 import Ajv from "ajv";
 import User from "../models/user";
 import Doctor from "../models/doctor";
-import Consultation, { ConsultationRequest } from "../models/consultation";
+import Consultation from "../models/consultation";
 import { ConsultationValidationSchema } from "../types/services";
-import { IUser, IDoctor, ConsultationObject, IConsultation } from "../types/models";
+import { IUser, IDoctor, IConsultation } from "../types/models";
 import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
 import server from "../server";

@@ -10,8 +10,11 @@ class Logger {
     maxLogsInStack = 25;
     filesPath: string = "./logs";
 
-    constructor() {
+    prefix: string;
+
+    constructor(prefix = "") {
         this.startDate = new Date();
+        this.prefix = prefix;
     }
 
     saveStack = async () => {
@@ -39,7 +42,7 @@ class Logger {
     error = (message: any, ...args: any[]): void => {
         const time = new Date();
 
-        console.log(`${colors.bgRed.white(" Error: ")} ${message}`, ...args);
+        console.log(`${colors.bgRed.white(" Error: ")} ${this.prefix} ${message}`, ...args);
         console.log(`${new Date().toISOString()}`);
 
         const log: Log = {
@@ -55,7 +58,7 @@ class Logger {
     warning = (message: any, ...args: any[]): void => {
         const time = new Date();
 
-        console.log(`${" Warning: ".black.bgYellow} ${message}`, ...args);
+        console.log(`${" Warning: ".black.bgYellow} ${this.prefix} ${message}`, ...args);
         console.log(`${new Date().toISOString()}`);
 
         const log: Log = {
@@ -70,7 +73,7 @@ class Logger {
     info = (message: string, ...args: any[]): void => {
         const time = new Date();
 
-        console.log(`${"logger:".italic} ${message}`, ...args);
+        console.log(`${(this.prefix ?? "logger:").italic} ${message}`, ...args);
 
         const log: Log = {
             type: LogType.Warning,
@@ -111,5 +114,7 @@ enum LogType {
     Warning = "warning",
     Info = "info",
 }
+
+export { Logger };
 
 export default new Logger();

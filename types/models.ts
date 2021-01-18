@@ -506,3 +506,10 @@ export interface ISupportChat extends Document {
     title: string,
     date: Date,
 }
+
+export interface SupportChat {
+    user: ISupportChat['user'];
+    messages: ISupportChat['messages'];
+    title: ISupportChat['title'];
+    date: ISupportChat['date'];
+}
