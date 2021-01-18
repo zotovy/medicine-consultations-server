@@ -18,6 +18,8 @@ export default class SupportRoutes implements BaseRouter {
         Router.post("/support/create-chat", tokenServices.authenticateToken, SupportRoutes.createChat);
         Router.get("/user/support-questions", tokenServices.authenticateToken, SupportRoutes.getQuestions(true));
         Router.get("/doctor/support-questions", tokenServices.authenticateToken, SupportRoutes.getQuestions(false));
+        Router.get("/user/support-questions/:id", tokenServices.authenticateToken, SupportRoutes.getQuestion(true));
+        Router.get("/doctor/support-questions/:id", tokenServices.authenticateToken, SupportRoutes.getQuestion(false));
         this.router = Router;
     }
 
@@ -54,12 +56,31 @@ export default class SupportRoutes implements BaseRouter {
         let options: any = {};
         if (req.query.from) options.from = parseInt(req.query.from as string);
         if (req.query.amount) options.amount = parseInt(req.query.amount as string);
+        if (req.query.limitMessages) options.limitMessages = parseInt(req.query.limitMessages as string);
 
         let status = 200;
         const response = await SupportServices.getQuestions(uid, isUser, options)
             .then(questions => ({ success: true, questions }))
             .catch(e => {
                 status = RoutesHelper.getStatus({ 400: ["no_user_found"] }, e);
+                _logger.e("getQuestions error happened ", e);
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
+
+    private static getQuestion: (isUser: boolean) => IRouteHandler = (isUser: boolean) => async (req, res) => {
+        const uid = req.headers.userId as string;
+        const { id } = req.params;
+        let options: any = {};
+        if (req.query.limitMessages) options.limitMessages = parseInt(req.query.limitMessages as string);
+
+        let status = 200;
+        const response = await SupportServices.getQuestion(uid, id, isUser, options)
+            .then(question => ({ success: true, question }))
+            .catch(e => {
+                status = RoutesHelper.getStatus({ 400: ["no_user_found", "no_question_found"] }, e);
                 _logger.e("getQuestion error happened ", e);
                 return { success: false, error: e };
             });
