@@ -1,4 +1,4 @@
-import HelperChat from "../models/support";
+import SupportChatModel from "../models/support";
 import User from "../models/user";
 import Doctor from "../models/doctor";
 import { Logger } from "../logger";
@@ -12,7 +12,7 @@ export default class SupportServices {
      * @throws "no_user_found"
      */
     public static createChat = async (uid: string, isUser: boolean, title: string, message: string): Promise<string> => {
-        const { _id } = await HelperChat.create({
+        const { _id } = await SupportChatModel.create({
                 user: uid, title, messages: [
                     {
                         date: new Date(),
@@ -25,7 +25,7 @@ export default class SupportServices {
         );
 
         const u = await (isUser ? User : Doctor).findByIdAndUpdate(uid, {
-            $pull: { chatsWithHelpers: _id, }
+            $push: { chatsWithHelpers: _id, }
         });
         if (!u) throw "no_user_found";
 
@@ -39,23 +39,31 @@ export default class SupportServices {
      * @param uid - user id
      * @param isUser - is user a patient or doctor
      * @param options - from & amount options
-     * @default options = { from: 0, amount: 50 }
+     * @default options = { from: 0, amount: 50, limitQuestions: 50 }
      */
     public static getQuestions = async (uid: string, isUser: boolean, options: GetQuestionsType = {} ): Promise<SupportChat[]> => {
         const u = await (isUser ? User : Doctor).findById(uid)
             .populate({
                 path: "chatsWithHelpers",
-                limit: options.amount ?? 50,
-                skip: options.from ?? 0,
+                options: {
+                    limit: options.amount ?? 50,
+                    skip: options.from ?? 0,
+                }
             })
             .select("chatsWithHelpers")
             .lean();
 
         if (!u) throw "no_user_found";
 
-        SupportServices._logger.i(`successfully get questions, id=${uid}, isUser=${isUser}, `, options, "length =", u.chatsWithHelpers.length);
-        return u.chatsWithHelpers as SupportChat[];
+        // slice messages
+        (u.chatsWithHelpers as SupportChat[] ?? []).forEach(
+            (e, i) => (u.chatsWithHelpers as SupportChat[])[i].messages = e.messages.slice(0, options.limitMessages ?? 50)
+        );
+
+        SupportServices._logger.i(`successfully get questions, id=${uid}, isUser=${isUser}, `, options, "length =", u.chatsWithHelpers?.length);
+        return (u.chatsWithHelpers as SupportChat[] ?? []);
     }
 }
 
-type GetQuestionsType = { from?: number, amount?: number };
+type GetQuestionsType = { from?: number, amount?: number, limitMessages?: number };
+type GetQuestionType = { limitMessages?: number };

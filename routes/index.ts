@@ -15,7 +15,7 @@ export default class Router {
         router.use("/admin", AdminRouter);
         router.use("/", PaymentRouter);
         router.use("/consultation", new ConsultationRouter().router);
-        router.use("/support", new SupportRouter().router);
+        router.use("/", new SupportRouter().router);
         this.router = router;
     }
 

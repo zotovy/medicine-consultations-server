@@ -29,8 +29,7 @@ export default class UserRoutes implements BaseRouter {
         router.post("/login-user", UserRoutes.loginUser);
         router.post("/token", UserRoutes.updateToken);
         router.get("/users", UserRoutes.getUsers);
-        router.get("/user/:id", token_services.authenticateToken, UserRoutes.getUser);
-        router.get("/user/:id", token_services.authenticateToken, UserRoutes.getUser);
+        router.get("/user/:id([a-fA-F0-9]{24})", token_services.authenticateToken, UserRoutes.getUser);
         router.post("/user/setAvatar/:id", token_services.authenticateToken, UserRoutes.setAvatar);
         router.post("/user", UserRoutes.createUser);
         router.post("/user", UserRoutes.createUser);

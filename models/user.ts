@@ -50,22 +50,30 @@ const UserSchema = new Schema({
     country: {
         type: String,
     },
-    consultations: [ // Consultations which already have gone
-        {
-            // Store Array<ObjectId> of consultations
-            // We can get user with consultation running .populate("consultation")
-            type: Schema.Types.ObjectId,
-            ref: "Consultation",
-        },
-    ],
-    reviews: [
-        {
-            // Store Array<ObjectId> of reviews
-            // We can get user with reviews running .populate("review")
-            type: Schema.Types.ObjectId,
-            ref: "Review",
-        },
-    ],
+    consultations: {
+        type: [ // Consultations which already have gone
+            {
+                // Store Array<ObjectId> of consultations
+                // We can get user with consultation running .populate("consultation")
+                type: Schema.Types.ObjectId,
+                ref: "Consultation",
+            },
+        ],
+        required: true,
+        default: []
+    },
+    reviews: {
+        type:  [
+            {
+                // Store Array<ObjectId> of reviews
+                // We can get user with reviews running .populate("review")
+                type: Schema.Types.ObjectId,
+                ref: "Review",
+            },
+        ],
+        required: true,
+        default: []
+    },
     notificationEmail: {
         type: String,
         unique: true,
@@ -89,25 +97,37 @@ const UserSchema = new Schema({
         required: true,
     },
     // List of favourites doctors
-    favourites: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Doctor",
-        },
-    ],
-    activeConsultations: [ // Consultation which is going now and in the future
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Consultation",
-        },
-    ],
+    favourites: {
+        type: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Doctor",
+            },
+        ],
+        required: true,
+        default: [],
+    },
+    activeConsultations: {
+        type:  [ // Consultation which is going now and in the future
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Consultation",
+            },
+        ],
+        required: true,
+        default: [],
+    },
     birthday: Date,
-    chatsWithHelpers: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "HelpChat"
-        }
-    ]
+    chatsWithHelpers: {
+        type: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "SupportChat"
+            }
+        ],
+        required: true,
+        default: [],
+    }
 });
 
 export default model<IUser>("User", UserSchema);
