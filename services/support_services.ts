@@ -41,7 +41,7 @@ export default class SupportServices {
      * @param options - from & amount options
      * @default options = { from: 0, amount: 50, limitMessages: 50 }
      */
-    public static getQuestions = async (uid: string, isUser: boolean, options: GetQuestionsType = {} ): Promise<SupportChat[]> => {
+    public static getQuestions = async (uid: string, isUser: boolean, options: GetQuestionsType = {}): Promise<SupportChat[]> => {
         const u = await (isUser ? User : Doctor).findById(uid)
             .populate({
                 path: "chatsWithHelpers",
@@ -71,7 +71,7 @@ export default class SupportServices {
      * @param options - from & amount options
      * @default options = { from: 0, amount: 50, limitQuestions: 50 }
      */
-    public static getQuestion = async (uid: string, questionId: string, isUser: boolean, options: GetQuestionType = {} ): Promise<SupportChat> => {
+    public static getQuestion = async (uid: string, questionId: string, isUser: boolean, options: GetQuestionType = {}): Promise<SupportChat> => {
         const u = await (isUser ? User : Doctor).findById(uid)
             .populate({
                 path: "chatsWithHelpers",
@@ -84,7 +84,7 @@ export default class SupportServices {
             .lean();
 
         if (!u) throw "no_user_found";
-        if (!u.chatsWithHelpers) throw "no_question_found";
+        if (!u.chatsWithHelpers || u.chatsWithHelpers.length === 0) throw "no_question_found";
 
         // slice messages
         (u.chatsWithHelpers[0] as SupportChat).messages = (u.chatsWithHelpers[0] as SupportChat).messages.slice(0, options.limitMessages ?? 50)
@@ -102,6 +102,24 @@ export default class SupportServices {
         );
     }
 
+    /**
+     * @throws "no_question_found"
+     * @param questionId
+     * @param message
+     */
+    public static sendMessage = async (questionId: string, message: string): Promise<void> => {
+        const chat = await SupportChatModel.findByIdAndUpdate(questionId, {
+            $push: {
+                messages: {
+                    content: message,
+                    isUser: true,
+                    date: new Date(),
+                }
+            }
+        });
+        if (!chat) throw "no_question_found";
+        SupportServices._logger.i(`successfully send message, questionId=${questionId}, message=${message}`);
+    }
 }
 
 type GetQuestionsType = { from?: number, amount?: number, limitMessages?: number };

@@ -23,12 +23,12 @@ export default class RoutesHelper {
     }
 
     public static getStatus = (schema: { [key: number]: string[]}, error: string, def = 500): number => {
-        Object.keys(schema).forEach((_) => {
-            // @ts-ignore
-            const key: number = _;
+        // @ts-ignore
+        const keys: number[] = Object.keys(schema);
+        for (let i = 0; i < keys.length; i++) {
+            if (schema[keys[i]].includes(error)) return keys[i];
+        }
 
-            if (schema[key].includes(error)) return key;
-        })
         return def;
     }
 
