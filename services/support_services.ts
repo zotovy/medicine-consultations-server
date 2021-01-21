@@ -13,7 +13,7 @@ export default class SupportServices {
      */
     public static createChat = async (uid: string, isUser: boolean, title: string, message: string, problem: SupportProblemType): Promise<string> => {
 
-        const number = Math.random().toString(10);
+        const number = Math.random().toString(10).substr(3, 5);
         const { _id } = await SupportChatModel.create({
                 user: uid, title, messages: [
                     {
