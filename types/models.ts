@@ -504,12 +504,12 @@ export interface ISupportChat extends Document {
         date: Date,
     }[],
     title: string,
-    date: Date,
+    timestamp: Date,
 }
 
 export interface SupportChat {
     user: ISupportChat['user'];
     messages: ISupportChat['messages'];
     title: ISupportChat['title'];
-    date: ISupportChat['date'];
+    timestamp: ISupportChat['timestamp'];
 }

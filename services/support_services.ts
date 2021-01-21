@@ -20,7 +20,7 @@ export default class SupportServices {
                         isUser: true,
                     }
                 ],
-                date: new Date()
+                timestamp: new Date()
             }
         );
 

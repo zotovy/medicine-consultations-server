@@ -24,7 +24,7 @@ export default class DoctorRoutes implements BaseRouter{
         Router.post("/doctor", DoctorRoutes.createDoctor);
         Router.put("/doctor", token_services.authenticateToken, DoctorRoutes.updateDoctor);
         Router.delete("/doctor/:id", token_services.authenticateToken, DoctorRoutes.deleteDoctor);
-        Router.get("/doctor/:id", DoctorRoutes.getDoctorById);
+        Router.get("/doctor/:id([a-fA-F0-9]{24})", DoctorRoutes.getDoctorById);
         Router.get("/doctors", DoctorRoutes.getDoctors);
         Router.post("/doctor-request/send", DoctorRoutes.sendDoctorRequests);
         Router.get("/symptoms", DoctorRoutes.getSymptoms);
