@@ -227,6 +227,7 @@ class DoctorServices {
         }
 
         data.password = userServices.encryptPassword(data.password);
+        data.email = data.email.toLowerCase();
 
         const doctor: IDoctor = new Doctor(data);
 

@@ -50,6 +50,10 @@ class UserServices {
      * - "deleted_user_is_null"     # Deleted user is null
      */
 
+    // constructor() {
+    //     console.log(this.encryptPassword("tandem4224"));
+    // }
+
     async getUsers(
         amount: number = 50, // length of returned array, default = 50
         from: number = 0 // start index, default = 0
@@ -92,6 +96,8 @@ class UserServices {
         email: string,
         password: string
     ): Promise<TCheckUserEmailAndPassword> {
+        email = email.toLowerCase();
+
         let user: IUser | IDoctor | null = await User.findOne({ email });
         let isUser = true;
 
@@ -659,6 +665,7 @@ class UserServices {
             }
 
             data.password = this.encryptPassword(data.password);
+            data.email = data.email.toLowerCase();
 
             const user: IUser = new User(data);
 
