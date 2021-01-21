@@ -1,5 +1,5 @@
 import { Schema, Types, model } from "mongoose";
-import { ISupportChat } from "../types/models";
+import { ISupportChat, SupportProblemArray } from "../types/models";
 
 const SupportChatSchema = new Schema({
     user: {
@@ -29,6 +29,15 @@ const SupportChatSchema = new Schema({
         required: true,
     },
     timestamp: Date,
+    problem: {
+        type: String,
+        enum: SupportProblemArray,
+        required: true,
+    },
+    number: {
+        type: Number,
+        required: true,
+    }
 });
 
 export default model<ISupportChat>("SupportChat", SupportChatSchema);

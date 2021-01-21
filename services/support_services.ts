@@ -2,7 +2,7 @@ import SupportChatModel from "../models/support";
 import User from "../models/user";
 import Doctor from "../models/doctor";
 import { Logger } from "../logger";
-import { SupportChat } from "../types/models";
+import { SupportChat, SupportProblemType } from "../types/models";
 
 export default class SupportServices {
 
@@ -11,7 +11,9 @@ export default class SupportServices {
     /**
      * @throws "no_user_found"
      */
-    public static createChat = async (uid: string, isUser: boolean, title: string, message: string): Promise<string> => {
+    public static createChat = async (uid: string, isUser: boolean, title: string, message: string, problem: SupportProblemType): Promise<string> => {
+
+        const number = Math.random().toString(10);
         const { _id } = await SupportChatModel.create({
                 user: uid, title, messages: [
                     {
@@ -20,7 +22,9 @@ export default class SupportServices {
                         isUser: true,
                     }
                 ],
-                timestamp: new Date()
+                timestamp: new Date(),
+                problem,
+                number,
             }
         );
 
@@ -30,7 +34,7 @@ export default class SupportServices {
         if (!u) throw "no_user_found";
 
         SupportServices._logger.i(`successfully create chat: uid=${uid}, title=${title}, message=${message}`);
-        return uid;
+        return number;
     }
 
 

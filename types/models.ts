@@ -505,6 +505,8 @@ export interface ISupportChat extends Document {
     }[],
     title: string,
     timestamp: Date,
+    problem: SupportProblemType,
+    number: number;
 }
 
 export interface SupportChat {
@@ -512,4 +514,9 @@ export interface SupportChat {
     messages: ISupportChat['messages'];
     title: ISupportChat['title'];
     timestamp: ISupportChat['timestamp'];
+    problem: ISupportChat['problem'];
+    number: ISupportChat['number'];
 }
+
+export type SupportProblemType = "Tech" | "Doctor" | "Other";
+export const SupportProblemArray: SupportProblemType[] = ["Tech", "Doctor", "Other"];

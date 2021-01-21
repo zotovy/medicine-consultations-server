@@ -8,6 +8,7 @@ import tokenServices from "../services/token_services";
 import RoutesHelper from "../helpers/routes_helper";
 import { Schema  } from "mongoose";
 import ValidationHelper from "../helpers/validation_helper";
+import { SupportProblemArray } from "../types/models";
 
 const _logger = new Logger("SupportRoutes:");
 
@@ -32,6 +33,7 @@ export default class SupportRoutes implements BaseRouter {
             title: Joi.string().min(8).max(1024).required(),
             message: Joi.string().min(1).max(4086).required(),
             isUser: Joi.boolean().default(true),
+            problem: Joi.string().equal(...SupportProblemArray).required(),
         });
 
         const validate = schema.validate(req.body);
@@ -43,10 +45,10 @@ export default class SupportRoutes implements BaseRouter {
             return res.status(400).json({ success: false, error: "validation_error" });
         }
 
-        const { title, message, isUser } = validate.value;
+        const { title, message, isUser, problem } = validate.value;
         const uid = req.headers.userId as string;
-        const response = await SupportServices.createChat(uid, isUser, title, message)
-            .then(uid => ({ success: true, uid }))
+        const response = await SupportServices.createChat(uid, isUser, title, message, problem)
+            .then(number => ({ success: true, number }))
             .catch(e => {
                 _logger.e("createChat error happened ", e);
                return { success: false, error: e };
