@@ -25,7 +25,7 @@ export default class SupportServices {
                 timestamp: new Date(),
                 problem,
                 number,
-                checkedByUser: true,
+            readByUser: true,
             }
         );
 
@@ -137,7 +137,7 @@ export default class SupportServices {
      */
     public static setCheckedUserMessages = async (id: string, value: boolean): Promise<void> => {
         const chat = await SupportChatModel.findByIdAndUpdate(id, {
-            checkedByUser: value,
+            readByUser: value,
         });
         if (!chat) {
             _logger.w("setCheckedUserMessages – no chat found with id", id);

@@ -507,7 +507,7 @@ export interface ISupportChat extends Document {
     timestamp: Date,
     problem: SupportProblemType,
     number: number;
-    checkedByUser: boolean;
+    readByUser: boolean;
 }
 
 export interface SupportChat {
@@ -517,7 +517,7 @@ export interface SupportChat {
     timestamp: ISupportChat['timestamp'];
     problem: ISupportChat['problem'];
     number: ISupportChat['number'];
-    checkedByUser: ISupportChat['checkedByUser'];
+    readByUser: ISupportChat['readByUser'];
 }
 
 export type SupportProblemType = "Tech" | "Doctor" | "Other";
