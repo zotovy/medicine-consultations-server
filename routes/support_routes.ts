@@ -37,6 +37,20 @@ export default class SupportRoutes implements BaseRouter {
             SupportRoutes.checkUserAccess,
             SupportRoutes.sendMessageByUser
         );
+        Router.post(
+            "/user/support-questions/:supportChatId/read-messages",
+            tokenServices.authenticateToken,
+            RoutesHelper.checkIdFromParams("supportChatId"),
+            SupportRoutes.checkUserAccess,
+            SupportRoutes.readMessageByUser
+        );
+        Router.post(
+            "/doctor/support-questions/:supportChatId/read-messages",
+            tokenServices.authenticateToken,
+            RoutesHelper.checkIdFromParams("supportChatId"),
+            SupportRoutes.checkUserAccess,
+            SupportRoutes.readMessageByUser
+        );
         this.router = Router;
     }
 
@@ -135,6 +149,21 @@ export default class SupportRoutes implements BaseRouter {
         return res.status(status).json(response);
     }
 
+    private static readMessageByUser: IRouteHandler = async (req, res) => {
+        const { supportChatId } = req.params;
+
+        let status = 201;
+        const response = await SupportServices.setCheckedUserMessages(supportChatId, true)
+            .then(() => ({ success: true }))
+            .catch(e => {
+                status = RoutesHelper.getStatus({ 404: ["no_question_found"] }, e);
+                _logger.e("readMessageByUser –", e);
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
+
 
     // ---- Middleware --------------------------
 
@@ -143,7 +172,7 @@ export default class SupportRoutes implements BaseRouter {
     private static checkUserAccess: IRouteHandler = async (req, res, next) => {
         const { supportChatId } = req.params;
         const userIdOk = ValidationHelper.checkId(req.headers.userId as string);
-        if (!userIdOk || await SupportServices.canUserAccessQuestion(req.headers.userId as string, supportChatId)) {
+        if (!userIdOk || !await SupportServices.canUserAccessQuestion(req.headers.userId as string, supportChatId)) {
             _logger.w("checkUserAccess – user ", req.headers.userId, "can't access question", supportChatId);
             return res.status(401).json({ success: false, error: "access_denied" });
         }
