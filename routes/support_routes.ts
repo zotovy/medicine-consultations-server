@@ -6,7 +6,7 @@ import Joi from "joi";
 import SupportServices from "../services/support_services";
 import tokenServices from "../services/token_services";
 import RoutesHelper from "../helpers/routes_helper";
-import { Schema  } from "mongoose";
+import { Schema } from "mongoose";
 import ValidationHelper from "../helpers/validation_helper";
 import { SupportProblemArray } from "../types/models";
 
@@ -23,8 +23,20 @@ export default class SupportRoutes implements BaseRouter {
         Router.get("/doctor/support-questions", tokenServices.authenticateToken, SupportRoutes.getQuestions(false));
         Router.get("/user/support-questions/:id", tokenServices.authenticateToken, SupportRoutes.getQuestionById(true));
         Router.get("/doctor/support-questions/:id", tokenServices.authenticateToken, SupportRoutes.getQuestionById(false));
-        Router.post("/user/support-questions/:id/send-message", tokenServices.authenticateToken, SupportRoutes.sendMessageByUser);
-        Router.post("/doctor/support-questions/:id/send-message", tokenServices.authenticateToken, SupportRoutes.sendMessageByUser);
+        Router.post(
+            "/user/support-questions/:supportChatId/send-message",
+            tokenServices.authenticateToken,
+            RoutesHelper.checkIdFromParams("supportChatId"),
+            SupportRoutes.checkUserAccess,
+            SupportRoutes.sendMessageByUser
+        );
+        Router.post(
+            "/doctor/support-questions/:supportChatId/send-message",
+            tokenServices.authenticateToken,
+            RoutesHelper.checkIdFromParams("supportChatId"),
+            SupportRoutes.checkUserAccess,
+            SupportRoutes.sendMessageByUser
+        );
         this.router = Router;
     }
 
@@ -41,7 +53,7 @@ export default class SupportRoutes implements BaseRouter {
             _logger.w("createChat validation body error", validate.error);
             return res.status(400).json({ success: false, error: "validation_error" });
         } else if (!await UserServices.exists(req.headers.userId as string).catch(() => false)) {
-            _logger.w("createChat user not found with id =", req.headers.userId );
+            _logger.w("createChat user not found with id =", req.headers.userId);
             return res.status(400).json({ success: false, error: "validation_error" });
         }
 
@@ -51,7 +63,7 @@ export default class SupportRoutes implements BaseRouter {
             .then(number => ({ success: true, number }))
             .catch(e => {
                 _logger.e("createChat error happened ", e);
-               return { success: false, error: e };
+                return { success: false, error: e };
             });
 
         return res.status(response.success ? 201 : 500).json(response);
@@ -102,13 +114,7 @@ export default class SupportRoutes implements BaseRouter {
 
     private static sendMessageByUser: IRouteHandler = async (req, res) => {
         const { message } = req.body;
-        const { id } = req.params;
-
-        // check giving id
-        if (!ValidationHelper.checkId(id)) {
-            _logger.w("sendMessageByUser – invalid ID:", id);
-            return res.status(400).json({ success: false, error: "validation_error" });
-        }
+        const { supportChatId } = req.params;
 
         // Check message
         if (!message || message.length == 0 || message.length > 2048) {
@@ -116,15 +122,9 @@ export default class SupportRoutes implements BaseRouter {
             return res.status(400).json({ success: false, error: "validation_error" });
         }
 
-        // Check user access
-        if (!await SupportServices.canUserAccessQuestion(req.headers.userId as string, id)) {
-            _logger.w("sendMessageByUser – user ", req.headers.userId, "can't access question", id);
-            return res.status(401).json({ success: false, error: "access_denied" });
-        }
-
         // send message
         let status = 201;
-        const response = await SupportServices.sendMessage(id, message)
+        const response = await SupportServices.sendMessage(supportChatId, message)
             .then(() => ({ success: true }))
             .catch(e => {
                 status = RoutesHelper.getStatus({ 404: ["no_question_found"] }, e);
@@ -133,5 +133,20 @@ export default class SupportRoutes implements BaseRouter {
             });
 
         return res.status(status).json(response);
+    }
+
+
+    // ---- Middleware --------------------------
+
+    // NOTE: key of SupportChat id must be "supportChatId"
+    // NOTE: should be used only on authorized routes
+    private static checkUserAccess: IRouteHandler = async (req, res, next) => {
+        const { supportChatId } = req.params;
+        const userIdOk = ValidationHelper.checkId(req.headers.userId as string);
+        if (!userIdOk || await SupportServices.canUserAccessQuestion(req.headers.userId as string, supportChatId)) {
+            _logger.w("checkUserAccess – user ", req.headers.userId, "can't access question", supportChatId);
+            return res.status(401).json({ success: false, error: "access_denied" });
+        }
+        return next();
     }
 }

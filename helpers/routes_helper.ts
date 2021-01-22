@@ -36,7 +36,7 @@ export default class RoutesHelper {
 
     public static checkIdFromParams: (...keys: string[] ) => IRouteHandler = (...keys) => (req, res, next) => {
         const logger = new Logger("RoutesHelper.checkIdFromParams");
-        for (const key in keys) {
+        for (const key of keys) {
             const id = req.params[key];
             if (!ValidationHelper.checkId(id)) {
                 logger.w(`invalid ${key} ID:`, id);
