@@ -37,6 +37,11 @@ const SupportChatSchema = new Schema({
     number: {
         type: Number,
         required: true,
+    },
+    checkedByUser: {
+        type: Boolean,
+        required: true,
+        default: true,
     }
 });
 

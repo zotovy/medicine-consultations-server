@@ -4,9 +4,9 @@ import Doctor from "../models/doctor";
 import { Logger } from "../logger";
 import { SupportChat, SupportProblemType } from "../types/models";
 
-export default class SupportServices {
+const _logger = new Logger("SupportServices");
 
-    private static _logger = new Logger("SupportServices");
+export default class SupportServices {
 
     /**
      * @throws "no_user_found"
@@ -25,6 +25,7 @@ export default class SupportServices {
                 timestamp: new Date(),
                 problem,
                 number,
+                checkedByUser: true,
             }
         );
 
@@ -33,7 +34,7 @@ export default class SupportServices {
         });
         if (!u) throw "no_user_found";
 
-        SupportServices._logger.i(`successfully create chat: uid=${uid}, title=${title}, message=${message}`);
+        _logger.i(`successfully create chat: uid=${uid}, title=${title}, message=${message}`);
         return number;
     }
 
@@ -62,7 +63,7 @@ export default class SupportServices {
         // slice messages
         (u.chatsWithHelpers as SupportChat[]) = SupportServices.sliceManyMessage(u.chatsWithHelpers as SupportChat[] ?? [], options.limitMessages);
 
-        SupportServices._logger.i(`successfully get questions, id=${uid}, isUser=${isUser},`, options, "length =", u.chatsWithHelpers?.length);
+        _logger.i(`successfully get questions, id=${uid}, isUser=${isUser},`, options, "length =", u.chatsWithHelpers?.length);
         return (u.chatsWithHelpers as SupportChat[] ?? []);
     }
 
@@ -93,7 +94,7 @@ export default class SupportServices {
         // slice messages
         (u.chatsWithHelpers[0] as SupportChat).messages = (u.chatsWithHelpers[0] as SupportChat).messages.slice(0, options.limitMessages ?? 50)
 
-        SupportServices._logger.i(`successfully get question, uid=${uid}, isUser=${isUser}, qid=${questionId}`, options, u.chatsWithHelpers[0]);
+        _logger.i(`successfully get question, uid=${uid}, isUser=${isUser}, qid=${questionId}`, options, u.chatsWithHelpers[0]);
         return u.chatsWithHelpers[0] as SupportChat;
     }
 
@@ -122,11 +123,27 @@ export default class SupportServices {
             }
         });
         if (!chat) throw "no_question_found";
-        SupportServices._logger.i(`successfully send message, questionId=${questionId}, message=${message}`);
+        _logger.i(`successfully send message, questionId=${questionId}, message=${message}`);
     }
 
     public static canUserAccessQuestion = (uid: string, qid: string): Promise<boolean> => {
         return SupportChatModel.exists({ _id: qid, user: uid });
+    }
+
+    /**
+     * @throws "no_question_found"
+     * @param id
+     * @param value
+     */
+    public static setCheckedUserMessages = async (id: string, value: boolean): Promise<void> => {
+        const chat = await SupportChatModel.findByIdAndUpdate(id, {
+            checkedByUser: value,
+        });
+        if (!chat) {
+            _logger.w("setCheckedUserMessages – no chat found with id", id);
+            throw "no_question_found"
+        }
+        _logger.i("setCheckedUserMessages to", value, "to chat with id", id);
     }
 }
 
