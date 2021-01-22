@@ -1,6 +1,8 @@
 import { Response } from "express";
-import logger from "../logger";
+import logger, { Logger } from "../logger";
 import Joi from "joi";
+import IRouteHandler from "../types/routes";
+import ValidationHelper from "./validation_helper";
 
 export default class RoutesHelper {
 
@@ -30,6 +32,18 @@ export default class RoutesHelper {
         }
 
         return def;
+    }
+
+    public static checkIdFromParams: (...keys: string[] ) => IRouteHandler = (...keys) => (req, res, next) => {
+        const logger = new Logger("RoutesHelper.checkIdFromParams");
+        for (const key in keys) {
+            const id = req.params[key];
+            if (!ValidationHelper.checkId(id)) {
+                logger.w(`invalid ${key} ID:`, id);
+                return res.status(400).json({ success: false, error: "validation_error" });
+            }
+        }
+        return next();
     }
 
 }
