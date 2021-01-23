@@ -136,6 +136,13 @@ const UserSchema = new Schema({
             default: [],
         },
     ],
+    consultationRequests: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "ConsultationRequest",
+            required: true,
+        }
+    ]
 });
 
 export default model<IUser>("User", UserSchema);

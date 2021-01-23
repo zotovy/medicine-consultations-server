@@ -66,6 +66,7 @@ export interface UserObject {
     activeConsultations: IUser["activeConsultations"];
     birthday?: IUser['birthday'];
     chatsWithHelpers: IUser['chatsWithHelpers'];
+    consultationRequests: mongoose.Types.ObjectId[] | IConsultationRequest[];
 }
 
 /**
@@ -104,7 +105,6 @@ export interface IDoctor extends IUser {
     education?: DoctorEducationType[];
     qualificationProofs?: DoctorQualificationDocumentType[];
     workingTime: DoctorWorkingType;
-    consultationRequests: mongoose.Types.ObjectId[] | IConsultationRequest[];
 }
 
 export interface DoctorObject extends UserObject {
