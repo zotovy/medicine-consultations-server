@@ -79,14 +79,6 @@ const Doctor = extendedSchema(User.schema, {
             required: true,
         },
     ],
-    schedule: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "Appointment",
-            required: true,
-            default: [],
-        },
-    ],
     workPlan: String,
     isChild: Boolean,
     isAdult: Boolean,

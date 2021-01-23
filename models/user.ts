@@ -127,7 +127,15 @@ const UserSchema = new Schema({
         ],
         required: true,
         default: [],
-    }
+    },
+    schedule: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "Appointment",
+            required: true,
+            default: [],
+        },
+    ],
 });
 
 export default model<IUser>("User", UserSchema);

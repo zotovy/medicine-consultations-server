@@ -35,6 +35,7 @@ export interface IUser extends Document {
     activeConsultations: (mongoose.Types.ObjectId | IConsultation)[];
     birthday?: Date;
     chatsWithHelpers: (mongoose.Types.ObjectId | ISupportChat)[];
+    schedule: (mongoose.Types.ObjectId| IAppointment)[];
 }
 
 /**
@@ -82,7 +83,6 @@ export interface IDoctor extends IUser {
     serviceExperience: number;
     rating: number;
     whosFavourite: mongoose.Types.ObjectId[];
-    schedule: (mongoose.Types.ObjectId| IAppointment)[];
     passportIssuedByWhom: string;
     passportSeries: string;
     passportIssueDate: string;
