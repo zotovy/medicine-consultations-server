@@ -725,35 +725,6 @@ class DoctorServices {
         }
     }
 
-    /** This function get doctor consultation requests */
-    getAppointsRequests = async (uid: string, detail: boolean = false): Promise<ConsultationRequestObject[]> => {
-        const populate = detail
-            ? [
-                { path: "patient", select: "fullName sex city country photoUrl" },
-                { path: "appointment" }
-            ]
-            : [
-                { path: "patient", select: "_id fullName photoUrl" },
-                { path: "appointment" }
-            ]
-
-        const raw = await Doctor.findById(uid)
-            .populate({
-                path: "consultationRequests",
-                populate,
-            })
-            .select("consultationRequests")
-            .lean() as DoctorObject;
-
-        if (!raw || raw.consultationRequests == undefined) {
-            logger.w(`trying to get doctor consultation but no doctor found with id=${uid}, raw=`, raw);
-            throw "not-found"
-        }
-
-        logger.i(`successfully get consultation requests for ${uid}`, raw.consultationRequests);
-        return raw.consultationRequests as ConsultationRequestObject[];
-    }
-
     /** converts doctor's string dates to usual JS Date object  */
     public convertDoctorFields = (doctor: any) => {
         if (doctor.lastActiveAt && doctor.createdAt && doctor.beginDoctorDate) {

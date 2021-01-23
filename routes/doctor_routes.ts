@@ -298,21 +298,7 @@ export default class DoctorRoutes implements BaseRouter{
 
     public static getAppoints = UserRoutes.getAppoints(false);
 
-    public static getAppointsRequests: IRouteHandler = async (req, res) => {
-        const { id } = req.params;
-        const detail = req.query.detail === "true";
-
-        // validate id & body
-        if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(403).json({
-            status: false, error: "invalid_id"
-        });
-
-        const response = await doctorServices.getAppointsRequests(id, detail)
-            .then((v) => ({ success: true, requests: v }))
-            .catch(e => ({ success: false, error: e }));
-
-        return res.status(response.success ? 200 : 500).json(response);
-    }
+    public static getAppointsRequests = UserRoutes.getAppointsRequests(false);
 
     public static confirmAppointRequest: IRouteHandler = async (req, res) => {
         const { doctorId, appointId } = req.params;

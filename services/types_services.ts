@@ -43,6 +43,7 @@ export function IUserToUserObj(e: IUser): UserObject {
         activeConsultations: [...e.activeConsultations],
         birthday: e.birthday,
         chatsWithHelpers: [...e.chatsWithHelpers],
+        consultationRequests: [...e.consultationRequests]
     };
 }
 

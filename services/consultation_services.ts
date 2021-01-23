@@ -3,7 +3,14 @@ import User from "../models/user";
 import Doctor from "../models/doctor";
 import Consultation from "../models/consultation";
 import { ConsultationValidationSchema, TGetAppointsServiceOptions } from "../types/services";
-import { IUser, IDoctor, IConsultation, AppointmentObject } from "../types/models";
+import {
+    IUser,
+    IDoctor,
+    IConsultation,
+    AppointmentObject,
+    ConsultationRequestObject,
+    DoctorObject, UserObject
+} from "../types/models";
 import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
 import server from "../server";
@@ -294,6 +301,35 @@ class ConsultationServices {
 
         logger.i(`successfully get consultation requests for ${id}, amount=`, raw.schedule.length)
         return appointments;
+    }
+
+    /** This function get doctor consultation requests */
+    getAppointsRequests = async (uid: string, isUser: boolean, detail: boolean = false): Promise<ConsultationRequestObject[]> => {
+        const populate = detail
+            ? [
+                { path: isUser ? "doctor" : "patient", select: "fullName sex city country photoUrl" },
+                { path: "appointment" }
+            ]
+            : [
+                { path: isUser ? "doctor" : "patient", select: "_id fullName photoUrl" },
+                { path: "appointment" }
+            ]
+
+        const raw = await (isUser ? User : Doctor).findById(uid)
+            .populate({
+                path: "consultationRequests",
+                populate,
+            })
+            .select("consultationRequests")
+            .lean() as DoctorObject | UserObject;
+
+        if (!raw || raw.consultationRequests == undefined) {
+            logger.w(`trying to get ${isUser ? "user" : "doctor"} consultation but no doctor found with id=${uid}, raw=`, raw);
+            throw "not-found"
+        }
+
+        logger.i(`successfully get consultation requests for ${uid}`, raw.consultationRequests);
+        return raw.consultationRequests as ConsultationRequestObject[];
     }
 }
 
