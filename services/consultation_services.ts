@@ -2,8 +2,8 @@ import Ajv from "ajv";
 import User from "../models/user";
 import Doctor from "../models/doctor";
 import Consultation from "../models/consultation";
-import { ConsultationValidationSchema } from "../types/services";
-import { IUser, IDoctor, IConsultation } from "../types/models";
+import { ConsultationValidationSchema, TGetAppointsServiceOptions } from "../types/services";
+import { IUser, IDoctor, IConsultation, AppointmentObject } from "../types/models";
 import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
 import server from "../server";
@@ -248,6 +248,52 @@ class ConsultationServices {
         if (!user) throw "user_not_found";
 
         logger.i("ConsultationServices.rejectConsultation: successfully reject consultation with id =", id);
+    }
+
+    public getAppoints = async (id: string, isUser: boolean, options: TGetAppointsServiceOptions = {}): Promise<(AppointmentObject & { photoUrl?: string })[]> => {
+
+        const findQuery: any = {};
+        (Object.keys(options) as (keyof TGetAppointsServiceOptions)[]).forEach((e: keyof TGetAppointsServiceOptions) => findQuery[e] = options[e])
+
+        // get raw schedule
+        const raw = await (isUser ? User : Doctor).findById(id).populate({
+            path: "schedule",
+            options: { getters: true },
+            match: findQuery,
+        }).select("schedule").lean();
+
+        // no doctor found
+        if (!raw || raw.schedule == undefined) {
+            logger.w(`trying to get doctor appoints but no doctor found with id=${id}, raw=`, raw);
+            throw "not-found"
+        }
+
+        // parse documents string --> object
+        for (let i = 0; i < (raw.schedule as AppointmentObject[]).length; i++) {
+            if ((raw.schedule as AppointmentObject[])[i].documents) {
+                for (let j = 0; j < (raw.schedule as AppointmentObject[])[i].documents.length; j++) {
+                    (raw.schedule as AppointmentObject[])[i].documents[j] = JSON.parse((raw.schedule as AppointmentObject[])[i].documents[j].toString());
+                }
+            }
+        }
+
+        // populate patient or doctor photoUrl
+        let appointments: (AppointmentObject & { photoUrl?: string })[] = [];
+        for (let i = 0; i < raw.schedule.length; i++) {
+            const appoint = raw.schedule[i] as AppointmentObject;
+            const consultation = await Consultation.findOne({ _id: appoint.consultation, ...findQuery }).populate({
+                path: isUser ? "doctor" : "patient",
+                select: "photoUrl",
+            }).select(isUser ? "doctor" : "patient");
+            const user = (consultation ? consultation?.patient : null) as IUser | IDoctor | null;
+            appointments.push({
+                ...appoint,
+                photoUrl: user?.photoUrl,
+            });
+        }
+
+        logger.i(`successfully get consultation requests for ${id}, amount=`, raw.schedule.length)
+        return appointments;
     }
 }
 

@@ -765,48 +765,6 @@ class DoctorServices {
         return doctor;
     };
 
-    public getAppoints = async (id: string, options: TGetAppointsServiceOptions = {}): Promise<(AppointmentObject & { photoUrl?: string })[]> => {
-
-        const findQuery: any = {};
-        (Object.keys(options) as (keyof TGetAppointsServiceOptions)[]).forEach((e: keyof TGetAppointsServiceOptions) => findQuery[e] = options[e])
-
-        const raw = await Doctor.findById(id).populate({
-            path: "schedule",
-            options: { getters: true },
-            match: findQuery,
-        }).select("schedule").lean();
-
-        if (!raw || raw.schedule == undefined) {
-            logger.w(`trying to get doctor appoints but no doctor found with id=${id}, raw=`, raw);
-            throw "not-found"
-        }
-
-        for (let i = 0; i < (raw.schedule as AppointmentObject[]).length; i++) {
-            if ((raw.schedule as AppointmentObject[])[i].documents) {
-                for (let j = 0; j < (raw.schedule as AppointmentObject[])[i].documents.length; j++) {
-                    (raw.schedule as AppointmentObject[])[i].documents[j] = JSON.parse((raw.schedule as AppointmentObject[])[i].documents[j].toString());
-                }
-            }
-        }
-
-        let appointments: (AppointmentObject & { photoUrl?: string })[] = [];
-        for (let i = 0; i < raw.schedule.length; i++) {
-            const appoint = raw.schedule[i] as AppointmentObject;
-            const consultation = await Consultation.findOne({ _id: appoint.consultation, ...findQuery }).populate({
-                path: "patient",
-                select: "photoUrl",
-            }).select("patient");
-            const patient = (consultation ? consultation?.patient : null) as IUser | null;
-            appointments.push({
-                ...appoint,
-                photoUrl: patient?.photoUrl,
-            });
-        }
-
-        logger.i(`successfully get consultation requests for ${id}`, raw.schedule)
-        return appointments;
-    }
-
     public confirmAppointRequest = async (doctorId: string, requestId: string): Promise<void> => {
         const request = await ConsultationRequest.findById(requestId).populate("appointment");
         if (!request) throw "request_not_found";

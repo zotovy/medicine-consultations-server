@@ -18,6 +18,7 @@ import Doctor from "../models/doctor";
 import IRouteHandler, { BaseRouter, FileRequest, IFileRouteHandler } from "../types/routes";
 import Joi from "joi";
 import RoutesHelper from "../helpers/routes_helper";
+import { TGetAppointsServiceOptions } from "../types/services";
 
 
 export default class UserRoutes implements BaseRouter {
@@ -40,6 +41,7 @@ export default class UserRoutes implements BaseRouter {
         router.get("/user/:id/reviews", UserRoutes.getReviews);
         router.post("/user/:id/update-password", token_services.authenticateToken, UserRoutes.updatePassword);
         router.get("/user/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(true));
+        router.get("/user/:id/appoints", token_services.authenticateToken, UserRoutes.getAppoints(true));
         this.router = router;
     }
 
@@ -499,5 +501,31 @@ export default class UserRoutes implements BaseRouter {
                 return { success: false, error };
             });
         return res.status(status).json(response);
+    }
+
+    public static getAppoints: (isUser: boolean) => IRouteHandler = (isUser) => async (req, res) => {
+        const { id } = req.params;
+
+        // validate id & body
+        if ((id.length != 24 && id.length != 12) || id !== req.headers.userId) return res.status(403).json({
+            status: false, error: "invalid_id"
+        });
+
+        // handle query params
+        const validQueriesParams: (keyof TGetAppointsServiceOptions)[] = ["numericDate"];
+        const options: TGetAppointsServiceOptions = {};
+        validQueriesParams.forEach(e => {
+            if (req.query[e]) options[e] = req.query[e] as string;
+        });
+
+
+        const response = await consultationServices.getAppoints(id, isUser, options)
+            .then(v => ({ success: true, appoints: v }))
+            .catch(e => {
+                logger.e(`${isUser ? "userRoutes" : "doctorRoutes"}.getAppoints: `, e);
+                return ({ success: true, error: e });
+            });
+
+        return res.status(response.success ? 200 : 500).json(response);
     }
 }
