@@ -111,13 +111,14 @@ export default class SupportServices {
      * @throws "no_question_found"
      * @param questionId
      * @param message
+     * @param isUser
      */
-    public static sendMessage = async (questionId: string, message: string): Promise<void> => {
+    public static sendMessage = async (questionId: string, message: string, isUser: boolean): Promise<void> => {
         const chat = await SupportChatModel.findByIdAndUpdate(questionId, {
             $push: {
                 messages: {
                     content: message,
-                    isUser: true,
+                    isUser,
                     date: new Date(),
                 }
             }

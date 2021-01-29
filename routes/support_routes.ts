@@ -6,7 +6,6 @@ import Joi from "joi";
 import SupportServices from "../services/support_services";
 import tokenServices from "../services/token_services";
 import RoutesHelper from "../helpers/routes_helper";
-import { Schema } from "mongoose";
 import ValidationHelper from "../helpers/validation_helper";
 import { SupportProblemArray } from "../types/models";
 
@@ -36,6 +35,12 @@ export default class SupportRoutes implements BaseRouter {
             RoutesHelper.checkIdFromParams("supportChatId"),
             SupportRoutes.checkUserAccess,
             SupportRoutes.sendMessageByUser
+        );
+        Router.post(
+            "/admin/support-questions/:supportChatId/send-message",
+            tokenServices.authAdminToken,
+            RoutesHelper.checkIdFromParams("supportChatId"),
+            SupportRoutes.sendMessageByAdmin
         );
         Router.post(
             "/user/support-questions/:supportChatId/read-messages",
@@ -138,11 +143,35 @@ export default class SupportRoutes implements BaseRouter {
 
         // send message
         let status = 201;
-        const response = await SupportServices.sendMessage(supportChatId, message)
+        const response = await SupportServices.sendMessage(supportChatId, message, true)
             .then(() => ({ success: true }))
             .catch(e => {
                 status = RoutesHelper.getStatus({ 404: ["no_question_found"] }, e);
                 _logger.e("sendMessageByUser –", e);
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
+
+    private static sendMessageByAdmin: IRouteHandler = async (req, res) => {
+        const chatId = req.params.supportChatId as string;
+        const message = req.body.message as string;
+
+        // Check message
+        if (!message || message.length == 0 || message.length > 2048) {
+            _logger.e("sendMessageByAdmin – invalid message length, message =", message);
+            return res.status(400).json({ success: false, error: "validation_error" });
+        }
+
+        // send message
+        let status = 201;
+        const response = await SupportServices.sendMessage(chatId, message, false)
+            .then(() => ({ success: true }))
+            .catch(e => {
+                status = RoutesHelper.getStatus({ 404: ["no_question_found"] }, e);
+                console.log(status);
+                _logger.e("sendMessageByAdmin –", e);
                 return { success: false, error: e };
             });
 
