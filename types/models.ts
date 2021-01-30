@@ -329,49 +329,49 @@ export interface SpecialityType {
  *  Send by client when user submit form to become a doctor
  */
 export interface IBecomeDoctor extends Document {
-    name?: string;
-    surname?: string;
-    phone?: string;
-    email?: string;
-    sex?: boolean;
-    password?: string;
-    education?: string;
-    speciality?: string;
-    yearEducation?: string;
-    blankSeries?: string;
-    blankNumber?: string;
-    issueDate?: string;
-    experience?: string;
-    passportIssuedByWhom?: string;
-    passportSeries?: string;
-    passportIssueDate?: string;
-    workExperience?: string;
-    workPlaces?: string;
+    name: string;
+    surname: string;
+    phone: string;
+    email: string;
+    sex: boolean;
+    password: string;
+    education: string;
+    speciality: string;
+    yearEducation: string;
+    blankSeries: string;
+    blankNumber: string;
+    issueDate: string;
+    experience: string;
+    passportIssuedByWhom: string;
+    passportSeries: string;
+    passportIssueDate: string;
+    workExperience: string;
+    workPlaces: string;
 }
 
 /**
  * Become Doctor Request Object
  */
 export interface BecomeDoctorObj {
-    id?: string;
-    name?: IBecomeDoctor["name"];
-    surname?: IBecomeDoctor["surname"];
-    phone?: IBecomeDoctor["phone"];
-    email?: IBecomeDoctor["email"];
-    sex?: IBecomeDoctor["sex"];
-    password?: IBecomeDoctor["password"];
-    education?: IBecomeDoctor["education"];
-    speciality?: IBecomeDoctor["speciality"];
-    yearEducation?: IBecomeDoctor["yearEducation"];
-    blankSeries?: IBecomeDoctor["blankSeries"];
-    blankNumber?: IBecomeDoctor["blankNumber"];
-    issueDate?: IBecomeDoctor["issueDate"];
-    experience?: IBecomeDoctor["experience"];
-    passportIssuedByWhom?: IBecomeDoctor["passportIssuedByWhom"];
-    passportSeries?: IBecomeDoctor["passportSeries"];
-    passportIssueDate?: IBecomeDoctor["passportIssueDate"];
-    workExperience?: IBecomeDoctor["workExperience"];
-    workPlaces?: IBecomeDoctor["workPlaces"];
+    id: string;
+    name: IBecomeDoctor["name"];
+    surname: IBecomeDoctor["surname"];
+    phone: IBecomeDoctor["phone"];
+    email: IBecomeDoctor["email"];
+    sex: IBecomeDoctor["sex"];
+    password: IBecomeDoctor["password"];
+    education: IBecomeDoctor["education"];
+    speciality: IBecomeDoctor["speciality"];
+    yearEducation: IBecomeDoctor["yearEducation"];
+    blankSeries: IBecomeDoctor["blankSeries"];
+    blankNumber: IBecomeDoctor["blankNumber"];
+    issueDate: IBecomeDoctor["issueDate"];
+    experience: IBecomeDoctor["experience"];
+    passportIssuedByWhom: IBecomeDoctor["passportIssuedByWhom"];
+    passportSeries: IBecomeDoctor["passportSeries"];
+    passportIssueDate: IBecomeDoctor["passportIssueDate"];
+    workExperience: IBecomeDoctor["workExperience"];
+    workPlaces: IBecomeDoctor["workPlaces"];
 }
 
 /**
@@ -509,6 +509,7 @@ export interface ISupportChat extends Document {
     problem: SupportProblemType,
     number: number;
     readByUser: boolean;
+    readByAdmin: boolean;
 }
 
 export interface SupportChat {
@@ -519,6 +520,7 @@ export interface SupportChat {
     problem: ISupportChat['problem'];
     number: ISupportChat['number'];
     readByUser: ISupportChat['readByUser'];
+    readByAdmin: ISupportChat['readByAdmin'];
 }
 
 export type SupportProblemType = "Tech" | "Doctor" | "Other";

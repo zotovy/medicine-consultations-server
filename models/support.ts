@@ -42,6 +42,11 @@ const SupportChatSchema = new Schema({
         type: Boolean,
         required: true,
         default: true,
+    },
+    readByAdmin: {
+        type: Boolean,
+        required: true,
+        default: true,
     }
 });
 

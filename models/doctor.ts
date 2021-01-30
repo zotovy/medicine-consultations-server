@@ -19,7 +19,6 @@ import { defaultDoctorWorkingTime } from "../helpers/constants";
 const Doctor = extendedSchema(User.schema, {
     _education: {
         type: String,
-        required: true,
     },
     yearEducation: {
         type: String,
@@ -59,11 +58,9 @@ const Doctor = extendedSchema(User.schema, {
     },
     _workExperience: {
         type: String,
-        required: true,
     },
     _workPlaces: {
         type: String,
-        required: true,
     },
     experience: Number, // in days
     serviceExperience: Number, // in days

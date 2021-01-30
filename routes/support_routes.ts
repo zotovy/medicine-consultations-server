@@ -56,6 +56,7 @@ export default class SupportRoutes implements BaseRouter {
             SupportRoutes.checkUserAccess,
             SupportRoutes.readMessageByUser
         );
+        Router.get("/admin/support-questions", tokenServices.authAdminToken, SupportRoutes.getAdminChats);
         this.router = Router;
     }
 
@@ -187,6 +188,25 @@ export default class SupportRoutes implements BaseRouter {
             .catch(e => {
                 status = RoutesHelper.getStatus({ 404: ["no_question_found"] }, e);
                 _logger.e("readMessageByUser –", e);
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
+
+
+    private static getAdminChats: IRouteHandler = async (req, res) => {
+        const from = parseInt(req.query.from as string ?? "") ?? 0;
+        const amount = parseInt(req.query.amount as string ?? "") ?? 50;
+        const unread = req.query.unread === "true";
+
+        let status = 200;
+        const f = unread ? SupportServices.getAllUnreadAdminChats : SupportServices.getAllChats;
+        const response = await f(from, amount)
+            .then(questions => ({ success: true, questions }))
+            .catch(e => {
+                status = RoutesHelper.getStatus({}, e);
+                _logger.e("getAdminChats –", e);
                 return { success: false, error: e };
             });
 

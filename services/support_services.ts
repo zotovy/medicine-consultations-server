@@ -25,7 +25,8 @@ export default class SupportServices {
                 timestamp: new Date(),
                 problem,
                 number,
-            readByUser: true,
+                readByUser: true,
+                readByAdmin: false,
             }
         );
 
@@ -145,6 +146,26 @@ export default class SupportServices {
             throw "no_question_found"
         }
         _logger.i("setCheckedUserMessages to", value, "to chat with id", id);
+    }
+
+    /**
+     * get all existing support chats
+     * @param from amount of skipped chats
+     * @param amount limit giving chats
+     * @default amount=50, from=0
+     */
+    public static getAllChats = async (from = 0, amount = 50): Promise<SupportChat[]> => {
+        return SupportChatModel.find({}).skip(0).limit(50).lean();
+    }
+
+    /**
+     *  get all existing unread support chats for admins
+     * @param from amount of skipped chats
+     * @param amount limit giving chats
+     * @default amount=50, from=0
+     */
+    public static getAllUnreadAdminChats = async (from = 0, amount = 50): Promise<SupportChat[]> => {
+        return SupportChatModel.find({ readByAdmin: false }).skip(0).limit(50).lean();
     }
 }
 

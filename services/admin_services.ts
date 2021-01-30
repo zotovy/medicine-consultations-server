@@ -17,8 +17,9 @@ import logger from "../logger";
 import { AdminAccessToken, AdminRefreshToken } from "../models/tokens";
 import admin from "../models/admin";
 import token_services from "../services/token_services";
-import { BecomeDoctorObj, IBecomeDoctor, AdminRole } from "../types/models";
+import { BecomeDoctorObj, IBecomeDoctor, AdminRole, DoctorObject } from "../types/models";
 import FormatHelper from "../helpers/format_helper";
+import { defaultDoctorWorkingTime } from "../helpers/constants";
 
 class AdminServices {
     // constructor() {
@@ -92,14 +93,17 @@ class AdminServices {
                 };
             }
 
+
+            console.log(founded);
+
             // create doctor for this request
-            const doctorObject = {
+            const doctorObject: DoctorObject = {
                 id: founded.id,
                 name: founded.name,
                 surname: founded.surname,
                 patronymic: "",
                 photoUrl: "",
-                phone: parseInt(founded.phone ?? ""),
+                phone: parseInt(founded.phone),
                 email: founded.email,
                 password: founded.password,
                 sex: founded.sex,
@@ -118,8 +122,7 @@ class AdminServices {
                 issueDate: founded.issueDate,
                 yearEducation: founded.yearEducation,
                 beginDoctorDate: new Date(),
-                clientsConsultations: [],
-                clientsReviews: [],
+                activeConsultations: [],
                 experience: 0,
                 favourites: [],
                 rating: 0,
@@ -130,13 +133,21 @@ class AdminServices {
                 passportIssuedByWhom: founded.passportIssuedByWhom,
                 passportSeries: founded.passportSeries,
                 _workExperience: founded.workExperience,
-                workPlaces: founded.workPlaces,
-                fullName: FormatHelper.fullName(founded)
+                _workPlaces: founded.workPlaces,
+                fullName: FormatHelper.fullName(founded),
+                serviceExperience: 0,
+                price: 0,
+                qualification: "",
+                qualificationProofs: [],
+                chatsWithHelpers: [],
+                workingTime: defaultDoctorWorkingTime,
+                consultationRequests: [],
             };
+
+            console.log(doctorObject);
+
             // @ts-ignore
             const doctor = await Doctor.create(doctorObject);
-
-            await doctor.save();
 
             // remove request
             await BecomeDoctorRequest.deleteOne({ _id: requestId });

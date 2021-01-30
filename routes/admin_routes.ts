@@ -106,7 +106,7 @@ Router.post(
 );
 
 // ANCHOR: POST /become-doctor-request/remove/:id
-Router.delete(
+Router.post(
     "/become-doctor-request/remove/:id",
     tokenServices.authAdminToken,
     async (req, res) => {
