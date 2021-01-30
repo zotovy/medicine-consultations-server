@@ -51,6 +51,7 @@ export default class SupportServices {
         const u = await (isUser ? User : Doctor).findById(uid)
             .populate({
                 path: "chatsWithHelpers",
+                select: "-readByAdmin",
                 options: {
                     limit: options.amount ?? 50,
                     skip: options.from ?? 0,
@@ -82,6 +83,7 @@ export default class SupportServices {
             .populate({
                 path: "chatsWithHelpers",
                 match: { _id: questionId },
+                select: "-readByAdmin",
                 options: {
                     limit: 1,
                 },
