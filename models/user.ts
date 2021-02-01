@@ -142,7 +142,20 @@ const UserSchema = new Schema({
             ref: "ConsultationRequest",
             required: true,
         }
-    ]
+    ],
+    balance: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+    history: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "TransactionModel",
+            required: true,
+            default: [],
+        },
+    ],
 });
 
 export default model<IUser>("User", UserSchema);
