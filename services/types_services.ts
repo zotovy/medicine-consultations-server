@@ -43,7 +43,10 @@ export function IUserToUserObj(e: IUser): UserObject {
         activeConsultations: [...e.activeConsultations],
         birthday: e.birthday,
         chatsWithHelpers: [...e.chatsWithHelpers],
-        consultationRequests: [...e.consultationRequests]
+        consultationRequests: [...e.consultationRequests],
+        balance: e.balance,
+        transactionHistory: [...e.transactionHistory],
+        schedule: [...e.schedule],
     };
 }
 
@@ -124,6 +127,8 @@ export function IDoctorToDoctorObj(e: IDoctor): DoctorObject {
         workingTime: e.workingTime,
         consultationRequests: e.consultationRequests,
         chatsWithHelpers: [...e.chatsWithHelpers],
+        balance: e.balance,
+        transactionHistory: [...e.transactionHistory],
     };
 }
 /**

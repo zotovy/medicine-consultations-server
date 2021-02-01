@@ -35,6 +35,7 @@ declare function done(): any;
 
 // Sample user will use or modify for some cases
 export const sampleDoctor: DoctorObject = {
+    balance: 0, chatsWithHelpers: [], transactionHistory: [],
     consultationRequests: [],
     price: 750,
     workingTime: {
@@ -42,6 +43,7 @@ export const sampleDoctor: DoctorObject = {
         to: { h: 18, m: 0 },
         weekends: [5, 6],
         consultationTimeInMin: 60,
+        consultationPauseInMin: 0
     },
     id: undefined,
     name: "Иван",

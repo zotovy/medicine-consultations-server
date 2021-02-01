@@ -37,6 +37,8 @@ export interface IUser extends Document {
     chatsWithHelpers: (mongoose.Types.ObjectId | ISupportChat)[];
     schedule: (mongoose.Types.ObjectId| IAppointment)[];
     consultationRequests: (mongoose.Types.ObjectId | IConsultationRequest)[];
+    balance: number;
+    transactionHistory: (mongoose.Types.ObjectId | ITransactionModel)[];
 }
 
 /**
@@ -68,7 +70,9 @@ export interface UserObject {
     birthday?: IUser['birthday'];
     chatsWithHelpers: IUser['chatsWithHelpers'];
     consultationRequests: IUser['consultationRequests']
-
+    balance: IUser['balance']
+    transactionHistory: IUser['transactionHistory']
+    schedule: IUser['schedule']
 }
 
 /**

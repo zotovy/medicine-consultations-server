@@ -142,6 +142,8 @@ class AdminServices {
                 chatsWithHelpers: [],
                 workingTime: defaultDoctorWorkingTime,
                 consultationRequests: [],
+                balance: 0,
+                transactionHistory: [],
             };
 
             console.log(doctorObject);

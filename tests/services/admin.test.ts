@@ -84,7 +84,7 @@ const sampleDoctor: DoctorObject = {
     passportIssuedByWhom: "МВД г. Москвы",
     passportSeries: "123123",
     _workExperience: "1 год",
-    workPlaces: "Городская поликлиника №1 г. Москва",
+    _workPlaces: "Городская поликлиника №1 г. Москва",
     serviceExperience: 365,
     age: 35,
     isAdult: false,

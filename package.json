@@ -93,6 +93,11 @@
         "ext": "ts"
     },
     "jest": {
+        "globals": {
+            "ts-jest": {
+                "tsConfigFile": "tsconfig.json"
+            }
+        },
         "transform": {
             "\\.ts$": "ts-jest"
         },
