@@ -5,6 +5,7 @@ import AdminRouter from "./admin_routes";
 import PaymentRouter from "./payment_routes";
 import ConsultationRouter from "./consultation_routes";
 import SupportRouter from "./support_routes";
+import BalanceRoutes from "./balance_routes";
 
 export default class Router {
 
@@ -16,6 +17,7 @@ export default class Router {
         router.use("/", PaymentRouter);
         router.use("/consultation", new ConsultationRouter().router);
         router.use("/", new SupportRouter().router);
+        router.use("/", new BalanceRoutes().router);
         this.router = router;
     }
 

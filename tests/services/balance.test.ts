@@ -114,11 +114,11 @@ describe("Test Balance Services", () => {
     test("should use this_month option", async () => {
         //* Arrange
         const now = new Date();
-        const d1 = new Date(now.getFullYear(), now.getMonth() - 1, 20);
-        const d2 = new Date(now.getFullYear(), now.getMonth() - 1,  13);
-        const d3 = new Date(now.getFullYear(), now.getMonth() - 1,  6);
-        const d4 = new Date(now.getFullYear(), now.getMonth() + 1,  19);
-        const d5 = new Date(now.getFullYear(), now.getMonth() - 10,  12);
+        const d1 = new Date(now.getFullYear(), now.getMonth(), 20);
+        const d2 = new Date(now.getFullYear(), now.getMonth(), 13);
+        const d3 = new Date(now.getFullYear(), now.getMonth(), 6);
+        const d4 = new Date(now.getFullYear(), now.getMonth() + 1, 19);
+        const d5 = new Date(now.getFullYear(), now.getMonth() - 10, 12);
 
         const t1 = await TransactionModel.create({ ...sampleTransaction, date: d1 });
         const t2 = await TransactionModel.create({ ...sampleTransaction, date: d2 });
@@ -126,13 +126,15 @@ describe("Test Balance Services", () => {
         const t4 = await TransactionModel.create({ ...sampleTransaction, date: d4 });
         const t5 = await TransactionModel.create({ ...sampleTransaction, date: d5 });
 
-        const { _id } = await User.create({ ...sampleUser, transactionHistory: [
-            t1._id,
-            t2._id,
-            t3._id,
-            t4._id,
-            t5._id,
-            ] });
+        const { _id } = await User.create({
+            ...sampleUser, transactionHistory: [
+                t1._id,
+                t2._id,
+                t3._id,
+                t4._id,
+                t5._id,
+            ]
+        });
 
         //* Act
         const data = await BalanceServices.getBalance(_id, true, { period: "this_month" });
@@ -155,9 +157,9 @@ describe("Test Balance Services", () => {
         const now = new Date();
         const d1 = new Date();
         const d2 = new Date();
-        const d3 = new Date(now.getFullYear(), now.getMonth() - 1,  now.getDay() + 7);
-        const d4 = new Date(now.getFullYear(), now.getMonth() - 1,  now.getDay() + 11);
-        const d5 = new Date(now.getFullYear(), now.getMonth() - 10,  now.getDay() + 2);
+        const d3 = new Date(now.getFullYear(), now.getMonth() - 1, now.getDay() + 7);
+        const d4 = new Date(now.getFullYear(), now.getMonth() - 1, now.getDay() + 11);
+        const d5 = new Date(now.getFullYear(), now.getMonth() - 10, now.getDay() + 2);
 
         const t1 = await TransactionModel.create({ ...sampleTransaction, date: d1 });
         const t2 = await TransactionModel.create({ ...sampleTransaction, date: d2 });
@@ -165,13 +167,15 @@ describe("Test Balance Services", () => {
         const t4 = await TransactionModel.create({ ...sampleTransaction, date: d4 });
         const t5 = await TransactionModel.create({ ...sampleTransaction, date: d5 });
 
-        const { _id } = await User.create({ ...sampleUser, transactionHistory: [
+        const { _id } = await User.create({
+            ...sampleUser, transactionHistory: [
                 t1._id,
                 t2._id,
                 t3._id,
                 t4._id,
                 t5._id,
-            ] });
+            ]
+        });
 
         //* Act
         const data = await BalanceServices.getBalance(_id, true, { period: "this_week" });
@@ -191,8 +195,8 @@ describe("Test Balance Services", () => {
         //* Arrange
         const now = new Date();
         const d1 = new Date(now.getFullYear(), 1, 20);
-        const d2 = new Date(now.getFullYear(), 11,  13);
-        const d3 = new Date(now.getFullYear(), 7,   7);
+        const d2 = new Date(now.getFullYear(), 11, 13);
+        const d3 = new Date(now.getFullYear(), 7, 7);
         const d4 = new Date(now.getFullYear() + 1, 1, 3);
         const d5 = new Date(now.getFullYear() - 10, 3, 5);
 
@@ -202,13 +206,15 @@ describe("Test Balance Services", () => {
         const t4 = await TransactionModel.create({ ...sampleTransaction, date: d4 });
         const t5 = await TransactionModel.create({ ...sampleTransaction, date: d5 });
 
-        const { _id } = await User.create({ ...sampleUser, transactionHistory: [
+        const { _id } = await User.create({
+            ...sampleUser, transactionHistory: [
                 t1._id,
                 t2._id,
                 t3._id,
                 t4._id,
                 t5._id,
-            ] });
+            ]
+        });
 
         //* Act
         const data = await BalanceServices.getBalance(_id, true, { period: "this_year" });
@@ -229,8 +235,8 @@ describe("Test Balance Services", () => {
         //* Arrange
         const now = new Date();
         const d1 = new Date(2011, 1, 20);
-        const d2 = new Date(2011, 11,  13);
-        const d3 = new Date(2011, 7,   7);
+        const d2 = new Date(2011, 11, 13);
+        const d3 = new Date(2011, 7, 7);
         const d4 = new Date(now.getFullYear() + 1, 1, 3);
         const d5 = new Date(now.getFullYear() - 1, 3, 5);
 
@@ -240,13 +246,15 @@ describe("Test Balance Services", () => {
         const t4 = await TransactionModel.create({ ...sampleTransaction, date: d4 });
         const t5 = await TransactionModel.create({ ...sampleTransaction, date: d5 });
 
-        const { _id } = await User.create({ ...sampleUser, transactionHistory: [
+        const { _id } = await User.create({
+            ...sampleUser, transactionHistory: [
                 t1._id,
                 t2._id,
                 t3._id,
                 t4._id,
                 t5._id,
-            ] });
+            ]
+        });
 
         //* Act
         const data = await BalanceServices.getBalance(_id, true, { period: "x_year", periodPayload: 2011 });
@@ -267,8 +275,8 @@ describe("Test Balance Services", () => {
         //* Arrange
         const now = new Date();
         const d1 = new Date(now.getFullYear(), 2, 20);
-        const d2 = new Date(now.getFullYear(), 2,  13);
-        const d3 = new Date(now.getFullYear(), 2,   7);
+        const d2 = new Date(now.getFullYear(), 2, 13);
+        const d3 = new Date(now.getFullYear(), 2, 7);
         const d4 = new Date(now.getFullYear(), 1, 3);
         const d5 = new Date(now.getFullYear(), 6, 5);
 
@@ -278,13 +286,15 @@ describe("Test Balance Services", () => {
         const t4 = await TransactionModel.create({ ...sampleTransaction, date: d4 });
         const t5 = await TransactionModel.create({ ...sampleTransaction, date: d5 });
 
-        const { _id } = await User.create({ ...sampleUser, transactionHistory: [
+        const { _id } = await User.create({
+            ...sampleUser, transactionHistory: [
                 t1._id,
                 t2._id,
                 t3._id,
                 t4._id,
                 t5._id,
-            ] });
+            ]
+        });
 
         //* Act
         const data = await BalanceServices.getBalance(_id, true, { period: "x_month", periodPayload: 3 });

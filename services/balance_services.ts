@@ -25,8 +25,8 @@ export default class BalanceServices {
             const now = new Date();
             switch (opts.period) {
                 case "this_month":
-                    startPeriodDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                    endPeriodDate = new Date(now.getFullYear(), now.getMonth(), 0);
+                    startPeriodDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endPeriodDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                     break;
                 case "this_week":
                     startPeriodDate = new Date(now.setDate(now.getDate() - now.getDay()));
@@ -79,7 +79,6 @@ export default class BalanceServices {
             history: u.transactionHistory as ITransactionModel[],
         }
     }
-
 }
 
 // ––– TYPES ––––––––––––––––––––––––

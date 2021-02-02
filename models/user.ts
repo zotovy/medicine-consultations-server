@@ -151,7 +151,7 @@ const UserSchema = new Schema({
     transactionHistory: [
         {
             type: mongoose.Types.ObjectId,
-            ref: "TransactionModel",
+            ref: "Transaction",
             required: true,
             default: [],
         },

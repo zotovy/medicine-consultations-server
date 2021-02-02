@@ -43,4 +43,4 @@ const TransactionModel = new Schema({
     }
 });
 
-export default model<ITransactionModel>("TransactionModel", TransactionModel);
+export default model<ITransactionModel>("Transaction", TransactionModel);
