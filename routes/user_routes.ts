@@ -40,7 +40,7 @@ export default class UserRoutes implements BaseRouter {
         router.post("/send-reset-password-email", UserRoutes.sendResetPasswordEmail);
         router.get("/user/:id/reviews", UserRoutes.getReviews);
         router.post("/user/:id/update-password", token_services.authenticateToken, UserRoutes.updatePassword);
-        router.get("/user/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(true));
+        router.get("/user/get-appoints-dates/:date", token_services.authenticateToken, UserRoutes.getAppointsDatesByMonth(true));
         router.get("/user/:id/appoints", token_services.authenticateToken, UserRoutes.getAppoints(true));
         router.get("/user/:id/appoints-requests", token_services.authenticateToken, UserRoutes.getAppointsRequests(true));
         this.router = router;
@@ -480,7 +480,7 @@ export default class UserRoutes implements BaseRouter {
         return res.status(response.success ? 202 : 400).json(response);
     }
 
-    public static getConsultationsDatesByMonth: (isUser: boolean ) => IRouteHandler = (isUser) => async (req, res) => {
+    public static getAppointsDatesByMonth: (isUser: boolean ) => IRouteHandler = (isUser) => async (req, res) => {
         const schema = Joi.object({
             date: Joi.string().regex(new RegExp("^((0)[0-9])|((1)[0-2])(\\.)\\d{4}$")).required(), // 01.2021
         });
@@ -494,11 +494,12 @@ export default class UserRoutes implements BaseRouter {
         const amount = parseInt((req.query.amount as string) ?? NaN);
 
         let status = 200
-        const response = await consultationServices.getUserConsultationsDates(id, isUser, { date, from, amount })
+        const response = await consultationServices.getUserAppointsDates(id, isUser, { date, from, amount })
             .then((dates) => ({ success: true, dates }))
             .catch((error) => {
                 status = 500;
                 if (error === "no_user_found") status = 404;
+                logger.e("UserRoutes.getAppointsDatesByMonth:", error);
                 return { success: false, error };
             });
         return res.status(status).json(response);

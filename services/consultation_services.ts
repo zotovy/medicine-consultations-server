@@ -9,7 +9,7 @@ import {
     IConsultation,
     AppointmentObject,
     ConsultationRequestObject,
-    DoctorObject, UserObject
+    DoctorObject, UserObject, IAppointment
 } from "../types/models";
 import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
@@ -189,42 +189,42 @@ class ConsultationServices {
      * @param isUser - is giving id related to user
      * @param options - from, amount and date options
      */
-     getUserConsultationsDates = async (uid: string, isUser: boolean, options: getUserConsultationsDatesOptions = {}): Promise<Date[]> => {
-
+     getUserAppointsDates = async (uid: string, isUser: boolean, options: getUserAppointsDatesOptions = {}): Promise<Date[]> => {
         let match = {};
         if (options.date) {
             const split = options.date.split(".");
             const month = parseInt(split[0]), year = parseInt(split[1]);
             const nextMonth = `${month === 12 ? year + 1 : year}-${month === 12 ? 1 : month + 1}-01`
             match = {
-                match: { date: { $gte: `${year}-${month}-01`, $lt: nextMonth } },
+                match: { from: { $gte: `${year}-${month}-01`, $lt: nextMonth } },
             }
         }
 
         const populate: QueryPopulateOptions[] = [
-            { path: "activeConsultations", ...match, select: "date" },
-            { path: "consultations", ...match, select: "date" },
+            { path: "schedule", ...match, select: "from" },
         ];
 
         const model: Model<IUser | IDoctor> = isUser ? User : Doctor;
         const u = await model
             .findById(uid)
             .populate(populate)
-            .select("activeConsultations consultation")
+            .select("schedule")
             .skip(options.from ?? 0)
             .limit(options.amount ?? 50)
             .lean();
 
         if (!u) throw "no_user_found";
 
-        const dates: Date[] = (u.activeConsultations.concat(u.consultations))
+        console.log(u);
+
+        const dates: Date[] = u.schedule
             .map((e) => {
-                const d = (e as IConsultation).date;
+                const d = (e as IAppointment).from;
                 return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0);
             })
              .filter((date, i, array) => array.indexOf(date) === i);
 
-        logger.i("ConsultationServices.getUserConsultationsDates: successfully get consultation dates, " +
+        logger.i("ConsultationServices.getUserAppointsDates: successfully get appoints dates, " +
             `uid=${uid}, isUser=${isUser}, options = `, options, "result: ", dates);
         return dates;
     }
@@ -333,6 +333,6 @@ class ConsultationServices {
     }
 }
 
-type getUserConsultationsDatesOptions = { from?: number, amount?: number, date?: string };
+type getUserAppointsDatesOptions = { from?: number, amount?: number, date?: string };
 
 export default new ConsultationServices();

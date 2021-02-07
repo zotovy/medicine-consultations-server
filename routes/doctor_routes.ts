@@ -34,7 +34,7 @@ export default class DoctorRoutes implements BaseRouter{
         Router.post("/doctor/:doctorId/appoint/:appointId/confirm", token_services.authenticateToken, DoctorRoutes.confirmAppointRequest);
         Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
         Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
-        Router.get("/doctor/get-consultations-dates/:date", token_services.authenticateToken, UserRoutes.getConsultationsDatesByMonth(false));
+        Router.get("/doctor/get-appoints-dates/:date", token_services.authenticateToken, UserRoutes.getAppointsDatesByMonth(false));
         Router.post("/doctor/:doctorId/consultation/:consultationId/reject", token_services.authenticateToken, DoctorRoutes.rejectConsultation);
         this.router = Router;
     }
