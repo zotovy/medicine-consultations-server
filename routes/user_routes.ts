@@ -19,6 +19,7 @@ import IRouteHandler, { BaseRouter, FileRequest, IFileRouteHandler } from "../ty
 import Joi from "joi";
 import RoutesHelper from "../helpers/routes_helper";
 import { TGetAppointsServiceOptions } from "../types/services";
+import DoctorRoutes from "./doctor_routes";
 
 
 export default class UserRoutes implements BaseRouter {

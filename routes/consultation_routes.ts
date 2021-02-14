@@ -26,6 +26,7 @@ export default class ConsultationRoutes implements BaseRouter {
             ConsultationRoutes.checkUserAccess,
             ConsultationRoutes.getAppointById,
         );
+        Router.post("/appoint/:id([a-fA-F0-9]{24})/reject", tokenServices.authenticateToken, ConsultationRoutes.rejectAppoint);
         this.router = Router;
     }
 
@@ -117,6 +118,28 @@ export default class ConsultationRoutes implements BaseRouter {
             .catch(e => {
                 status = RoutesHelper.getStatus({ 404: ['not_found'] }, e);
                 _logger.e("getAppointById –", e);
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
+
+    private static rejectAppoint: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
+        const userId = req.headers.userId as string;
+
+        let status = 200;
+        const response = await consultationServices.rejectAppoint(id, userId)
+            .then(appoint => ({ success: true, appoint }))
+            .catch(e => {
+                status = RoutesHelper.getStatus(
+                    {
+                        404: ['not_found'],
+                        412: ['access_denied']
+                    },
+                    e
+                );
+                _logger.e("rejectAppoint –", e);
                 return { success: false, error: e };
             });
 

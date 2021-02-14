@@ -35,7 +35,6 @@ export default class DoctorRoutes implements BaseRouter{
         Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
         Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
         Router.get("/doctor/get-appoints-dates/:date", token_services.authenticateToken, UserRoutes.getAppointsDatesByMonth(false));
-        Router.post("/doctor/:doctorId/consultation/:consultationId/reject", token_services.authenticateToken, DoctorRoutes.rejectConsultation);
         this.router = Router;
     }
 
@@ -376,30 +375,5 @@ export default class DoctorRoutes implements BaseRouter{
         return res.status(response.success ? 500 : 202).json(response);
     }
 
-    public static rejectConsultation: IRouteHandler = async (req, res) => {
-
-        // validate id & body
-        const schema = Joi.object({
-            doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).equal(req.headers.userId),
-            consultationId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
-        });
-        const ok = RoutesHelper.JoiValidator(res, schema, req.params, "DoctorRoutes.rejectConsultation");
-        if (!ok) return;
-
-        // todo: notify user that consultation is rejected
-
-        let status = 202;
-        const response = await consultationServices.rejectConsultation(req.params.doctorId, req.params.consultationId)
-            .then(() => ({ success: true }))
-            .catch((e) => {
-                logger.e("DoctorRoutes.rejectConsultation:", e);
-                status = 500;
-                const e404 = ["consultation_not_found", "doctor_not_found", "user_not_found"];
-                if (e404.includes(e)) status = 404;
-                return { success: false, error: e };
-            });
-
-        return res.status(status).json(response);
-    }
 }
 

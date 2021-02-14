@@ -8,18 +8,22 @@ import {
     IDoctor,
     AppointmentObject,
     ConsultationRequestObject,
-    DoctorObject, UserObject, IAppointment
+    DoctorObject,
+    UserObject,
+    ConsultationObject, IConsultation, IAppointment
 } from "../types/models";
-import { Model, QueryPopulateOptions, Schema, Types } from "mongoose";
+import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
 import server from "../server";
-import logger from "../logger";
+import logger, { Logger } from "../logger";
 import Appointment from "../models/appointment";
 import ModelHelper from "../helpers/model_helper";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
 };
+
+const _logger = new Logger("ConsultationServices");
 
 class ConsultationServices {
 
@@ -229,32 +233,42 @@ class ConsultationServices {
         return dates;
     }
 
+
     /**
-     * @throws consultation_not_found
-     * @throws doctor_not_found
-     * @throws user_not_found
-     * @param uid
-     * @param id
+     * @throws not_found if no appoint found
+     * @throws access_denied if user have no access to this appoint
+     * @param id is appoint id
+     * @param userId is patient or doctor id
      */
-    public rejectConsultation = async (uid: string, id: string): Promise<void> => {
-        const consultation = await Consultation.findById(id).select("patient");
-        if (!consultation) throw "consultation_not_found";
+    public rejectAppoint = async (id: string, userId: string): Promise<void> => {
+        const appoint = await Appointment.findById(id)
+            .populate({
+                path: "consultation",
+                select: "doctor patient",
+            })
+            .select("consultation")
+            .lean();
+
+        if (!appoint) throw "not_found";
+        const consultation = appoint.consultation as IConsultation;
+
+        const uid = Types.ObjectId(userId);
+        console.log(uid, consultation.patient, consultation.doctor);
+        if (consultation.patient != uid && consultation.doctor != uid) {
+            throw "access_denied";
+        }
+
 
         const update = {
             $pull: {
-                activeConsultations: Types.ObjectId(id)
-            }
-        }
+                schedule: Types.ObjectId(appoint._id),
+            },
+        };
 
-        // Change doctor
-        const doctor = await Doctor.findByIdAndUpdate(uid, update);
-        if (!doctor) throw "doctor_not_found";
+        await User.findByIdAndUpdate(consultation.patient, update);
+        await Doctor.findByIdAndUpdate(consultation.doctor, update);
 
-        // Change user
-        const user = await User.findByIdAndUpdate(consultation.patient, update)
-        if (!user) throw "user_not_found";
-
-        logger.i("ConsultationServices.rejectConsultation: successfully reject consultation with id =", id);
+        _logger.i(`rejectAppoint – successfully reject appoint id=${appoint._id}`);
     }
 
     public getAppoints = async (id: string, isUser: boolean, options: TGetAppointsServiceOptions = {}): Promise<(AppointmentObject & { photoUrl?: string })[]> => {
@@ -380,6 +394,8 @@ class ConsultationServices {
         logger.i(`successfully get consultation requests for ${uid}`, raw.consultationRequests);
         return raw.consultationRequests as ConsultationRequestObject[];
     }
+
+
 }
 
 type getUserAppointsDatesOptions = { from?: number, amount?: number, date?: string };

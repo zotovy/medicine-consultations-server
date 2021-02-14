@@ -227,8 +227,8 @@ export interface IConsultation extends Document {
 }
 
 export interface ConsultationObject {
-    patientId: IConsultation["patient"];
-    doctorId: IConsultation["doctor"];
+    patient: IConsultation["patient"];
+    doctor: IConsultation["doctor"];
     date: IConsultation["date"];
     note?: IConsultation["note"];
     messages: IConsultation["messages"];
