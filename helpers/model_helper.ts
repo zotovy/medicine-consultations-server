@@ -1,5 +1,6 @@
 import { DoctorWorkplaceType } from "../types/models";
 import logger from "../logger";
+import { QueryPopulateOptions } from "mongoose";
 
 export default class ModelHelper {
 
@@ -36,6 +37,18 @@ export default class ModelHelper {
             }
         );
     }
+
+    public static getDoctorPublicPopulationConfig = (path = "doctor"): QueryPopulateOptions => ({
+        path,
+        select: "name surname patronymic fullName photoUrl email age sex city country experience serviceExperience " +
+            "rating schedule workPlan isChild isAdult vkLink instagramLink telegramLink whatsAppLink viberLink" +
+            "emailLink information price workPlaces education qualificationProofs workingTime"
+    })
+
+    public static getPatientPublicPopulationConfig = (path = "patient"): QueryPopulateOptions => ({
+        path,
+        select: "name surname patronymic fullName photoUrl email age sex city country"
+    })
 }
 
 export type JsonField<T> = {

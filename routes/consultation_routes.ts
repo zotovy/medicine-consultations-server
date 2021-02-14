@@ -1,12 +1,15 @@
-import { IRoute, Router as ExpressRouter } from "express";
+import { Router as ExpressRouter } from "express";
 import consultationServices from "../services/consultation_services";
 import tokenServices from "../services/token_services";
 import Consultation from "../models/consultation";
-import logger from "../logger";
+import logger, { Logger } from "../logger";
 import { IDoctor, IUser } from "../types/models";
 import User from "../models/user";
 import Doctor from "../models/doctor";
 import IRouteHandler, { BaseRouter } from "../types/routes";
+import RoutesHelper from "../helpers/routes_helper";
+
+const _logger = new Logger("ConsultationRoutes");
 
 export default class ConsultationRoutes implements BaseRouter {
 
@@ -14,9 +17,15 @@ export default class ConsultationRoutes implements BaseRouter {
 
     constructor() {
         const Router = ExpressRouter();
-        Router.post("/create", ConsultationRoutes.createConsultation);
-        Router.get("/:id", tokenServices.authenticateToken, ConsultationRoutes.getById);
-        Router.get("/user/:id", tokenServices.authenticateToken, ConsultationRoutes.getUserConsultations);
+        Router.post("/consultation/create", ConsultationRoutes.createConsultation);
+        Router.get("/consultation/:id", tokenServices.authenticateToken, ConsultationRoutes.getById);
+        Router.get("/consultation/user/:id", tokenServices.authenticateToken, ConsultationRoutes.getUserConsultations);
+        Router.get(
+            "/appoint/:appointId([a-fA-F0-9]{24})",
+            tokenServices.authenticateToken,
+            ConsultationRoutes.checkUserAccess,
+            ConsultationRoutes.getAppointById,
+        );
         this.router = Router;
     }
 
@@ -99,5 +108,33 @@ export default class ConsultationRoutes implements BaseRouter {
         });
     }
 
+    private static getAppointById: IRouteHandler = async (req, res) => {
+        const { appointId } = req.params;
+
+        let status = 200;
+        const response = await consultationServices.getAppointById(appointId)
+            .then(appoint => ({ success: true, appoint }))
+            .catch(e => {
+                status = RoutesHelper.getStatus({ 404: ['not_found'] }, e);
+                _logger.e("getAppointById –", e);
+                return { success: false, error: e };
+            });
+
+        return res.status(status).json(response);
+    }
+
+    // ---- Middleware --------------------------
+
+    // NOTE: key of Appoint id must be "appointId"
+    // NOTE: should be used only on authorized routes
+    private static checkUserAccess: IRouteHandler = async (req, res, next) => {
+        const { appointId } = req.params;
+        const { userId } = req.headers;
+        if (!await consultationServices.canUserAccessAppoint(appointId, userId as string)) return res.status(412).json({
+            success: false,
+            error: "access_denied",
+        });
+        return next();
+    }
 }
 

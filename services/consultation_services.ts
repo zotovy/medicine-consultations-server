@@ -6,15 +6,16 @@ import { ConsultationValidationSchema, TGetAppointsServiceOptions } from "../typ
 import {
     IUser,
     IDoctor,
-    IConsultation,
     AppointmentObject,
     ConsultationRequestObject,
     DoctorObject, UserObject, IAppointment
 } from "../types/models";
-import { Model, QueryPopulateOptions, Types } from "mongoose";
+import { Model, QueryPopulateOptions, Schema, Types } from "mongoose";
 import token_services from "./token_services";
 import server from "../server";
 import logger from "../logger";
+import Appointment from "../models/appointment";
+import ModelHelper from "../helpers/model_helper";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -189,7 +190,7 @@ class ConsultationServices {
      * @param isUser - is giving id related to user
      * @param options - from, amount and date options
      */
-     getUserAppointsDates = async (uid: string, isUser: boolean, options: getUserAppointsDatesOptions = {}): Promise<Date[]> => {
+    getUserAppointsDates = async (uid: string, isUser: boolean, options: getUserAppointsDatesOptions = {}): Promise<Date[]> => {
         let match = {};
         if (options.date) {
             const split = options.date.split(".");
@@ -215,14 +216,13 @@ class ConsultationServices {
 
         if (!u) throw "no_user_found";
 
-        console.log(u);
 
         const dates: Date[] = u.schedule
             .map((e) => {
                 const d = (e as IAppointment).from;
                 return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0);
             })
-             .filter((date, i, array) => array.indexOf(date) === i);
+            .filter((date, i, array) => array.indexOf(date) === i);
 
         logger.i("ConsultationServices.getUserAppointsDates: successfully get appoints dates, " +
             `uid=${uid}, isUser=${isUser}, options = `, options, "result: ", dates);
@@ -237,14 +237,14 @@ class ConsultationServices {
      * @param id
      */
     public rejectConsultation = async (uid: string, id: string): Promise<void> => {
-         const consultation = await Consultation.findById(id).select("patient");
-         if (!consultation) throw "consultation_not_found";
+        const consultation = await Consultation.findById(id).select("patient");
+        if (!consultation) throw "consultation_not_found";
 
-         const update = {
-             $pull: {
-                 activeConsultations: Types.ObjectId(id)
-             }
-         }
+        const update = {
+            $pull: {
+                activeConsultations: Types.ObjectId(id)
+            }
+        }
 
         // Change doctor
         const doctor = await Doctor.findByIdAndUpdate(uid, update);
@@ -266,6 +266,19 @@ class ConsultationServices {
         const raw = await (isUser ? User : Doctor).findById(id).populate({
             path: "schedule",
             options: { getters: true },
+            populate: {
+                path: "consultation",
+                populate: [
+                    {
+                        path: "doctor",
+                        select: "fullName photoUrl",
+                    },
+                    {
+                        path: "patient",
+                        select: "fullName photoUrl",
+                    }
+                ],
+            },
             match: findQuery,
         }).select("schedule").lean();
 
@@ -275,10 +288,12 @@ class ConsultationServices {
             throw "not-found"
         }
 
+
         // parse documents string --> object
         for (let i = 0; i < (raw.schedule as AppointmentObject[]).length; i++) {
             if ((raw.schedule as AppointmentObject[])[i].documents) {
                 for (let j = 0; j < (raw.schedule as AppointmentObject[])[i].documents.length; j++) {
+                    if (typeof (raw.schedule as AppointmentObject[])[i].documents[j] !== "string") continue;
                     (raw.schedule as AppointmentObject[])[i].documents[j] = JSON.parse((raw.schedule as AppointmentObject[])[i].documents[j].toString());
                 }
             }
@@ -301,6 +316,32 @@ class ConsultationServices {
 
         logger.i(`successfully get consultation requests for ${id}, amount=`, raw.schedule.length)
         return appointments;
+    }
+
+    /**
+     * @throws not_found while no appoint was found
+     * @param id is a appoint id
+     */
+    public getAppointById = async (id: string): Promise<AppointmentObject> => {
+        const appoint = await Appointment.findById(id)
+            .populate([
+                ModelHelper.getDoctorPublicPopulationConfig(),
+                ModelHelper.getPatientPublicPopulationConfig(),
+                "consultation"
+            ])
+            .lean()
+        if (!appoint) throw "not_found";
+        return appoint;
+    }
+
+    public canUserAccessAppoint = async (appointId: string, userId: string): Promise<boolean> => {
+        const query = {
+            _id: userId,
+            schedule: {
+                $in: [Types.ObjectId(appointId)]
+            }
+        };
+        return await User.exists(query) || await Doctor.exists(query);
     }
 
     /** This function get doctor consultation requests */
