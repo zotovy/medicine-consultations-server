@@ -331,6 +331,14 @@ class ConsultationServices {
             ])
             .lean()
         if (!appoint) throw "not_found";
+
+        if (appoint.documents) {
+            for (let j = 0; j < appoint.documents.length; j++) {
+                if (typeof appoint.documents[j] !== "string") continue;
+                appoint.documents[j] = JSON.parse(appoint.documents[j].toString());
+            }
+        }
+
         return appoint;
     }
 
