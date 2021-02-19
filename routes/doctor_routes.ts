@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import logger from "../logger";
 import { ServerError } from "../types/errors";
 import encoder from "./encoder";
-import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/sympthoms";
+import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/symptoms";
 import { DoctorObject, DoctorWorkingType } from "../types/models";
 import { TGetAppointsServiceOptions, translateSpeciality } from "../types/services";
 import token_services from "../services/token_services";

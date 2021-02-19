@@ -11,6 +11,7 @@ import ApiRouter from "./routes";
 import * as Sentry from "@sentry/node";
 import SocketServices from "./services/socket_services";
 import fileUpload from "express-fileupload";
+import NotificationServices from "./services/notification_services";
 
 class Server {
     app: Express;
@@ -29,6 +30,7 @@ class Server {
         this.server = https.createServer({});
         this.io = socketio();
         this.useSentry = useSentry;
+        NotificationServices.setup();
     }
 
     setupDatabase = async (): Promise<void> => {

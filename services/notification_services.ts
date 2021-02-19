@@ -1,12 +1,9 @@
 import ejs from "ejs";
 import Mail from "nodemailer/lib/mailer";
 import nodemailer from "nodemailer";
-import User from "../models/User";
-import Doctor from "../models/Doctor";
 import { Logger } from "../logger";
 import { AppointmentObject, IAppointment, IConsultation, IDoctor, IUser } from "../types/models";
 import Appointment from "../models/appointment";
-import appointment from "../models/appointment";
 import FormatHelper from "../helpers/format_helper";
 
 const logger = new Logger("NotificationServices: ");
@@ -27,7 +24,7 @@ export default class NotificationServices {
 
     private static async sendEmail(email: string, title: string, content: string): Promise<void> {
         const opts: Mail.Options = {
-            text: content,
+            html: content,
             from: NotificationServices.sender,
             to: email,
             subject: title,
@@ -48,24 +45,25 @@ export default class NotificationServices {
     }
 
     private static get templates() {
-        return "../assets/templates/";
+        return "./assets/templates/";
     }
 
     private static async getAppoint(id: string): Promise<QueriedAppointObject> {
-        const appoint =  await Appointment.findById(id).populate({
-            consultation: {
-                path: [
+        const appoint =  await Appointment.findById(id).populate([
+            {
+                path: "consultation",
+                populate: [
                     {
                         path: "patient",
-                        select: "fullName email"
+                        select: "fullName email sendNotificationToEmail"
                     },
                     {
                         path: "doctor",
                         select: "fullName email",
                     }
-                ],
+                ]
             }
-        }).lean();
+        ]).lean();
 
         if (!appoint) {
             throw "appoint_not_found";
@@ -82,7 +80,7 @@ export default class NotificationServices {
         const appoint = await NotificationServices.getAppoint(appointment._id);
         const patient = appoint.consultation.patient;
 
-        const opts = {}; // todo: pass correct args to template
+        const opts = { data: 123 }; // todo: pass correct args to template
         const content = await ejs.renderFile(
             NotificationServices.templates + "doctor-confirm-appoint-notification.ejs",
             opts

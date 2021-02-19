@@ -40,7 +40,7 @@ import userServices from "./user_services";
 import consultationServices from "./consultation_services";
 import { consistingOf, IDoctorToDoctorObj, validateByEnum, } from "./types_services";
 import logger from "../logger";
-import { BodyPartsToSpecialities, EBodyParts } from "../types/sympthoms";
+import { BodyPartsToSpecialities, EBodyParts } from "../types/symptoms";
 import { ConsultationRequest } from "../models/consultation";
 
 class DoctorServices {
