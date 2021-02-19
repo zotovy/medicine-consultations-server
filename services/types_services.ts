@@ -244,8 +244,8 @@ export const IConsultationToConsultationObj = (
 ): ConsultationObject => {
     return {
         date: e.date,
-        doctorId: e.doctor,
-        patientId: e.patient,
+        doctor: e.doctor,
+        patient: e.patient,
         note: e.note,
         connected: e.connected,
         messages: e.messages,

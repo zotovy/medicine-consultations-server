@@ -11,6 +11,15 @@ class FormatHelper {
         return fullName;
     }
 
+    /// Return formatted time in MM:HH format
+    static time = (date: Date): string => {
+        let minutes = date.getMinutes().toString(),
+            hours = date.getHours().toString();
+        if (minutes.length === 1) minutes = "0" + minutes;
+        if (hours.length === 1) hours = "0" + hours;
+        return `${minutes}:${hours}`;
+    }
+
 }
 
 export default FormatHelper;

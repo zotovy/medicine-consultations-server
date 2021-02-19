@@ -291,6 +291,7 @@ export interface IAppointment extends Document {
 }
 
 export interface AppointmentObject {
+    _id: string;
     from: IAppointment["from"];
     to: IAppointment["to"];
     consultation: IAppointment["consultation"];
