@@ -42,6 +42,7 @@ import { consistingOf, IDoctorToDoctorObj, validateByEnum, } from "./types_servi
 import logger from "../logger";
 import { BodyPartsToSpecialities, EBodyParts } from "../types/symptoms";
 import { ConsultationRequest } from "../models/consultation";
+import Review from "../models/review";
 
 class DoctorServices {
     // constructor() {
@@ -793,6 +794,45 @@ class DoctorServices {
     public updatePrice = async (id: string, price: number): Promise<void> => {
         await Doctor.findByIdAndUpdate(id, { price });
         logger.i(`update doctor (${id}) price to`, price);
+    }
+
+    public checkCanUserWriteReview = async (uid: string, consultationId: string) => {
+        // get consultation
+        const consultation = await Consultation.findById(consultationId).select("patient createdAt");
+    }
+
+    /**
+     * @throws invalid_rating_format if not 0<=point<=5
+     * @throws no_user_found invalid user id passed
+     * @throws no_doctor_found invalid doctor id passed
+     */
+    public writeReview = async (uid: string, doctorId: string, content: string, point: number) => {
+        if (point < 0 || point > 5) throw "invalid_rating_format";
+
+        // Create review obj
+        const review = await Review.create({
+            content,
+            doctorId: doctorId,
+            patientId: uid,
+            point,
+            timestamp: new Date(),
+        });
+
+        // update patient and doctor
+        const query = {
+            push: {
+                review: review._id as Types.ObjectId,
+            }
+        }
+
+        await User.findByIdAndUpdate(uid, query).then(u => {
+            if (!u) throw "no_user_found";
+        });
+        await Doctor.findByIdAndUpdate(uid, query).then(u => {
+            if (!u) throw "no_doctor_found";
+        });
+
+        logger.i(`successfully write review to ${doctorId} from ${uid}`);
     }
 }
 
