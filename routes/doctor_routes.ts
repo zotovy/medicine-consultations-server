@@ -7,13 +7,12 @@ import { ServerError } from "../types/errors";
 import encoder from "./encoder";
 import symptoms, { BodyParts, BodyPartsToSpecialities } from "../types/symptoms";
 import { DoctorObject, DoctorWorkingType } from "../types/models";
-import { TGetAppointsServiceOptions, translateSpeciality } from "../types/services";
+import { translateSpeciality } from "../types/services";
 import token_services from "../services/token_services";
 import Ajv from "ajv";
 import IRouteHandler, { BaseRouter } from "../types/routes";
 import ValidationHelper from "../helpers/validation_helper";
 import RoutesHelper from "../helpers/routes_helper";
-import consultationServices from "../services/consultation_services";
 import UserRoutes from "./user_routes";
 
 export default class DoctorRoutes implements BaseRouter{
@@ -35,6 +34,7 @@ export default class DoctorRoutes implements BaseRouter{
         Router.post("/doctor/:doctorId/appoint/:appointId/reject", token_services.authenticateToken, DoctorRoutes.rejectAppointRequest);
         Router.post("/doctor/:id/update-working-time", token_services.authenticateToken, DoctorRoutes.updateWorkingTime);
         Router.get("/doctor/get-appoints-dates/:date", token_services.authenticateToken, UserRoutes.getAppointsDatesByMonth(false));
+        Router.post("/doctor/:id([a-fA-F0-9]{24})/review", token_services.authenticateToken, DoctorRoutes.writeReview);
         this.router = Router;
     }
 
@@ -375,5 +375,34 @@ export default class DoctorRoutes implements BaseRouter{
         return res.status(response.success ? 500 : 202).json(response);
     }
 
+    private static writeReview: IRouteHandler = async (req, res) => {
+        const schema = Joi.object({
+            userId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+            doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+            content: Joi.string().min(1).max(1024).required(),
+            point: Joi.number().min(0).max(5).required(),
+        });
+
+        // Check received body data
+        const validation = schema.validate(req.body);
+        if (validation.error) {
+            logger.i("writeReview – not validated", validation.error);
+            return res.status(400).json({ success: false, error: "not_validated" });
+        }
+
+        // save review
+        let status = 201;
+        const response = await doctorServices.writeReview(req.body.userId, req.body.doctorId, req.body.content, req.body.point)
+            .then(() => {
+                logger.i("save review for", req.body);
+                return { success: true };
+            })
+            .catch((e) => {
+               status = RoutesHelper.getStatus({ 404: ["no_user_found", "no_doctor_found"] }, e);
+               logger.e("error while save review", req.body, e);
+            });
+
+        return res.status(status).json(response);
+    }
 }
 

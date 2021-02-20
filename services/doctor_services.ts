@@ -818,17 +818,20 @@ class DoctorServices {
             timestamp: new Date(),
         });
 
+        // todo: сделать так чтобы пользователь не мог писать отзыв по 10 раз за одну консультацию
+        // todo: связать объект консультации и отзыва Many to Many
+
         // update patient and doctor
         const query = {
-            push: {
-                review: review._id as Types.ObjectId,
+            $push: {
+                reviews: review._id as Types.ObjectId,
             }
         }
 
-        await User.findByIdAndUpdate(uid, query).then(u => {
+        await User.findByIdAndUpdate(uid, query, { new: true }).select("_id").then(u => {
             if (!u) throw "no_user_found";
         });
-        await Doctor.findByIdAndUpdate(uid, query).then(u => {
+        await Doctor.findByIdAndUpdate(doctorId, query, { new: true }).select("_id").then(u => {
             if (!u) throw "no_doctor_found";
         });
 
