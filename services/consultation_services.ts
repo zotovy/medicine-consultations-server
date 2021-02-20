@@ -10,7 +10,8 @@ import {
     ConsultationRequestObject,
     DoctorObject,
     UserObject,
-    ConsultationObject, IConsultation, IAppointment
+    IConsultation,
+    IAppointment
 } from "../types/models";
 import { Model, QueryPopulateOptions, Types } from "mongoose";
 import token_services from "./token_services";
@@ -18,6 +19,7 @@ import server from "../server";
 import logger, { Logger } from "../logger";
 import Appointment from "../models/appointment";
 import ModelHelper from "../helpers/model_helper";
+import doctorServices from "../services/doctor_services";
 
 const throwInvalidError = (): { _id: any } => {
     throw "invalid_error";
@@ -49,9 +51,7 @@ class ConsultationServices {
         return String(_id);
     };
 
-    connect = async (
-        socket: SocketIO.Socket
-    ): Promise<{ room: string; uid: string }> => {
+    connect = async (socket: SocketIO.Socket): Promise<{ room: string; uid: string }> => {
         const {
             consultationId,
             userId,
@@ -170,6 +170,16 @@ class ConsultationServices {
         socket.on("disconnect", () => {
             this.connectedAmount[room] -= 1;
             socket.to(`consultation-${consultationId}`).emit("disconnected", socket.id);
+        });
+
+        socket.on("start-consultation", (consultationId: string, doctorId: string) => {
+            doctorServices.startConsultation(consultationId, doctorId);
+            socket.to(`consultation-${consultationId}`).emit("start-consultation");
+        });
+
+        socket.on("finish-consultation", (consultationId: string, doctorId: string) => {
+            doctorServices.finishConsultation(consultationId, doctorId);
+            socket.to(`consultation-${consultationId}`).emit("finish-consultation");
         });
 
         return {

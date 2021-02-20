@@ -854,7 +854,7 @@ class DoctorServices {
     /**
      * @throws "not_found" if no consultation found or invalid doctorId
      */
-    public static async finishConsultation(consultationId: string, doctorId: string) {
+    public async finishConsultation(consultationId: string, doctorId: string) {
         await DoctorServices.changeConsultationStatus(consultationId, doctorId, "finished")
         logger.i(`finished ${consultationId} consultation`);
     }
@@ -862,7 +862,7 @@ class DoctorServices {
     /**
      * @throws "not_found" if no consultation found or invalid doctorId
      */
-    public static async startConsultation(consultationId: string, doctorId: string) {
+    public async startConsultation(consultationId: string, doctorId: string) {
         await DoctorServices.changeConsultationStatus(consultationId, doctorId, "started")
         logger.i(`start ${consultationId} consultation`);
     }
