@@ -25,6 +25,12 @@ const Consultation = new Schema({
         type: [{}],
         default: [],
     },
+    status: {
+        type: String,
+        enum: ["not_started", "waiting_for_doctor", "started", "finished"],
+        required: true,
+        default: "not_started",
+    },
     connected: [
         {
             type: Types.ObjectId,
