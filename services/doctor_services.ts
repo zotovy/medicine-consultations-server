@@ -834,6 +834,38 @@ class DoctorServices {
 
         logger.i(`successfully write review to ${doctorId} from ${uid}`);
     }
+
+    /**
+     * @throws "not_found" if no consultation found or invalid doctorId
+     */
+    private static async changeConsultationStatus(consultationId: string, doctorId: string, status: string) {
+        const consultation = await Consultation.findOneAndUpdate(
+            {
+                _id: consultationId,
+                doctor: doctorId,
+            },
+            {
+                status: "finished",
+            }
+        );
+        if (!consultation) throw "not_found";
+    }
+
+    /**
+     * @throws "not_found" if no consultation found or invalid doctorId
+     */
+    public static async finishConsultation(consultationId: string, doctorId: string) {
+        await DoctorServices.changeConsultationStatus(consultationId, doctorId, "finished")
+        logger.i(`finished ${consultationId} consultation`);
+    }
+
+    /**
+     * @throws "not_found" if no consultation found or invalid doctorId
+     */
+    public static async startConsultation(consultationId: string, doctorId: string) {
+        await DoctorServices.changeConsultationStatus(consultationId, doctorId, "started")
+        logger.i(`start ${consultationId} consultation`);
+    }
 }
 
 export default new DoctorServices();
