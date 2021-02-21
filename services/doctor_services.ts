@@ -796,9 +796,22 @@ class DoctorServices {
         logger.i(`update doctor (${id}) price to`, price);
     }
 
-    public checkCanUserWriteReview = async (uid: string, consultationId: string) => {
+    public checkCanUserWriteReview = async (uid: string, consultationId: string): Promise<boolean> => {
         // get consultation
-        const consultation = await Consultation.findById(consultationId).select("patient createdAt");
+        const consultation = await Consultation
+            .findById(consultationId)
+            .select("patient status wroteReview");
+
+        // no consultation found or user have no access to this consultation
+        if (!consultation || consultation.patient.toString() != uid) return false;
+
+        // consultation is not finished yet
+        if (consultation.status !== "finished") return false;
+
+        // user already wrote review
+        if (consultation.wroteReview) return false;
+
+        return true;
     }
 
     /**
@@ -834,6 +847,12 @@ class DoctorServices {
         await Doctor.findByIdAndUpdate(doctorId, query, { new: true }).select("_id").then(u => {
             if (!u) throw "no_doctor_found";
         });
+
+        // update consultation
+        await Consultation.findOneAndUpdate(
+            { doctor: doctorId, patient: uid },
+            { wroteReview: true },
+        );
 
         logger.i(`successfully write review to ${doctorId} from ${uid}`);
     }
