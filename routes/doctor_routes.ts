@@ -377,6 +377,7 @@ export default class DoctorRoutes implements BaseRouter{
 
     private static writeReview: IRouteHandler = async (req, res) => {
         const schema = Joi.object({
+            consultationId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
             userId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
             doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
             content: Joi.string().min(1).max(1024).required(),
@@ -388,6 +389,13 @@ export default class DoctorRoutes implements BaseRouter{
         if (validation.error) {
             logger.i("writeReview – not validated", validation.error);
             return res.status(400).json({ success: false, error: "not_validated" });
+        }
+
+        // check can user write review
+        const canWrite = await doctorServices.checkCanUserWriteReview(req.body.userId, req.body.consultationId);
+        if (!canWrite) {
+            logger.i("writeReview – user can't write this review");
+            return res.status(403).json({ success: false, error: "access_denied" });
         }
 
         // save review
