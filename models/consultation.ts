@@ -31,6 +31,11 @@ const Consultation = new Schema({
         required: true,
         default: "not_started",
     },
+    wroteReview: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     connected: [
         {
             type: Types.ObjectId,

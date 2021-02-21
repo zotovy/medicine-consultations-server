@@ -249,6 +249,8 @@ export const IConsultationToConsultationObj = (
         note: e.note,
         connected: e.connected,
         messages: e.messages,
+        status: e.status,
+        wroteReview: e.wroteReview,
     };
 };
 

@@ -225,6 +225,7 @@ export interface IConsultation extends Document {
     messages: string[];
     connected: (Types.ObjectId | IUser)[];
     status: "not_started" | "waiting_for_doctor" | "started" | "finished",
+    wroteReview: boolean,
 }
 
 export interface ConsultationObject {
@@ -235,6 +236,7 @@ export interface ConsultationObject {
     messages: IConsultation["messages"];
     connected: IConsultation["connected"];
     status: IConsultation["status"],
+    wroteReview: IConsultation["wroteReview"]
 }
 
 /**
