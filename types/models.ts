@@ -222,7 +222,7 @@ export interface IConsultation extends Document {
     doctor: Types.ObjectId | IDoctor;
     date: Date;
     note?: string;
-    messages: string[];
+    messages: { message: string, userId: string }[];
     connected: (Types.ObjectId | IUser)[];
     status: "not_started" | "waiting_for_doctor" | "started" | "finished",
     wroteReview: boolean,

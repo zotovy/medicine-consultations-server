@@ -362,7 +362,7 @@ class DoctorServices {
 
         const doctor: IDoctor | null = await Doctor.findById(id).populate([
             {
-                path: "clientsReviews",
+                path: "reviews",
                 populate: {
                     path: "patientId",
                     select: {

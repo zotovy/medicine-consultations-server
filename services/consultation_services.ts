@@ -59,6 +59,7 @@ class ConsultationServices {
             accessToken,
         } = socket.handshake.query;
 
+
         const ok = await token_services.checkToken(
             "jwt_access",
             userId,
@@ -69,7 +70,7 @@ class ConsultationServices {
 
         // Check is consultationId correct
         const consultation = await Consultation.findById(consultationId)
-            .select("date -_id patientId doctorId")
+            .select("date -_id patient doctor")
             .exec();
         ``;
 
@@ -77,8 +78,6 @@ class ConsultationServices {
         if (!consultation) throw "no_consultation_found_error";
 
         const delta = consultation.date.getTime() - new Date().getTime();
-
-        if (delta > 0 || delta < -1.08e7) throw "time_error";
 
         // Throw error if its not this user
         if (isUser == "true") {
@@ -99,7 +98,6 @@ class ConsultationServices {
                 }
             );
         } else {
-
             if (consultation.doctor != userId) throw "no_access_error";
 
             // Add ref to this consultation to doctor
@@ -141,7 +139,10 @@ class ConsultationServices {
                 { _id: consultationId },
                 {
                     $push: {
-                        messages: message,
+                        messages: {
+                            message,
+                            userId,
+                        },
                     },
                 },
                 (err: any, data: any) => {

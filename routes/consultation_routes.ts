@@ -47,7 +47,6 @@ export default class ConsultationRoutes implements BaseRouter {
 
         try {
             const consultation = await Consultation.findById(id)
-                .select("-_id -__v")
                 .populate([
                     { path: "patient", select: "fullName photoUrl _id" },
                     {
