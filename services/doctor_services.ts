@@ -5,6 +5,7 @@ import Doctor, { BecomeDoctorRequest } from "../models/doctor";
 import User from "../models/user";
 import Consultation from "../models/consultation";
 import Appointment from "../models/appointment";
+import { IConsultation } from "../types/models";
 
 // types
 import {
@@ -860,14 +861,15 @@ class DoctorServices {
     /**
      * @throws "not_found" if no consultation found or invalid doctorId
      */
-    private static async changeConsultationStatus(consultationId: string, doctorId: string, status: string) {
+    private static async changeConsultationStatus(consultationId: string, doctorId: string, status: IConsultation['status']) {
+        console.log(status);
         const consultation = await Consultation.findOneAndUpdate(
             {
                 _id: consultationId,
                 doctor: doctorId,
             },
             {
-                status: "finished",
+                status,
             }
         );
         if (!consultation) throw "not_found";

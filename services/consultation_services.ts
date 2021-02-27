@@ -168,6 +168,12 @@ class ConsultationServices {
                 .broadcast.emit("mute", status)
         );
 
+        socket.on("change-camera-status", (status) =>
+            socket
+                .to(`consultation-${consultationId}`)
+                .broadcast.emit("change-camera-status", status)
+        );
+
         socket.on("disconnect", () => {
             this.connectedAmount[room] -= 1;
             socket.to(`consultation-${consultationId}`).emit("disconnected", socket.id);
@@ -179,6 +185,7 @@ class ConsultationServices {
         });
 
         socket.on("finish-consultation", (consultationId: string, doctorId: string) => {
+            console.log("1");
             doctorServices.finishConsultation(consultationId, doctorId);
             socket.to(`consultation-${consultationId}`).emit("finish-consultation");
         });
