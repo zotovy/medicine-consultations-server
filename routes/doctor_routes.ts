@@ -392,7 +392,9 @@ export default class DoctorRoutes implements BaseRouter{
         }
 
         // check can user write review
-        const canWrite = await doctorServices.checkCanUserWriteReview(req.body.userId, req.body.consultationId);
+        const canWrite = await doctorServices.checkCanUserWriteReview(
+            req.body.userId, req.body.doctorId, req.body.consultationId
+        );
         if (!canWrite) {
             logger.i("writeReview – user can't write this review");
             return res.status(412).json({ success: false, error: "access_denied" });

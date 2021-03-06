@@ -13,19 +13,11 @@
         "postinstall": "npm run build",
         "sandbox": "set MODE=dev&&ts-node-dev --respawn ./sandbox.ts"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/PandaDEVoper/medicine-consultations-server.git"
-    },
     "keywords": [
         "express"
     ],
     "author": "panda.code",
     "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/PandaDEVoper/medicine-consultations-server/issues"
-    },
-    "homepage": "https://github.com/PandaDEVoper/medicine-consultations-server#readme",
     "dependencies": {
         "@sentry/node": "^5.20.1",
         "@types/express-fileupload": "^1.1.5",

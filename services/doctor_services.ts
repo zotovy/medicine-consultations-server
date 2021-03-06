@@ -797,14 +797,21 @@ class DoctorServices {
         logger.i(`update doctor (${id}) price to`, price);
     }
 
-    public checkCanUserWriteReview = async (uid: string, consultationId: string): Promise<boolean> => {
+    public checkCanUserWriteReview = async (uid: string, doctorId: string, consultationId: string): Promise<boolean> => {
         // get consultation
         const consultation = await Consultation
             .findById(consultationId)
-            .select("patient status wroteReview");
+            .select("patient status wroteReview date");
 
         // no consultation found or user have no access to this consultation
         if (!consultation || consultation.patient.toString() != uid) return false;
+
+        // if date is expired --> change status
+        const timeDelta = consultation.date.getTime() - new Date().getTime();
+        if (timeDelta < -10800000) {
+            consultation.status = "finished";
+            DoctorServices.changeConsultationStatus(consultationId, doctorId, "finished");
+        }
 
         // consultation is not finished yet
         if (consultation.status !== "finished") return false;
@@ -862,7 +869,6 @@ class DoctorServices {
      * @throws "not_found" if no consultation found or invalid doctorId
      */
     private static async changeConsultationStatus(consultationId: string, doctorId: string, status: IConsultation['status']) {
-        console.log(status);
         const consultation = await Consultation.findOneAndUpdate(
             {
                 _id: consultationId,

@@ -44,6 +44,7 @@ const Consultation = new Schema({
     ],
 });
 
+
 export default model<IConsultation>("Consultation", Consultation);
 
 const ConsultationRequestSchema = new Schema({
