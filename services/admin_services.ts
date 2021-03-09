@@ -146,8 +146,6 @@ class AdminServices {
                 transactionHistory: [],
             };
 
-            console.log(doctorObject);
-
             // @ts-ignore
             const doctor = await Doctor.create(doctorObject);
 
