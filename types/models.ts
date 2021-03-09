@@ -226,6 +226,7 @@ export interface IConsultation extends Document {
     status: "not_started" | "waiting_for_doctor" | "started" | "finished",
     wroteReview: boolean,
     connectionHistory: ConnectionHistoryRecord[],
+    audioRecords: string[],
 }
 
 export interface ConsultationObject {
@@ -237,6 +238,7 @@ export interface ConsultationObject {
     status: IConsultation["status"],
     wroteReview: IConsultation["wroteReview"],
     connectionHistory: IConsultation["connectionHistory"],
+    audioRecords: string[],
 }
 
 export type ConnectionHistoryRecord = {

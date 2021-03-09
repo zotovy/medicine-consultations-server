@@ -42,7 +42,11 @@ const Consultation = new Schema({
             who: {  type: Types.ObjectId, required: true },
             date: { type: Date, required: true }
         }
-    ]
+    ],
+    audioRecords: {
+        type: [String],
+        required: true,
+    },
 });
 
 
