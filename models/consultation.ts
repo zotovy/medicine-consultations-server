@@ -36,12 +36,13 @@ const Consultation = new Schema({
       required: true,
       default: false,
     },
-    connected: [
+    connectionHistory: [
         {
-            type: Types.ObjectId,
-            ref: "User",
-        },
-    ],
+            action: { type: Number, required: true }, // enum ConnectionHistoryAction
+            who: {  type: Types.ObjectId, required: true },
+            date: { type: Date, required: true }
+        }
+    ]
 });
 
 

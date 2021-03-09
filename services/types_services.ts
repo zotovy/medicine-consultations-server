@@ -10,7 +10,7 @@ import {
     IAdmin,
     AdminObj,
     IConsultation,
-    ConsultationObject, IConsultationRequest,
+    ConsultationObject
 } from "../types/models";
 import { EWorkPlan } from "../types/services";
 
@@ -238,20 +238,4 @@ export function validateByEnum<E>(array: any, e: any): Array<E> | undefined {
 
     return undefined;
 }
-
-export const IConsultationToConsultationObj = (
-    e: IConsultation
-): ConsultationObject => {
-    return {
-        date: e.date,
-        doctor: e.doctor,
-        patient: e.patient,
-        note: e.note,
-        connected: e.connected,
-        messages: e.messages,
-        status: e.status,
-        wroteReview: e.wroteReview,
-    };
-};
-
 

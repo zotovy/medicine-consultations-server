@@ -223,9 +223,9 @@ export interface IConsultation extends Document {
     date: Date;
     note?: string;
     messages: { message: string, userId: string }[];
-    connected: (Types.ObjectId | IUser)[];
     status: "not_started" | "waiting_for_doctor" | "started" | "finished",
     wroteReview: boolean,
+    connectionHistory: ConnectionHistoryRecord[],
 }
 
 export interface ConsultationObject {
@@ -234,9 +234,20 @@ export interface ConsultationObject {
     date: IConsultation["date"];
     note?: IConsultation["note"];
     messages: IConsultation["messages"];
-    connected: IConsultation["connected"];
     status: IConsultation["status"],
-    wroteReview: IConsultation["wroteReview"]
+    wroteReview: IConsultation["wroteReview"],
+    connectionHistory: IConsultation["connectionHistory"],
+}
+
+export type ConnectionHistoryRecord = {
+    action: ConnectionHistoryAction,
+    who: Types.ObjectId | IUser | IDoctor,
+    date: Date,
+}
+
+export enum ConnectionHistoryAction {
+    Connected,
+    Disconnected,
 }
 
 /**
