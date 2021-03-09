@@ -7,6 +7,7 @@ import TokenServices from "../services/token_services";
 import AdminServices from "../services/admin_services";
 import ConsultationRoutes from "./consultation_routes";
 import SupportChatSchema from "../models/support";
+import Consultation from "../models/consultation";
 
 const logger = new Logger("AdminRoutes");
 
@@ -198,7 +199,24 @@ export default class AdminRoutes implements BaseRouter {
         });
     }
 
-    private static getConsultation: IRouteHandler = ConsultationRoutes.getById;
+    private static getConsultation: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
+
+        const consultation = await Consultation.findById(id)
+            .populate([
+                { path: "patient", select: "fullName photoUrl _id" },
+                {
+                    path: "doctor",
+                    select: "fullName photoUrl _id speciality",
+                },
+            ])
+            .lean();
+
+        return res.json({
+            success: !!consultation,
+            consultation,
+        })
+    };
 
     private static confirmConsultationConflict: IRouteHandler = async (req, res) => {
         const { id } = req.params;
