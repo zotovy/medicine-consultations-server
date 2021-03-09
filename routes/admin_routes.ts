@@ -6,6 +6,7 @@ import { IAdmin } from "../types/models";
 import TokenServices from "../services/token_services";
 import AdminServices from "../services/admin_services";
 import ConsultationRoutes from "./consultation_routes";
+import SupportChatSchema from "../models/support";
 
 const logger = new Logger("AdminRoutes");
 
@@ -22,6 +23,7 @@ export default class AdminRoutes implements BaseRouter {
         router.get("/token/is-expired", AdminRoutes.checkIsTokenExpired);
         router.post("/token/update-tokens", AdminRoutes.updateTokens);
         router.get("/consultation/:id", TokenServices.authAdminToken, AdminRoutes.getConsultation);
+        router.post("/support/:id/confirm", TokenServices.authAdminToken, AdminRoutes.confirmConsultationConflict);
         this.router = router;
     }
 
@@ -196,5 +198,19 @@ export default class AdminRoutes implements BaseRouter {
     }
 
     private static getConsultation: IRouteHandler = ConsultationRoutes.getById;
+
+    private static confirmConsultationConflict: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
+
+        const chat = await SupportChatSchema.findByIdAndUpdate(id, { closed: true });
+        if (!chat) res.status(403).json({ success: false, error: "not_found" });
+
+        // todo: перевести деньги за консультацию в статус "Отклонено"
+        // todo: понизитить репутацию доктору
+        // todo: вернуть деньги на баланс пациенту
+        // todo: отправить email доктору и пациенту
+
+        return res.status(200).json({ success: true });
+    }
 }
 

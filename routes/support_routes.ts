@@ -71,7 +71,7 @@ export default class SupportRoutes implements BaseRouter {
                 consultationId: Joi.string().regex(/^[0-9a-fA-F]{24}$/)
             }),
         });
-        
+
         // validate payload
         let isPayloadOk = true;
         if (req.body.problem === "Doctor" && !idRegexp.test(req.body.payload?.consultationId)) isPayloadOk = false;

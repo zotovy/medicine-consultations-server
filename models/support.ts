@@ -50,6 +50,11 @@ const SupportChatSchema = new Schema({
     },
     payload: {
         consultationId: String,
+    },
+    closed: {
+        type: Boolean,
+        required: true,
+        default: false,
     }
 });
 
