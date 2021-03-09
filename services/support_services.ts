@@ -35,6 +35,7 @@ export default class SupportServices {
                 readByUser: true,
                 readByAdmin: false,
                 payload,
+                closed: false,
             }
         );
 
