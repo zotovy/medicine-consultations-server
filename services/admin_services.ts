@@ -34,8 +34,7 @@ class AdminServices {
     //     });
     // }
 
-    // ANCHOR: login
-    login = async (
+    static login = async (
         username: string,
         password: string
     ): Promise<TLoginAdmin> => {
@@ -76,9 +75,8 @@ class AdminServices {
         }
     };
 
-    // ANCHOR: submit become doctor requests
     //! This function have no security and do not check any admin token. Do not run this function without checking token
-    submitBecomeDoctorRequests = async (
+    static submitBecomeDoctorRequests = async (
         requestId: string
     ): Promise<TSubmitBecomeDoctorRequests> => {
         try {
@@ -93,8 +91,6 @@ class AdminServices {
                 };
             }
 
-
-            console.log(founded);
 
             // create doctor for this request
             const doctorObject: DoctorObject = {
@@ -146,7 +142,6 @@ class AdminServices {
                 transactionHistory: [],
             };
 
-            // @ts-ignore
             const doctor = await Doctor.create(doctorObject);
 
             // remove request
@@ -166,8 +161,7 @@ class AdminServices {
         }
     };
 
-    // ANCHOR: remove become doctor requests
-    removeBecomeDoctorRequest = async (id: string): Promise<boolean> => {
+    static removeBecomeDoctorRequest = async (id: string): Promise<boolean> => {
         try {
             let error;
 
@@ -187,22 +181,19 @@ class AdminServices {
         }
     };
 
-    // ANCHOR: check refresh token
-    checkAccessToken = async (
+    static checkAccessToken = async (
         adminId: string,
         token: string
     ): Promise<boolean> =>
         await tokenServices.checkToken("jwt_admin_access", adminId, token);
 
-    // ANCHOR: check refresh token
-    checkRefreshToken = async (
+    static checkRefreshToken = async (
         adminId: string,
         token: string
     ): Promise<boolean> =>
         await tokenServices.checkToken("jwt_admin_refresh", adminId, token);
 
-    // ANCHOR: is Token Exprired
-    isTokenExpired = (token: string): boolean => {
+    static isTokenExpired = (token: string): boolean => {
         const isOk = jwt.verify(
             token,
             process.env.jwt_admin_access ?? "",
@@ -218,8 +209,7 @@ class AdminServices {
         return isOk;
     };
 
-    // ANCHOR: generate new tokens
-    generateTokenAndDeleteOld = async (
+    static generateTokenAndDeleteOld = async (
         adminId: string,
         oldAccessToken: string,
         oldRefreshToken: string
@@ -258,8 +248,7 @@ class AdminServices {
         return { access, refresh };
     };
 
-    // ANCHOR: getBecomeDoctorsRequest
-    getAllBecomeDoctorsRequests = async (
+    static getAllBecomeDoctorsRequests = async (
         amount: number = 50,
         from: number = 0
     ): Promise<Array<BecomeDoctorObj>> => {
@@ -279,4 +268,4 @@ class AdminServices {
     };
 }
 
-export default new AdminServices();
+export default AdminServices;
