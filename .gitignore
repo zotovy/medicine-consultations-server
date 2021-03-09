@@ -12,4 +12,5 @@ deploy_rsa.pub
 deploy_rsa
 .idea
 /static/qualification-proofs/
+/static/consultation/
 .DS_Store
