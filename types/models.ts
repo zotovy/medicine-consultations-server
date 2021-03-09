@@ -530,9 +530,7 @@ export interface ISupportChat extends Document {
     number: number;
     readByUser: boolean;
     readByAdmin: boolean;
-    payloads?: {
-        consultationId?: string
-    }
+    payload?: SupportChatPayload;
 }
 
 export interface SupportChat {
@@ -544,7 +542,11 @@ export interface SupportChat {
     number: ISupportChat['number'];
     readByUser: ISupportChat['readByUser'];
     readByAdmin: ISupportChat['readByAdmin'];
-    payloads: ISupportChat["payloads"]
+    payload: ISupportChat["payload"]
+}
+
+export type SupportChatPayload = {
+    consultationId?: string
 }
 
 export type SupportProblemType = "Tech" | "Doctor" | "Other";

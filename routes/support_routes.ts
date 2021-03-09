@@ -7,9 +7,10 @@ import SupportServices from "../services/support_services";
 import tokenServices from "../services/token_services";
 import RoutesHelper from "../helpers/routes_helper";
 import ValidationHelper from "../helpers/validation_helper";
-import { SupportProblemArray } from "../types/models";
+import { SupportProblemArray, SupportProblemType } from "../types/models";
 
 const _logger = new Logger("SupportRoutes:");
+const idRegexp = new RegExp(/^[0-9a-fA-F]{24}$/);
 
 export default class SupportRoutes implements BaseRouter {
 
@@ -66,10 +67,17 @@ export default class SupportRoutes implements BaseRouter {
             message: Joi.string().min(1).max(4086).required(),
             isUser: Joi.boolean().default(true),
             problem: Joi.string().equal(...SupportProblemArray).required(),
+            payload: Joi.object({
+                consultationId: Joi.string().regex(/^[0-9a-fA-F]{24}$/)
+            }),
         });
+        
+        // validate payload
+        let isPayloadOk = true;
+        if (req.body.problem === "Doctor" && !idRegexp.test(req.body.payload?.consultationId)) isPayloadOk = false;
 
         const validate = schema.validate(req.body);
-        if (validate.error) {
+        if (validate.error || !isPayloadOk) {
             _logger.w("createChat validation body error", validate.error);
             return res.status(400).json({ success: false, error: "validation_error" });
         } else if (!await UserServices.exists(req.headers.userId as string).catch(() => false)) {
@@ -77,9 +85,9 @@ export default class SupportRoutes implements BaseRouter {
             return res.status(400).json({ success: false, error: "validation_error" });
         }
 
-        const { title, message, isUser, problem } = validate.value;
+        const { title, message, isUser, problem, payload } = validate.value;
         const uid = req.headers.userId as string;
-        const response = await SupportServices.createChat(uid, isUser, title, message, problem)
+        const response = await SupportServices.createChat(uid, isUser, title, message, problem, payload)
             .then(number => ({ success: true, number }))
             .catch(e => {
                 _logger.e("createChat error happened ", e);
