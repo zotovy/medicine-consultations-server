@@ -24,6 +24,7 @@ export default class AdminRoutes implements BaseRouter {
         router.post("/token/update-tokens", AdminRoutes.updateTokens);
         router.get("/consultation/:id", TokenServices.authAdminToken, AdminRoutes.getConsultation);
         router.post("/support/:id/confirm", TokenServices.authAdminToken, AdminRoutes.confirmConsultationConflict);
+        router.post("/support/:id/reject", TokenServices.authAdminToken, AdminRoutes.rejectConsultationConflict);
         this.router = router;
     }
 
@@ -208,6 +209,19 @@ export default class AdminRoutes implements BaseRouter {
         // todo: перевести деньги за консультацию в статус "Отклонено"
         // todo: понизитить репутацию доктору
         // todo: вернуть деньги на баланс пациенту
+        // todo: отправить email доктору и пациенту
+
+        return res.status(200).json({ success: true });
+    }
+
+    private static rejectConsultationConflict: IRouteHandler = async (req, res) => {
+        const { id } = req.params;
+
+        const chat = await SupportChatSchema.findByIdAndUpdate(id, { closed: true });
+        if (!chat) res.status(403).json({ success: false, error: "not_found" });
+
+        // todo: перевести деньги за консультацию в статус "Подтверждено"
+        // todo: повысить репутацию доктору
         // todo: отправить email доктору и пациенту
 
         return res.status(200).json({ success: true });
