@@ -42,7 +42,7 @@ export default class ConsultationRoutes implements BaseRouter {
         return res.status(status).json(body);
     }
 
-    private static getById: IRouteHandler = async (req, res) => {
+    public static getById: IRouteHandler = async (req, res) => {
         const { id } = req.params;
 
         try {
