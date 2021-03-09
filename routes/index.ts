@@ -13,7 +13,7 @@ export default class Router {
         const router = express.Router();
         router.use("/", new UserRouter().router);
         router.use("/", new DoctorRouter().router);
-        router.use("/admin", AdminRouter);
+        router.use("/admin", new AdminRouter().router);
         router.use("/", PaymentRouter);
         router.use("/", new ConsultationRouter().router);
         router.use("/", new SupportRouter().router);
