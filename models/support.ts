@@ -47,6 +47,9 @@ const SupportChatSchema = new Schema({
         type: Boolean,
         required: true,
         default: true,
+    },
+    payloads: {
+        consultationId: String,
     }
 });
 
