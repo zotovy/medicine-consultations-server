@@ -119,10 +119,18 @@ export default class NotificationServices {
         const appoint = await NotificationServices.getAppoint(appointment._id);
         const patient = appoint.consultation.patient;
 
-        const opts = {}; // todo: pass correct args to template
+        const data = {
+            header_title: "Консультация отклонена",
+            content_title: `Добрый день, ${appoint.consultation.patient.name}!`,
+            content_subtitle: `Доктор отказался от консультации с Вами.`,
+            content_button_text: "Найти нового врача",
+            content_button_href: `https://healthy-mountains.ru/find-doctor`,
+            content_paragraph: `Консультацию ${FormatHelper.formatDate(appoint.from)} была отклонена доктором. 
+                               Вы можете найти нового доктора и повторно записатся на консультацию`,
+        };
         const content = await ejs.renderFile(
             NotificationServices.templates + "doctor-confirm-appoint-notification.ejs", // todo: change template
-            opts
+            data
         );
 
         // Check if we can send notification
@@ -144,10 +152,18 @@ export default class NotificationServices {
         const appoint = await NotificationServices.getAppoint(appointment._id);
         const patient = appoint.consultation.patient;
 
-        const opts = {}; // todo: pass correct args to template
+        const data = {
+            header_title: "Уведомление о консультации",
+            content_title: `Добрый день, ${appoint.consultation.patient.name}!`,
+            content_subtitle: `Завтра у вас назначена консультацию.`,
+            content_button_text: "Подключиться",
+            content_button_href: `https://healthy-mountains.ru/consultation/${appoint._id}`,
+            content_paragraph: `У вас назначена консультация ${FormatHelper.formatDate(appoint.from)}.
+                                Вы сможете подключится к ней из личного кабинета когда она начнется.`,
+        };
         const content = await ejs.renderFile(
             NotificationServices.templates + "doctor-confirm-appoint-notification.ejs", // todo: change template
-            opts
+            data
         );
 
         // Check if we can send notification
@@ -173,10 +189,18 @@ export default class NotificationServices {
         const appoint = await NotificationServices.getAppoint(appointment._id);
         const patient = appoint.consultation.patient;
 
-        const opts = {}; // todo: pass correct args to template
+        const data = {
+            header_title: "Консультация началась",
+            content_title: `Добрый день, ${appoint.consultation.patient.name}!`,
+            content_subtitle: `Консультация началась!`,
+            content_button_text: "Подключиться",
+            content_button_href: `https://healthy-mountains.ru/consultation/${appoint._id}`,
+            content_paragraph: `Консультация ${FormatHelper.formatDate(appoint.from)} уже началась!
+                                Скорее подключайтесь, доктор уже ожидает Вас.`,
+        };
         const content = await ejs.renderFile(
             NotificationServices.templates + "doctor-confirm-appoint-notification.ejs", // todo: change template
-            opts
+            data
         );
 
         // Check if we can send notification
