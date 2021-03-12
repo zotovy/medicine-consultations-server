@@ -5,6 +5,7 @@ import { Logger } from "../logger";
 import { AppointmentObject, IAppointment, IConsultation, IDoctor, IUser } from "../types/models";
 import Appointment from "../models/appointment";
 import FormatHelper from "../helpers/format_helper";
+import { Schema } from "mongoose";
 
 const logger = new Logger("NotificationServices: ");
 
@@ -48,14 +49,18 @@ export default class NotificationServices {
         return "./assets/templates/";
     }
 
-    private static async getAppoint(id: string): Promise<QueriedAppointObject> {
-        const appoint =  await Appointment.findById(id).populate([
+    private static async getAppoint(appointment: SomeAppoint): Promise<QueriedAppointObject> {
+
+        let id: string = appointment as string;
+        if (typeof appointment !== "string") id = appointment._id;
+
+        const appoint = await Appointment.findById(id).populate([
             {
                 path: "consultation",
                 populate: [
                     {
                         path: "patient",
-                        select: "fullName email sendNotificationToEmail"
+                        select: "fullName name email sendNotificationToEmail"
                     },
                     {
                         path: "doctor",
@@ -76,14 +81,22 @@ export default class NotificationServices {
      * send email to patient that a doctor confirm his appoint
      * @throws appoint_not_found if invalid appoint was received
      */
-    public static async sendDoctorConfirmAppointNotification(appointment: AppointmentObject | IAppointment) {
-        const appoint = await NotificationServices.getAppoint(appointment._id);
+    public static async sendDoctorConfirmAppointNotification(appointment: SomeAppoint) {
+        const appoint = await NotificationServices.getAppoint(appointment);
         const patient = appoint.consultation.patient;
 
-        const opts = { data: 123 }; // todo: pass correct args to template
+        const data = {
+            header_title: "Консультация подтверждена",
+            content_title: `Добрый день, ${appoint.consultation.patient.name}!`,
+            content_subtitle: `Доктор подтвердил Вашу консультацию.`,
+            content_button_text: "Подключится к консультации",
+            content_button_href: `https://healthy-mountains.ru/consultation/${appoint._id}`,
+            content_paragraph: `Консультацию в ${appoint.from.toLocaleString()} была подтверждена доктором. 
+                               Вы сможете подключится к ней когда она начнется из своего личного кабинета`,
+        };
         const content = await ejs.renderFile(
-            NotificationServices.templates + "doctor-confirm-appoint-notification.ejs",
-            opts
+            NotificationServices.templates + "template.ejs",
+            data
         );
 
         // Check if we can send notification
@@ -189,4 +202,6 @@ interface QueriedConsultationObject extends IConsultation {
     patient: IUser,
     doctor: IDoctor,
 }
+
+type SomeAppoint = AppointmentObject | IAppointment | string;
 
