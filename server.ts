@@ -31,7 +31,7 @@ class Server {
         this.io = socketio();
         this.useSentry = useSentry;
         NotificationServices.setup();
-        NotificationServices.sendDoctorConfirmAppointNotification("5fe2416b48bf55911a5824e6")
+        // NotificationServices.sendDoctorConfirmAppointNotification("5fe2416b48bf55911a5824e6")
     }
 
     setupDatabase = async (): Promise<void> => {

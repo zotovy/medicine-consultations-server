@@ -60,11 +60,11 @@ export default class NotificationServices {
                 populate: [
                     {
                         path: "patient",
-                        select: "fullName name email sendNotificationToEmail"
+                        select: "fullName name notificationEmail sendNotificationToEmail"
                     },
                     {
                         path: "doctor",
-                        select: "fullName email",
+                        select: "fullName notificationEmail",
                     }
                 ]
             }
@@ -91,7 +91,7 @@ export default class NotificationServices {
             content_subtitle: `Доктор подтвердил Вашу консультацию.`,
             content_button_text: "Подключится к консультации",
             content_button_href: `https://healthy-mountains.ru/consultation/${appoint._id}`,
-            content_paragraph: `Консультацию в ${appoint.from.toLocaleString()} была подтверждена доктором. 
+            content_paragraph: `Консультацию ${FormatHelper.formatDate(appoint.from)} была подтверждена доктором. 
                                Вы сможете подключится к ней когда она начнется из своего личного кабинета`,
         };
         const content = await ejs.renderFile(
@@ -105,9 +105,10 @@ export default class NotificationServices {
             return;
         }
 
-        NotificationServices.sendEmail(patient.email, "Доктор подтвердил консультацию!", content).then(() => {
-            logger.i(`successfully send email to patient ${patient._id} that a doctor confirm his appoint`);
-        })
+        NotificationServices.sendEmail(patient.notificationEmail, "Доктор подтвердил консультацию!", content)
+            .then(() => {
+                logger.i(`successfully send email to patient ${patient._id} that a doctor confirm his appoint`);
+            })
     }
 
     /**
